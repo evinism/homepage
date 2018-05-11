@@ -36,7 +36,7 @@ class App extends React.Component {
     return (
       <div onKeyPress={this.handleKeypress}>
         <h3>OS version: { os && os.version() }</h3>
-        {this.state.output}
+        <pre>{this.state.output}</pre>
         <button
           ref={this.setButtonRef} 
           autoFocus 

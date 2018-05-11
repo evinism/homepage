@@ -24,7 +24,7 @@ export class TextFile {
   }
 
   read(cb) {
-    cb(content, true);
+    cb(this.content, true);
   }
 
   write(content, cb) {
