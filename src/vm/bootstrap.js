@@ -14,8 +14,7 @@ const bootstrap = ({keyboardPipe, screenPipe}) => {
   os.initFS(initialFilesystem);
   os.filesystem.mountDevice(new Keyboard(keyboardPipe), '/dev/keyboard');
   os.filesystem.mountDevice(new Screen(screenPipe), '/dev/screen');
-
-  os.filesystem.writeToFile('lol writing to a device', '/dev/screen');
+  os.start();
 
   window.os = os;
   return os;

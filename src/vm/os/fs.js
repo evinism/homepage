@@ -81,10 +81,19 @@ class FileSystem {
   writeToFile(contents, pathStr){
     const file = this.getFile(pathStr);
     if (file instanceof Folder) {
-      throw('lol u cant write to a file');
+      throw('lol u cant write to a folder');
     }
     file.write(contents, noop);
   }
+
+  readFromFile(cb, pathStr){
+    const file = this.getFile(pathStr);
+    if (file instanceof Folder) {
+      throw('lol u cant read from a folder');
+    }
+    file.read(cb);
+  }
+
 
   mountDevice(device, pathStr){
     this.newFile(new DeviceFile(device), pathStr);
