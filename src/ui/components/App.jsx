@@ -18,13 +18,12 @@ class App extends React.Component {
   }
 
   writeToScreen(str){
-    this.setState({
-      output: this.state.output + str
-    });
+    this.setState(state => ({ output: state.output + str }));
   }
 
   handleKeypress = (e) => {
-    this.props.keyPipe.fire(e.key, false);
+    const native = e.nativeEvent;
+    this.props.keyPipe.fire(native);
   };
 
   setButtonRef = (button) => {

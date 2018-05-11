@@ -86,7 +86,7 @@ class FileSystem {
     file.write(contents, noop);
   }
 
-  readFromFile(cb, pathStr){
+  readFromFile(cb, pathStr) {
     const file = this.getFile(pathStr);
     if (file instanceof Folder) {
       throw('lol u cant read from a folder');
@@ -94,6 +94,13 @@ class FileSystem {
     file.read(cb);
   }
 
+  readDirContents(cb, pathStr) {
+    const folder = this.getFile(pathStr);
+    if (!folder instanceof Folder) {
+      throw('lol that a folder');
+    }
+    cb(Object.keys(folder.children).join('\n'));
+  }
 
   mountDevice(device, pathStr){
     this.newFile(new DeviceFile(device), pathStr);

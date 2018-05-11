@@ -1,3 +1,5 @@
+import { ProcStatus } from './constants';
+
 const syscalls = {
   partyHard: (arg, process, cb) => {
     console.log('wooo!!!'); cb();
@@ -13,7 +15,13 @@ const syscalls = {
   },
   exec: (arg, process, cb) => {
     // once again, with permissions
-    process.os.execProcess(arg);
+    process.os.execProcess(arg, cb);
+  },
+  dread: (arg, process, cb) => {
+    process.os.filesystem.readDirContents(cb, arg);
+  },
+  terminate: (arg, process, cb) => {
+    process.terminate();
   }
 }
 

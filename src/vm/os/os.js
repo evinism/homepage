@@ -8,6 +8,7 @@ class OS {
 
   processes = [];
   lastPID = 0;
+  cwd = '/';
 
   version(){
     return '0.0.1';
@@ -18,18 +19,29 @@ class OS {
   }
 
   // Should probs move this to other things here.
-  execProcess(pathStr) {
+  execProcess(pathStr, onTerminate) {
     this.filesystem.readFromFile(content => {
       this.lastPID++;
-      const proc = new Process(0, this.lastPID, this, content);
+      const proc = new Process(
+        0,
+        this.lastPID,
+        this,
+        content,
+        onTerminate
+      );
       proc.start();
     }, pathStr);
+  }
+
+  systemShutdown(){
+    this.filesystem.writeToFile('\nGoodbye!', '/dev/screen');
+    this.status = Status.FINISHED;
   }
 
   start () {
     this.status = Status.RUNNING;
     this.filesystem.writeToFile('writing to a device\n', '/dev/screen');
-    this.execProcess('/bin/sh');
+    this.execProcess('/bin/sh', () => this.systemShutdown());
   }
 };
 

@@ -23,36 +23,54 @@ const sh = {
   owner: 0,
   permissions: '755',
   content: `
-    let line = '';
+    const prompt = () => {
+      let line = '';
 
-    syscalls.fwrite({
-      content: 'sh v0.1\\n$ ',
-      path: '/dev/screen',
-    });
-    const readPrint = () => {
-      syscalls.fread(
-        '/dev/keyboard',
-        content => {
-          if (content === 'Enter') {
-            syscalls.fwrite({
-              content: '\\n$ ',
-              path: '/dev/screen',
-            });
-            syscalls.exec(line);
-          } else {
-            line += content;
+      syscalls.fwrite({
+        content: '\\n$ ',
+        path: '/dev/screen',
+      });
+
+      const readPrint = () => {
+        syscalls.fread(
+          '/dev/keyboard',
+          content => {
+
             syscalls.fwrite({
               content,
               path: '/dev/screen',
             });
-            readPrint();
-          }
 
-        }
-      );
-    };
-    readPrint();
+            if (content === '\\n') {
+              syscalls.exec(line, prompt);
+            } else {
+              line += content;
+              readPrint();
+            }
+          }
+        );
+      };
+      readPrint();
+    }
+    prompt();
   `,
+};
+
+const ls = {
+  _isFile: true,
+  owner: 0,
+  permissions: '755',
+  content: `
+    syscalls.partyHard();
+    syscalls.dread('/', content => {
+      syscalls.fwrite({
+        path: '/dev/screen',
+        content,
+      }, () => {
+        syscalls.terminate(0);
+      });
+    });
+  `
 };
 
 const cat = {
@@ -87,6 +105,7 @@ const fs = { name: 'root', owner: 0, perm: '644',
     bin: { owner: 0, perm: '644', children: {
       sh,
       cat,
+      ls,
     }},
     users: { owner: 0, perm: 644, children: {
       root: { owner: 0, perm: 644, children: {
