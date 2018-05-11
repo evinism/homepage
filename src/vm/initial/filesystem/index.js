@@ -34,15 +34,31 @@ const sh = {
       const readPrint = () => {
         syscalls.fread(
           '/dev/keyboard',
-          content => {
-
+          (content, eof) => {
             syscalls.fwrite({
               content,
               path: '/dev/screen',
             });
-
+            if (eof) {
+              syscalls.terminate(0);
+              return;
+            }
+            // TODO: Replace this with proper error codes for FS.
             if (content === '\\n') {
-              syscalls.exec(line, prompt);
+              syscalls.pathExists(
+                line,
+                exists => {
+                  if (exists) {
+                    syscalls.exec(line, prompt);
+                  } else {
+                    syscalls.fwrite({
+                      content: 'That file could not be found!',
+                      path: '/dev/screen',
+                    });
+                    prompt();
+                  }
+                }
+              );
             } else {
               line += content;
               readPrint();

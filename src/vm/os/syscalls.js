@@ -20,6 +20,9 @@ const syscalls = {
   dread: (arg, process, cb) => {
     process.os.filesystem.readDirContents(cb, arg);
   },
+  pathExists: (arg, process, cb) => {
+    process.os.filesystem.pathExists(cb, arg);
+  },
   terminate: (arg, process, cb) => {
     process.terminate();
   }

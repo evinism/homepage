@@ -40,7 +40,7 @@ class OS {
 
   start () {
     this.status = Status.RUNNING;
-    this.filesystem.writeToFile('writing to a device\n', '/dev/screen');
+    this.filesystem.writeToFile('os v0.0.0.0.1\nonly things that work are /bin/sh and /bin/ls\n', '/dev/screen');
     this.execProcess('/bin/sh', () => this.systemShutdown());
   }
 };

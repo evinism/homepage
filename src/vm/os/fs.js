@@ -94,6 +94,16 @@ class FileSystem {
     file.read(cb);
   }
 
+  // TODO: pass back error codes instead
+  pathExists(cb, pathStr) {
+    try {
+      const file = this.getFile(pathStr);
+      cb(true);
+    } catch (err) {
+      cb(false);
+    }
+  }
+
   readDirContents(cb, pathStr) {
     const folder = this.getFile(pathStr);
     if (!folder instanceof Folder) {

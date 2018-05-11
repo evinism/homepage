@@ -10,6 +10,9 @@ class Keyboard {
     let toSend;
     let eof = false;
     switch(keyCode){
+      case 8706:
+        toSend = ' EOF ';
+        eof = true;
       case 13:
         toSend = "\n";
         break;
