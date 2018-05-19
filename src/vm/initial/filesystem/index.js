@@ -23,7 +23,7 @@ const sh = {
   owner: 0,
   permissions: '755',
   content: `
-    const write = content => syscalls.write({
+    const stdout = content => syscalls.write({
       content,
       fd: 1,
     });
@@ -31,41 +31,38 @@ const sh = {
     const prompt = () => {
       let line = '';
 
-      write('\\n$ ');
+      stdout('\\n$ ');
 
       const readPrint = () => {
         syscalls.fread(
           '/dev/keyboard',
           (content, eof) => {
-            write(content);
             if (eof) {
               syscalls.terminate(0);
               return;
             }
             // TODO: Replace this with proper error codes for FS.
             if (content === '\\n') {
+              stdout(content);
               syscalls.pathExists(
                 line,
                 exists => {
                   if (exists) {
                     syscalls.exec(line, prompt);
                   } else {
-                    syscalls.fwrite({
-                      content: 'That file could not be found!',
-                      path: '/dev/screen',
-                    });
+                    stdout('That file could not be found!');
                     prompt();
                   }
                 }
               );
-            } else if (content === '\\b' && line.length > 0) {
-              line = line.substr(0, -1);
-              syscalls.write({
-                content: '\b',
-                fd: 1,
-              });
+            } else if (content === '\\b') {
+              if (line.length > 0) {
+                line = line.substr(0, line.length - 1);
+                stdout('\b');
+              }
               readPrint();
             } else {
+              stdout(content);
               line += content;
               readPrint();
             }
