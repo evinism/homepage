@@ -59,8 +59,20 @@ const sh = {
                       args,
                     }, prompt);
                   } else {
-                    stdout('command ' + args[0] + ' could not be found!');
-                    prompt();
+                    syscalls.pathExists(
+                      env.path + args[0],
+                      exists => {
+                        if (exists) {
+                          syscalls.exec({
+                            path: env.path + args[0],
+                            args,
+                          }, prompt);
+                        } else {
+                          stdout('command ' + args[0] + ' could not be found!');
+                          prompt();
+                        }
+                      }
+                    );
                   }
                 }
               );
@@ -90,7 +102,7 @@ const ls = {
   permissions: '755',
   content: `
     syscalls.partyHard();
-    const dir = args[1] || '/';
+    const dir = args[1] || env.cwd;
     syscalls.dread(dir, content => {
       syscalls.write({
         fd: 1,
@@ -121,6 +133,33 @@ const cat = {
   `,
 };
 
+const cd = {
+  _isFile: true,
+  owner: 0,
+  permissions: '755',
+  content: `
+    syscalls.partyHard();
+    syscalls.terminate(0);
+  `
+};
+
+const std = {
+  _isFile: true,
+  owner: 0,
+  permissions: '644',
+  content: `
+    // todo: make this work.
+    const stdout = content => syscalls.write({
+      content,
+      fd: 1,
+    });
+
+    module.exports = ({
+      stdout,
+    });
+  `,
+}
+
 
 
 const helloWorld = {
@@ -137,6 +176,10 @@ const fs = { name: 'root', owner: 0, perm: '644',
       sh,
       cat,
       ls,
+      cd,
+    }},
+    lib: { owner: 0, perm: '644', children: {
+      std,
     }},
     users: { owner: 0, perm: 644, children: {
       root: { owner: 0, perm: 644, children: {

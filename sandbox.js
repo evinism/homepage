@@ -7,13 +7,22 @@
           throw('referencing undefined variable ' + prop.toString());
         }
       },
-      set: (_, prop) => { throw('referencing undefined variable' + prop.toString()); },
+      set: (_, prop) => { throw('setting undefined variable ' + prop.toString()); },
     });
   }
 
   window.runInSandbox = function(source, syscalls, args, env) {
-    with(only(['source', 'syscalls', 'eval', 'args', 'env', Symbol.unscopables])) {
-      eval(source);
-    }
+    const closure = [
+      'source',
+      'syscalls',
+      'eval',
+      'args',
+      'env',
+      Symbol.unscopables
+    ];
+
+    with(only(closure)) {(function(){
+        eval(source);
+    })();}
   };
 })();
