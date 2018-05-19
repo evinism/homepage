@@ -1,17 +1,16 @@
 import Filesystem from './fs';
-import Pipe from '../../shared/pipe';
 import Process from './process';
 import { Status } from './constants';
+import FileSystem from './fs';
 
 const NOOP = () => {};
 
 class OS {
-  status = Status.HALTED;
-
-  processes = [];
-  lastPID = 0;
+  status : Status = Status.HALTED;
+  processes : Array<Process> = [];
   cwd = '/';
-  filesystem = undefined;
+  filesystem : FileSystem = undefined;
+  env = {};
 
   version(){
     return '0.0.1';
@@ -24,13 +23,13 @@ class OS {
   // Should probs move this to other things here.
   execProcess(onTerminate, pathStr) {
     this.filesystem.readFromFile(content => {
-      this.lastPID++;
       const proc = new Process(
         0,
-        this.lastPID,
         this,
         content,
-        onTerminate
+        onTerminate,
+        {},
+        [],
       );
       proc.start();
     }, pathStr);

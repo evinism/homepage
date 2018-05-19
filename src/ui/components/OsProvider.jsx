@@ -7,14 +7,16 @@ const osProvider = (Component) => {
   return class Provided extends React.Component {
     constructor(props){
       super(props);
-      this.keyPipe = new Pipe();
+      this.keydownPipe = new Pipe();
+      this.keypressPipe = new Pipe();
       this.screenPipe = new Pipe();
     }
 
     componentDidMount(){
       // wait for mount to initialize OS
       this.os = bootstrap({
-        keyboardPipe: this.keyPipe,
+        keydownPipe: this.keydownPipe,
+        keypressPipe: this.keypressPipe,
         screenPipe: this.screenPipe,
       });
     }
@@ -24,7 +26,8 @@ const osProvider = (Component) => {
         <Component
           {...this.props}
           os={this.os}
-          keyPipe={this.keyPipe}
+          keydownPipe={this.keydownPipe}
+          keypressPipe={this.keypressPipe}
           screenPipe={this.screenPipe}
         />
       );

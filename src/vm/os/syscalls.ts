@@ -11,18 +11,11 @@ const syscalls = {
   write: (arg, process, cb) => {
     const { content, fd } = arg;
     //TODO PERMS check. Probs do in the FS, not here.
-    process.os.filesystem.writeToFile(
-      cb,
-      content,
-      process.fds[fd],
-    );
+    process.fds[fd].write(content, cb);
   },
   read: (arg, process, cb) => {
     const { content, fd } = arg;
-    readFromFile(
-      cb,
-      process.fds[fd],
-    );
+    process.fds[fd].read(cb);
   },
   fwrite: (arg, process, cb) => {
     // todo: write with permissions.

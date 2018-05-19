@@ -23,22 +23,21 @@ const sh = {
   owner: 0,
   permissions: '755',
   content: `
+    const write = content => syscalls.write({
+      content,
+      fd: 1,
+    });
+
     const prompt = () => {
       let line = '';
 
-      syscalls.write({
-        content: '\\n$ ',
-        fd: 1,
-      });
+      write('\\n$ ');
 
       const readPrint = () => {
         syscalls.fread(
           '/dev/keyboard',
           (content, eof) => {
-            syscalls.fwrite({
-              content,
-              path: '/dev/screen',
-            });
+            write(content);
             if (eof) {
               syscalls.terminate(0);
               return;
@@ -59,6 +58,13 @@ const sh = {
                   }
                 }
               );
+            } else if (content === '\\b' && line.length > 0) {
+              line = line.substr(0, -1);
+              syscalls.write({
+                content: '\b',
+                fd: 1,
+              });
+              readPrint();
             } else {
               line += content;
               readPrint();
@@ -95,10 +101,10 @@ const cat = {
   permissions: '755',
   content: `
     syscalls.fread(
-      '/bin/cat',
+      '/bin/bash',
       content => {
-        syscalls.fwrite({
-          path: '/dev/screen',
+        syscalls.write({
+          fd: 1,
           content,
         });
       }

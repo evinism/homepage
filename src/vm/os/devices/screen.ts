@@ -14,10 +14,17 @@ class Screen implements Device {
   }
 
   write (content : string, cb : any) {
-    this.outpipe.fire({
-      type: 'appendCommand',
-      content,
-    });
+    if (content === '\b') {
+      this.outpipe.fire({
+        type: 'removeCommand',
+        amount: 1,
+      });
+    } else {
+      this.outpipe.fire({
+        type: 'appendCommand',
+        content,
+      });
+    }
     cb(true);
   }
 

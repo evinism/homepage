@@ -19,10 +19,17 @@ export interface Permissable {
   owner: number,
 };
 
-export interface ReadWritable {
+export interface Device {
   read: any,
   write: any, // TODO: Fix this stuff.
 };
 
-export type Device = ReadWritable;
+type ReadCB = (string, boolean) => void;
+type WriteCB = (boolean) => void;
+
+export interface ReadWritable {
+  read: (ReadCB) => void,
+  write: (string, WriteCB) => void,
+}
+
 export type FolderFile = Permissable;

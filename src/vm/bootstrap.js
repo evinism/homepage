@@ -9,10 +9,10 @@ import Screen from './os/devices/screen';
 import OS from './os';
 
 // pipes are just fifos.
-const bootstrap = ({keyboardPipe, screenPipe}) => {
+const bootstrap = ({keydownPipe, keypressPipe, screenPipe}) => {
   const os = new OS();
   os.initFS(initialFilesystem);
-  os.filesystem.mountDevice(new Keyboard(keyboardPipe), '/dev/keyboard');
+  os.filesystem.mountDevice(new Keyboard(keypressPipe, keydownPipe), '/dev/keyboard');
   os.filesystem.mountDevice(new Screen(screenPipe), '/dev/screen');
   os.start();
 

@@ -1,4 +1,5 @@
-import { ProcStatus } from './constants';
+import { ProcStatus, FolderFile } from './constants';
+import OS from './os';
 import runInSandbox from './sandbox';
 import syscalls from './syscalls';
 
@@ -10,30 +11,46 @@ const configSyscalls = process => {
   };
 
   return Object
-    .entries(syscalls)
-    .map(([key, syscall]) =>
-      [ key, (arg, cb) => syscall(arg, process, ensureRunning(cb)) ]
-    ).reduce(
-      (acc, [key, val]) => Object.assign(acc, { [key]: val }),
+    .keys(syscalls)
+    .map(key => ({
+        key, 
+        cb: (arg, cb) => syscalls[key](arg, process, ensureRunning(cb)),
+    })).reduce(
+      (acc, {key, cb}) => Object.assign(acc, { [key]: cb }),
       {}
     );
 };
 
 class Process {
-  constructor(owner, pid, os, source, onTerminate, env){
-    this.fds = {
-      // todo: switch these to actual files...
-      0: '/dev/keyboard', //stdin
-      1: '/dev/screen', //stdout
-      2: '/dev/screen', //stderr
-    };
+  owner : number;
+  os : OS;
+  source : string;
+  status : ProcStatus;
+  onTerminate : any;
+  env : object;
+  args : Array<string>;
+  fds: Array<FolderFile>; // Should be actual files.
+
+  constructor(
+    owner : number,
+    os : OS,
+    source : string,
+    onTerminate,
+    env : object,
+    args : Array<string>,
+  ){
+    this.fds = [
+      os.filesystem.getFile('/dev/keyboard'), //stdin
+      os.filesystem.getFile('/dev/screen'), //stdout
+      os.filesystem.getFile('/dev/screen'), //stderr
+    ];
     this.owner = owner;
-    this.pid = pid;
     this.source = source;
     this.os = os;
     this.status = ProcStatus.PENDING;
     this.onTerminate = onTerminate;
     this.env = env;
+    this.args = args;
   }
 
   start(){

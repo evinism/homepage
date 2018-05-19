@@ -1,20 +1,26 @@
+import Pipe from '../../../shared/pipe';
 import { Device } from '../constants';
 
 class Keyboard implements Device {
-  constructor(inpipe) {
-    inpipe.subscribe((native) => this.preprocess(native));
+  pending : Array<(string, boolean) => void>;
+
+  constructor(keypressPipe, keydownPipe) {
+    keypressPipe.subscribe(native => this.preprocessKeypress(native));
+    keydownPipe.subscribe(native => this.preprocessKeydown(native));
     this.pending = [];
   }
 
-  preprocess(native) {
+  // Weird hacky parallel streams here:
+  preprocessKeypress(native) {
     const keyCode = native.which || native.keyCode;
     console.log(keyCode);
     let toSend;
     let eof = false;
     switch(keyCode){
       case 8706:
-        toSend = ' EOF ';
+        toSend = '\n';
         eof = true;
+        break;
       case 13:
         toSend = "\n";
         break;
@@ -25,6 +31,23 @@ class Keyboard implements Device {
       this.callPending(toSend, eof);
     }
   };
+
+  // Ewww.
+  preprocessKeydown(native) {
+    const keyCode = native.which || native.keyCode;
+    let toSend;
+    let eof = false;
+    switch(keyCode){
+      case 8:
+        toSend = "\b";
+        break;
+      default:
+        break;
+    }
+    if(toSend) {
+      this.callPending(toSend, eof);
+    }
+  }
 
   callPending(str, finished){
     const toCall = this.pending;
