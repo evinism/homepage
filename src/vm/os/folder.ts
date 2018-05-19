@@ -1,4 +1,10 @@
-class Folder {
+import { FolderFile } from './constants';
+
+class Folder implements FolderFile {
+  owner: number;
+  permissions: string;
+  children: Array<FolderFile>;
+
   constructor(init) {
     const {
       owner,

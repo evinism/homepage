@@ -1,4 +1,4 @@
-import { Device } from './devices/types';
+import { Device, FolderFile, ReadWritable } from './constants';
 
 /* 
   interface file extends permissable 
@@ -6,15 +6,11 @@ import { Device } from './devices/types';
   write: (contents, bool => ()) => ()
 
   interface folder extends permissable
-  children
-
-  interface permissable
-  permissions, owner
 */
 
-export class TextFile {
+export class TextFile implements FolderFile, ReadWritable {
   owner : number;
-  permissions : string; // should be chmod style perms.
+  permissions : string;
   content : string;
 
   constructor(init){
@@ -39,7 +35,7 @@ export class TextFile {
   }
 }
 
-export class DeviceFile {
+export class DeviceFile implements FolderFile, ReadWritable {
   device : Device;
   owner : number;
   permissions : string; // perms-style string again.

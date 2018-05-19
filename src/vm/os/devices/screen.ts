@@ -1,5 +1,5 @@
 import { ScreenCommand } from '../../../shared/screenTypes';
-import { Device } from './types';
+import { Device } from '../constants';
 import Pipe from '../../../shared/pipe';
 
 class Screen implements Device {

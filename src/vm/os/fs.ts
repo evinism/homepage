@@ -1,5 +1,6 @@
 import Folder from './folder';
 import { TextFile, DeviceFile } from './file';
+import { FolderFile } from './constants';
 
 const noop = () => {};
 
@@ -54,6 +55,7 @@ const traversePath = (path, origin) => {
   if (!file) {
     return null;
   }
+  
   return file;
 };
 
@@ -66,6 +68,8 @@ const splitPath = (path) => {
 };
 
 class FileSystem {
+  root : FolderFile;
+
   constructor (fsSnapshot) {
     this.root = makeFS(fsSnapshot);
   }
@@ -92,7 +96,7 @@ class FileSystem {
 
   writeToFile(cb, contents, pathStr){
     const file = this.getFile(pathStr);
-    if (file instanceof Folder) {
+    if (file instanceof Folder) { // TODO: move to typeof guard.
       throw('lol u cant write to a folder');
     }
     file.write(contents, noop);

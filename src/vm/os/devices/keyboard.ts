@@ -1,4 +1,4 @@
-import { Device } from './types';
+import { Device } from '../constants';
 
 class Keyboard implements Device {
   constructor(inpipe) {
@@ -6,7 +6,7 @@ class Keyboard implements Device {
     this.pending = [];
   }
 
-  preprocess(native, ctrl) {
+  preprocess(native) {
     const keyCode = native.which || native.keyCode;
     console.log(keyCode);
     let toSend;
