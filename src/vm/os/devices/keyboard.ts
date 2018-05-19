@@ -1,10 +1,12 @@
-class Keyboard {
+import { Device } from './types';
+
+class Keyboard implements Device {
   constructor(inpipe) {
-    inpipe.subscribe((code, ctrl) => this.preprocess(code, ctrl));
+    inpipe.subscribe((native) => this.preprocess(native));
     this.pending = [];
   }
 
-  preprocess(native) {
+  preprocess(native, ctrl) {
     const keyCode = native.which || native.keyCode;
     console.log(keyCode);
     let toSend;

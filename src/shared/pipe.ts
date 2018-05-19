@@ -1,17 +1,17 @@
-class Pipe {
+class Pipe<T> {
   subscribers = [];
 
-  fire(...args) {
+  fire (arg : T) {
     this.subscribers.forEach(subscriber => {
-      subscriber(...args);
+      subscriber(arg);
     });
   }
  
-  subscribe(subscriber) {
+  subscribe(subscriber : (T) => any) {
     this.subscribers.push(subscriber);
   }
 
-  unsubscribe(toUnsubscribe) {
+  unsubscribe(toUnsubscribe : (T) => any) {
     this.subscribers = this.subscribers.filter(
       subscriber => subscriber !== toUnsubscribe
     )

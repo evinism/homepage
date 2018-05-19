@@ -1,3 +1,5 @@
+import { Device } from './devices/types';
+
 /* 
   interface file extends permissable 
   read: ((contents, eof) => ()) => ()
@@ -11,11 +13,15 @@
 */
 
 export class TextFile {
+  owner : number;
+  permissions : string; // should be chmod style perms.
+  content : string;
+
   constructor(init){
     const {
-      owner, // number
-      permissions, // chmod style perms
-      content, // a string
+      owner,
+      permissions,
+      content,
     } = init;
 
     this.owner = owner;
@@ -34,6 +40,10 @@ export class TextFile {
 }
 
 export class DeviceFile {
+  device : Device;
+  owner : number;
+  permissions : string; // perms-style string again.
+
   constructor(device){
     this.device = device;
     this.owner = 0;

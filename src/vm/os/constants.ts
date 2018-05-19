@@ -1,11 +1,15 @@
-export const Status = {
-  HALTED: 0,
-  RUNNING: 1,
-  FINISHED: 2,
+export enum Status {
+  HALTED,
+  RUNNING,
+  FINISHED,
 };
 
-export const ProcStatus = {
-  PENDING: 0,
-  RUNNING: 1,
-  STOPPED: 2,
+export enum ProcStatus {
+  PENDING,
+  RUNNING,
+  STOPPED,
+};
+
+export enum Err {
+  NO_SUCH_FILE,
 };

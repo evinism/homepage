@@ -17,8 +17,24 @@ class App extends React.Component {
     this.button && this.button.focus();
   }
 
-  writeToScreen(str){
-    this.setState(state => ({ output: state.output + str }));
+  writeToScreen(cmd){
+    switch(cmd.type){
+      case 'appendCommand': {
+        const str = cmd.content;
+        this.setState(state => ({ output: state.output + str }));
+        break;
+      }
+      case 'clearCommand': {
+        this.setState(state => ({ output: ''}));
+        break;
+      }
+      case 'removeCommand': {
+        this.setState(state => ({ output: output.slice(0, -1)}));
+        break;
+      }
+      default:
+        return;
+    }
   }
 
   handleKeypress = (e) => {
