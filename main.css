@@ -1,3 +1,19 @@
-.main {
-  color: red;
+.cursor {
+  content: ' ';
+  animation: cursorBlink 0.7s infinite;
+}
+
+@keyframes cursorBlink {
+	0% {
+    background-color: transparent;
+  }
+	40%{
+    background-color: transparent;
+  }
+	50% {
+    background-color: lightgray;
+  }
+  90% {
+    background-color: lightgray;
+  }
 }

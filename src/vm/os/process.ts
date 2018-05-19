@@ -56,7 +56,7 @@ class Process {
   start(){
     const syscalls = configSyscalls(this);
     this.status = ProcStatus.RUNNING;
-    runInSandbox(this.source, syscalls);
+    runInSandbox(this.source, syscalls, this.args, this.env);
   }
 
   terminate (exitCode) {

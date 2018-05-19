@@ -11,8 +11,8 @@
     });
   }
 
-  window.runInSandbox = function(source, syscalls) {
-    with(only(['source', 'syscalls', 'eval', Symbol.unscopables])) {
+  window.runInSandbox = function(source, syscalls, args, env) {
+    with(only(['source', 'syscalls', 'eval', 'args', 'env', Symbol.unscopables])) {
       eval(source);
     }
   };

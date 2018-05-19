@@ -14,10 +14,12 @@ const osProvider = (Component) => {
 
     componentDidMount(){
       // wait for mount to initialize OS
-      this.os = bootstrap({
+      bootstrap({
         keydownPipe: this.keydownPipe,
         keypressPipe: this.keypressPipe,
         screenPipe: this.screenPipe,
+      }).then(os => {
+        this.os = os;
       });
     }
 

@@ -29,9 +29,9 @@ const syscalls = {
     // todo: read with permissions.
     process.os.filesystem.readFromFile(cb, arg);
   },
-  exec: (arg, process, cb) => {
+  exec: ({ path, args }, process, cb) => {
     // once again, with permissions
-    process.os.execProcess(cb, arg);
+    process.os.execProcess(cb, path, args);
   },
   dread: (arg, process, cb) => {
     process.os.filesystem.readDirContents(cb, arg);

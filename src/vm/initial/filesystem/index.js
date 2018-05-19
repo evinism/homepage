@@ -28,6 +28,11 @@ const sh = {
       fd: 1,
     });
 
+    if (env.motd) {
+      stdout('\\n === Message of the Day === \\n');
+      stdout(env.motd);
+    }
+
     const prompt = () => {
       let line = '';
 
@@ -44,13 +49,17 @@ const sh = {
             // TODO: Replace this with proper error codes for FS.
             if (content === '\\n') {
               stdout(content);
+              const args = line.split(' ');
               syscalls.pathExists(
-                line,
+                args[0],
                 exists => {
                   if (exists) {
-                    syscalls.exec(line, prompt);
+                    syscalls.exec({
+                      path: args[0],
+                      args,
+                    }, prompt);
                   } else {
-                    stdout('That file could not be found!');
+                    stdout('command ' + args[0] + ' could not be found!');
                     prompt();
                   }
                 }
@@ -81,9 +90,10 @@ const ls = {
   permissions: '755',
   content: `
     syscalls.partyHard();
-    syscalls.dread('/', content => {
-      syscalls.fwrite({
-        path: '/dev/screen',
+    const dir = args[1] || '/';
+    syscalls.dread(dir, content => {
+      syscalls.write({
+        fd: 1,
         content,
       }, () => {
         syscalls.terminate(0);
@@ -97,13 +107,15 @@ const cat = {
   owner: 0,
   permissions: '755',
   content: `
+    const target = args[1] || '/bin/sh';
     syscalls.fread(
-      '/bin/bash',
+      target,
       content => {
         syscalls.write({
           fd: 1,
           content,
         });
+        syscalls.terminate(0);
       }
     );
   `,

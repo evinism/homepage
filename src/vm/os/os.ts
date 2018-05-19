@@ -10,7 +10,10 @@ class OS {
   processes : Array<Process> = [];
   cwd = '/';
   filesystem : FileSystem = undefined;
-  env = {};
+  env = {
+    path: '/bin/',
+    motd: 'Welcome to the personal website of Evin Sellin.\nTry poking around the filesystem for more info! \n',
+  };
 
   version(){
     return '0.0.1';
@@ -21,15 +24,15 @@ class OS {
   }
 
   // Should probs move this to other things here.
-  execProcess(onTerminate, pathStr) {
+  execProcess(onTerminate, pathStr, args) {
     this.filesystem.readFromFile(content => {
       const proc = new Process(
         0,
         this,
         content,
         onTerminate,
-        {},
-        [],
+        this.env,
+        args || [],
       );
       proc.start();
     }, pathStr);
@@ -42,7 +45,7 @@ class OS {
 
   start () {
     this.status = Status.RUNNING;
-    this.filesystem.writeToFile(NOOP, 'os v0.0.0.0.1\nonly things that work are /bin/sh and /bin/ls\n', '/dev/screen');
+    this.filesystem.writeToFile(NOOP, '\nEvinOS v0.01\n', '/dev/screen');
     this.execProcess(() => this.systemShutdown(), '/bin/sh');
   }
 };

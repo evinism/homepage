@@ -56,8 +56,7 @@ class App extends React.Component {
     const { os } = this.props;
     return (
       <div onKeyPress={this.handleKeypress} onKeyDown={this.handleKeydown}>
-        <h3>OS version: { os && os.version() }</h3>
-        <pre>{this.state.output}</pre>
+        <pre>{this.state.output}<span className='cursor'> </span></pre>
         <button
           ref={this.setButtonRef} 
           autoFocus 
