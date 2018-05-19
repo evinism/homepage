@@ -26,9 +26,9 @@ const sh = {
     const prompt = () => {
       let line = '';
 
-      syscalls.fwrite({
+      syscalls.write({
         content: '\\n$ ',
-        path: '/dev/screen',
+        fd: 1,
       });
 
       const readPrint = () => {

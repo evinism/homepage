@@ -40,10 +40,22 @@ const toPath = pathStr => {
 }
 
 // TODO: error handling
-const traversePath = (folderPath, origin) => folderPath.reduce(
-  (acc, cur) => (acc.children[cur]),
-  origin,
-);
+// (path, origin) => file?
+const traversePath = (path, origin) => {
+  const file = path.reduce(
+    (acc, cur) => {
+      if (!acc) {
+        return null;
+      }
+      return (acc.children[cur])
+    },
+    origin,
+  );
+  if (!file) {
+    return null;
+  }
+  return file;
+};
 
 const splitPath = (path) => {
   const folderPath = path.slice(0, -1);
@@ -78,12 +90,13 @@ class FileSystem {
     folder.children[fileName] = newFile;
   }
 
-  writeToFile(contents, pathStr){
+  writeToFile(cb, contents, pathStr){
     const file = this.getFile(pathStr);
     if (file instanceof Folder) {
       throw('lol u cant write to a folder');
     }
     file.write(contents, noop);
+    cb();
   }
 
   readFromFile(cb, pathStr) {

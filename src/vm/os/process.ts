@@ -2,8 +2,7 @@ import { ProcStatus } from './constants';
 import runInSandbox from './sandbox';
 import syscalls from './syscalls';
 
-// TODO: make head of line blocking for syscalls
-const configSyscalls = (os, process) => {
+const configSyscalls = process => {
   const ensureRunning = cb => (...args) => {
     if (process.status === ProcStatus.RUNNING && cb) {
       cb(...args);
@@ -21,17 +20,24 @@ const configSyscalls = (os, process) => {
 };
 
 class Process {
-  constructor(owner, pid, os, source, onTerminate){
+  constructor(owner, pid, os, source, onTerminate, env){
+    this.fds = {
+      // todo: switch these to actual files...
+      0: '/dev/keyboard', //stdin
+      1: '/dev/screen', //stdout
+      2: '/dev/screen', //stderr
+    };
     this.owner = owner;
     this.pid = pid;
     this.source = source;
     this.os = os;
     this.status = ProcStatus.PENDING;
     this.onTerminate = onTerminate;
+    this.env = env;
   }
 
   start(){
-    const syscalls = configSyscalls(this.os, this);
+    const syscalls = configSyscalls(this);
     this.status = ProcStatus.RUNNING;
     runInSandbox(this.source, syscalls);
   }

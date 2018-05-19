@@ -4,10 +4,33 @@ const syscalls = {
   partyHard: (arg, process, cb) => {
     console.log('wooo!!!'); cb();
   },
+  log: (arg, process, cb) => {
+    console.log('arg');
+    cb();
+  },
+  write: (arg, process, cb) => {
+    const { content, fd } = arg;
+    //TODO PERMS check. Probs do in the FS, not here.
+    process.os.filesystem.writeToFile(
+      cb,
+      content,
+      process.fds[fd],
+    );
+  },
+  read: (arg, process, cb) => {
+    const { content, fd } = arg;
+    readFromFile(
+      cb,
+      process.fds[fd],
+    );
+  },
   fwrite: (arg, process, cb) => {
     // todo: write with permissions.
-    process.os.filesystem.writeToFile(arg.content, arg.path);
-    cb();
+    process.os.filesystem.writeToFile(
+      cb,
+      arg.content,
+      arg.path
+    );
   },
   fread: (arg, process, cb) => {
     // todo: read with permissions.
@@ -15,7 +38,7 @@ const syscalls = {
   },
   exec: (arg, process, cb) => {
     // once again, with permissions
-    process.os.execProcess(arg, cb);
+    process.os.execProcess(cb, arg);
   },
   dread: (arg, process, cb) => {
     process.os.filesystem.readDirContents(cb, arg);
