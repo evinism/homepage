@@ -94,7 +94,7 @@ class FileSystem {
     folder.children[fileName] = newFile;
   }
 
-  writeToFile(cb, contents, pathStr){
+  writeToFile(contents, pathStr, cb){
     const file = this.getFile(pathStr);
     if (file instanceof Folder) { // TODO: move to typeof guard.
       throw('lol u cant write to a folder');
@@ -103,7 +103,7 @@ class FileSystem {
     cb();
   }
 
-  readFromFile(cb, pathStr) {
+  readFromFile(pathStr, cb) {
     const file = this.getFile(pathStr);
     if (file instanceof Folder) {
       throw('lol u cant read from a folder');
@@ -112,7 +112,7 @@ class FileSystem {
   }
 
   // TODO: pass back error codes instead
-  pathExists(cb, pathStr) {
+  pathExists(pathStr, cb) {
     try {
       const file = this.getFile(pathStr);
       cb(true);
@@ -121,7 +121,7 @@ class FileSystem {
     }
   }
 
-  readDirContents(cb, pathStr) {
+  readDirContents(pathStr, cb) {
     const folder = this.getFile(pathStr);
     if (!folder instanceof Folder) {
       throw('lol that a folder');

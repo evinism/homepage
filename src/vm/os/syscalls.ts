@@ -20,24 +20,24 @@ const syscalls = {
   fwrite: (arg, process, cb) => {
     // todo: write with permissions.
     process.os.filesystem.writeToFile(
-      cb,
       arg.content,
-      arg.path
+      arg.path,
+      cb
     );
   },
   fread: (arg, process, cb) => {
     // todo: read with permissions.
-    process.os.filesystem.readFromFile(cb, arg);
+    process.os.filesystem.readFromFile(arg, cb);
   },
   exec: ({ path, args }, process, cb) => {
     // once again, with permissions
     process.os.execProcess(cb, path, args);
   },
   dread: (arg, process, cb) => {
-    process.os.filesystem.readDirContents(cb, arg);
+    process.os.filesystem.readDirContents(arg, cb);
   },
   pathExists: (arg, process, cb) => {
-    process.os.filesystem.pathExists(cb, arg);
+    process.os.filesystem.pathExists(arg, cb);
   },
   terminate: (arg, process, cb) => {
     process.terminate();

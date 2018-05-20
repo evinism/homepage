@@ -7,6 +7,8 @@ const motd = `
 ---------
 Evin Sellin's homepage
 Try poking around the filesystem!
+
+WARNING: This is very much still a work in progress.
 ---------
 `
 
@@ -33,21 +35,24 @@ class OS {
 
   // Should probs move this to other things here.
   execProcess(onTerminate, pathStr, args) {
-    this.filesystem.readFromFile(content => {
-      const proc = new Process(
-        0,
-        this,
-        content,
-        onTerminate,
-        this.env,
-        args || [],
-      );
-      proc.start();
-    }, pathStr);
+    this.filesystem.readFromFile(
+      pathStr,
+      content => {
+        const proc = new Process(
+          0,
+          this,
+          content,
+          onTerminate,
+          this.env,
+          args || [],
+        );
+        proc.start();
+      }
+    );
   }
 
   systemShutdown(){
-    this.filesystem.writeToFile(NOOP, '\nGoodbye!', '/dev/screen');
+    this.filesystem.writeToFile('\nGoodbye!', '/dev/screen', NOOP);
     this.status = Status.FINISHED;
   }
 

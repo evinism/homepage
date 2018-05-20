@@ -126,6 +126,19 @@ const pwd = {
   `
 }
 
+const dicktown = {
+  _isFile: true,
+  owner: 0,
+  permissions: '755',
+  content: `
+    syscalls.write({
+      fd: 1,
+      content: "d i c k t o w n that's right it's dicktown"
+    });
+    syscalls.terminate(0);
+  `
+}
+
 const cat = {
   _isFile: true,
   owner: 0,
@@ -192,6 +205,7 @@ const fs = { name: 'root', owner: 0, perm: '644',
       ls,
       cd,
       pwd,
+      dicktown,
     }},
     lib: { owner: 0, perm: '644', children: {
       std,

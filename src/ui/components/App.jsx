@@ -21,7 +21,7 @@ class App extends React.Component {
 
   scrollToBottom = () => {
     const bodyElem = document.querySelector('body');
-    bodyElem.scrollTop = bodyElem.clientHeight; // a little overkill but whatev
+    bodyElem.scrollTop = document.querySelector('.screen').clientHeight; // a little overkill but whatev
   }
 
   writeToScreen(cmd){

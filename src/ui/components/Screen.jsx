@@ -9,8 +9,14 @@ class Screen extends React.Component {
 
   render () {
     return (
-      <div className="screen" ref={this.screen}>
-        <pre>{this.props.output}<span className='cursor'> </span></pre>
+      <div className="multiplier1">
+        <div className="multiplier2">
+          <div className="screen-wrapper"> 
+            <div className="screen" ref={this.screen}>
+              <pre>{this.props.output}<span className='cursor'> </span></pre>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
