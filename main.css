@@ -1,3 +1,16 @@
+body {
+  font-size: 1.4em;
+  border: 3px solid #44ff44;
+  margin-left: 10px;
+  padding-left: 10px;
+  background-color: black;
+  color: #44ff44;
+}
+
+pre {
+  font-family: 'VT323', monospace;
+}
+
 .cursor {
   content: ' ';
   animation: cursorBlink 0.7s infinite;
@@ -11,9 +24,9 @@
     background-color: transparent;
   }
 	50% {
-    background-color: lightgray;
+    background-color: #44ff44;
   }
   90% {
-    background-color: lightgray;
+    background-color: 44ff44;
   }
 }

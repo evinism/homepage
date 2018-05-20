@@ -33,7 +33,7 @@ const startupAnim = async (screen) => {
   const out = str => screen.write(str, noop);
 
   out('EvinVM(build 1.0) initializing');
-  for(let i = 0; i < 5; i++){
+  for(let i = 0; i < 3; i++){
     await sleep(300);
     out('.');
   }

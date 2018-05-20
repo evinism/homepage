@@ -3,6 +3,13 @@ import Process from './process';
 import { Status } from './constants';
 import FileSystem from './fs';
 
+const motd = `
+---------
+Evin Sellin's homepage
+Try poking around the filesystem!
+---------
+`
+
 const NOOP = () => {};
 
 class OS {
@@ -11,8 +18,9 @@ class OS {
   cwd = '/';
   filesystem : FileSystem = undefined;
   env = {
+    cwd: '/',
     path: '/bin/',
-    motd: 'Welcome to the personal website of Evin Sellin.\nTry poking around the filesystem for more info! \n',
+    motd,
   };
 
   version(){
@@ -45,7 +53,6 @@ class OS {
 
   start () {
     this.status = Status.RUNNING;
-    this.filesystem.writeToFile(NOOP, '\nEvinOS v0.01\n', '/dev/screen');
     this.execProcess(() => this.systemShutdown(), '/bin/sh');
   }
 };

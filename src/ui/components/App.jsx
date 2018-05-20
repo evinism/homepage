@@ -1,5 +1,7 @@
 import React from 'react';
 import OsProvider from './OsProvider';
+import Screen from './screen';
+
 
 class App extends React.Component {
   state = { output: '' };
@@ -17,20 +19,28 @@ class App extends React.Component {
     this.button && this.button.focus();
   }
 
+  scrollToBottom = () => {
+    const bodyElem = document.querySelector('body');
+    bodyElem.scrollTop = bodyElem.clientHeight; // a little overkill but whatev
+  }
+
   writeToScreen(cmd){
+    const cb = () => {
+      this.scrollToBottom();
+    }
     switch(cmd.type){
       case 'appendCommand': {
         const str = cmd.content;
-        this.setState(({ output }) => ({ output: output + str }));
+        this.setState(({ output }) => ({ output: output + str }), cb);
         break;
       }
       case 'clearCommand': {
-        this.setState(() => ({ output: ''}));
+        this.setState(() => ({ output: ''}), cb);
         break;
       }
       case 'removeCommand': {
         console.log('woo remove command');
-        this.setState(({ output }) => ({ output: output.substr(0, output.length - 1)}));
+        this.setState(({ output }) => ({ output: output.substr(0, output.length - 1)}), cb);
         break;
       }
       default:
@@ -56,7 +66,7 @@ class App extends React.Component {
     const { os } = this.props;
     return (
       <div onKeyPress={this.handleKeypress} onKeyDown={this.handleKeydown}>
-        <pre>{this.state.output}<span className='cursor'> </span></pre>
+        <Screen output={this.state.output} />
         <button
           ref={this.setButtonRef} 
           autoFocus 

@@ -29,7 +29,6 @@ const sh = {
     });
 
     if (env.motd) {
-      stdout('\\n === Message of the Day === \\n');
       stdout(env.motd);
     }
 
@@ -114,6 +113,19 @@ const ls = {
   `
 };
 
+const pwd = {
+  _isFile: true,
+  owner: 0,
+  permissions: '755',
+  content: `
+    syscalls.write({
+      fd: 1,
+      content: env.cwd
+    });
+    syscalls.terminate(0);
+  `
+}
+
 const cat = {
   _isFile: true,
   owner: 0,
@@ -138,7 +150,9 @@ const cd = {
   owner: 0,
   permissions: '755',
   content: `
-    syscalls.partyHard();
+    if (args[1]) {
+      env.cwd = args[1];
+    }
     syscalls.terminate(0);
   `
 };
@@ -177,6 +191,7 @@ const fs = { name: 'root', owner: 0, perm: '644',
       cat,
       ls,
       cd,
+      pwd,
     }},
     lib: { owner: 0, perm: '644', children: {
       std,

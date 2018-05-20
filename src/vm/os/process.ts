@@ -49,7 +49,7 @@ class Process {
     this.os = os;
     this.status = ProcStatus.PENDING;
     this.onTerminate = onTerminate;
-    this.env = { ...env, cwd: '/' };
+    this.env = env;
     this.args = args;
   }
 
