@@ -20,7 +20,6 @@ class OS {
   cwd = '/';
   filesystem : FileSystem = undefined;
   env = {
-    cwd: '/',
     path: '/bin/',
     motd,
   };
@@ -34,7 +33,7 @@ class OS {
   }
 
   // Should probs move this to other things here.
-  execProcess(pathStr, args, onTerminate) {
+  execProcess(pathStr, args, wd, onTerminate) {
     this.filesystem.readFromFile(
       pathStr,
       content => {
@@ -44,9 +43,11 @@ class OS {
           content,
           onTerminate,
           this.env,
+          wd,
           args || [],
         );
         proc.start();
+        console.log(proc);
       }
     );
   }
@@ -58,7 +59,7 @@ class OS {
 
   start () {
     this.status = Status.RUNNING;
-    this.execProcess('/bin/sh', [], () => this.systemShutdown());
+    this.execProcess('/bin/sh', [], '/', () => this.systemShutdown());
   }
 };
 

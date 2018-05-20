@@ -26,6 +26,20 @@ const sh = {
     const require = syscalls.fread('/lib/std', stdlib => {
       const { stdout, stdin } = eval(stdlib);
 
+      const builtins = {
+        cd: (args, cb) => {
+          syscalls.setcwd(
+            args[1] || '/',
+            (err) => {
+              if (err) {
+                stdout('An error occurred');
+              }
+              cb();
+            }
+          );
+        },
+      };
+
       if (env.motd) {
         stdout(env.motd);
       }
@@ -44,33 +58,37 @@ const sh = {
               // TODO: Replace this with proper error codes for FS.
               if (content === '\\n') {
                 stdout(content);
-                const args = line.split(' ');
-                syscalls.pathExists(
-                  args[0],
-                  exists => {
-                    if (exists) {
-                      syscalls.exec({
-                        path: args[0],
-                        args,
-                      }, prompt);
-                    } else {
-                      syscalls.pathExists(
-                        env.path + args[0],
-                        exists => {
-                          if (exists) {
-                            syscalls.exec({
-                              path: env.path + args[0],
-                              args,
-                            }, prompt);
-                          } else {
-                            stdout('command ' + args[0] + ' could not be found!');
-                            prompt();
+                const args = line.trim().split(' ');
+                if (!builtins[args[0]]) {
+                  syscalls.pathExists(
+                    args[0],
+                    exists => {
+                      if (exists) {
+                        syscalls.exec({
+                          path: args[0],
+                          args,
+                        }, prompt);
+                      } else {
+                        syscalls.pathExists(
+                          env.path + args[0],
+                          exists => {
+                            if (exists) {
+                              syscalls.exec({
+                                path: env.path + args[0],
+                                args,
+                              }, prompt);
+                            } else {
+                              stdout('command ' + args[0] + ' could not be found!');
+                              prompt();
+                            }
                           }
-                        }
-                      );
+                        );
+                      }
                     }
-                  }
-                );
+                  );
+                } else {
+                  builtins[args[0]](args, prompt);
+                }
               } else if (content === '\\b') {
                 if (line.length > 0) {
                   line = line.substr(0, line.length - 1);
@@ -97,7 +115,7 @@ const ls = {
   owner: 0,
   permissions: '755',
   content: `
-    const dir = args[1] || env.cwd;
+    const dir = args[1] || '/';
     syscalls.dread(dir, content => {
       syscalls.write({
         fd: 1,
@@ -114,11 +132,14 @@ const pwd = {
   owner: 0,
   permissions: '755',
   content: `
-    syscalls.write({
-      fd: 1,
-      content: env.cwd
-    });
-    syscalls.terminate(0);
+    // eww on this null thing
+    syscalls.getcwd(null, (cwd, err) => {
+      syscalls.write({
+        fd: 1,
+        content: cwd
+      });
+      syscalls.terminate(0);
+    })
   `
 }
 

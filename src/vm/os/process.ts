@@ -27,6 +27,7 @@ class Process {
   source : string;
   status : ProcStatus;
   onTerminate : any;
+  cwd : string;
   env : object;
   args : Array<string>;
   fds: Array<FolderFile>; // Should be actual files.
@@ -37,6 +38,7 @@ class Process {
     source : string,
     onTerminate,
     env : object,
+    cwd : string,
     args : Array<string>,
   ){
     this.fds = [
@@ -50,6 +52,7 @@ class Process {
     this.status = ProcStatus.PENDING;
     this.onTerminate = onTerminate;
     this.env = env;
+    this.cwd = cwd;
     this.args = args;
   }
 

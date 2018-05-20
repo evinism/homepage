@@ -13,7 +13,6 @@ class Keyboard implements Device {
   // Weird hacky parallel streams here:
   preprocessKeypress(native) {
     const keyCode = native.which || native.keyCode;
-    console.log(keyCode);
     let toSend;
     let eof = false;
     switch(keyCode){

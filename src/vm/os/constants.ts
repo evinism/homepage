@@ -13,6 +13,7 @@ export enum ProcStatus {
 export enum Err {
   NONE = 0,
   ENOFILE,
+  ENOFOLDER,
   ENOTFILE,
   ENOTFOLDER,
   EFILEEXISTS,

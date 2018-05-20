@@ -1,8 +1,10 @@
 import { ProcStatus, Err } from './constants';
+import { getAbsolutePathStr } from './util';
 
+// The last thing to a cb should always be an error code
 const syscalls = {
   partyHard: (arg, process, cb) => {
-    console.log('wooo!!!'); cb();
+    console.log('wooo!!!'); cb(Err.none);
   },
   log: (arg, process, cb) => {
     console.log('arg');
@@ -21,26 +23,64 @@ const syscalls = {
     // todo: write with permissions.
     process.os.filesystem.writeToFile(
       arg.content,
-      arg.path,
+      getAbsolutePathStr(arg.path, process.cwd),
       cb
     );
   },
   fread: (arg, process, cb) => {
     // todo: read with permissions.
-    process.os.filesystem.readFromFile(arg, cb);
+    process.os.filesystem.readFromFile(
+      getAbsolutePathStr(arg, process.cwd),
+      cb
+    );
   },
+  // spins up a new process
   exec: ({ path, args }, process, cb) => {
     // once again, with permissions
-    process.os.execProcess(path, args, cb);
+    process.os.execProcess(
+      getAbsolutePathStr(path, process.cwd),
+      args,
+      process.cwd,
+      cb
+    );
   },
+  // gets a list of everything in the folder
   dread: (arg, process, cb) => {
-    process.os.filesystem.readDirContents(arg, cb);
+    process.os.filesystem.readDirContents(
+      getAbsolutePathStr(arg, process.cwd),
+      cb
+    );
   },
+  // tells whether or not the path exists
   pathExists: (arg, process, cb) => {
     process.os.filesystem.pathExists(arg, cb);
   },
+  // tells the kernel to terminate the process.
   terminate: (arg, process, cb) => {
     process.terminate();
+  },
+  // gets the current working directory of the process
+  getcwd: (arg, process, cb) => {
+    cb(process.cwd, Err.NONE);
+  },
+  // sets the current working directory of the process
+  setcwd: (arg, process, cb) => {
+    arg = arg.trim();
+    // cwd should always have trailing slash.
+    if (arg[arg.length - 1] !== '/') {
+      arg = arg + '/';
+    }
+
+    const wd = getAbsolutePathStr(arg, process.cwd);
+
+    process.os.filesystem.pathExists(wd, exists => {
+      if (exists) {
+        process.cwd = wd;
+        cb(Err.NONE);
+      } else {
+        cb(Err.ENOFOLDER);
+      }
+    });
   }
 }
 

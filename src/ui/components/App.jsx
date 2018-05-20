@@ -39,7 +39,6 @@ class App extends React.Component {
         break;
       }
       case 'removeCommand': {
-        console.log('woo remove command');
         this.setState(({ output }) => ({ output: output.substr(0, output.length - 1)}), cb);
         break;
       }
