@@ -23,75 +23,72 @@ const sh = {
   owner: 0,
   permissions: '755',
   content: `
-    const stdout = content => syscalls.write({
-      content,
-      fd: 1,
-    });
+    const require = syscalls.fread('/lib/std', stdlib => {
+      const { stdout, stdin } = eval(stdlib);
 
-    if (env.motd) {
-      stdout(env.motd);
-    }
+      if (env.motd) {
+        stdout(env.motd);
+      }
 
-    const prompt = () => {
-      let line = '';
-
-      stdout('\\n$ ');
-
-      const readPrint = () => {
-        syscalls.fread(
-          '/dev/keyboard',
-          (content, eof) => {
-            if (eof) {
-              syscalls.terminate(0);
-              return;
-            }
-            // TODO: Replace this with proper error codes for FS.
-            if (content === '\\n') {
-              stdout(content);
-              const args = line.split(' ');
-              syscalls.pathExists(
-                args[0],
-                exists => {
-                  if (exists) {
-                    syscalls.exec({
-                      path: args[0],
-                      args,
-                    }, prompt);
-                  } else {
-                    syscalls.pathExists(
-                      env.path + args[0],
-                      exists => {
-                        if (exists) {
-                          syscalls.exec({
-                            path: env.path + args[0],
-                            args,
-                          }, prompt);
-                        } else {
-                          stdout('command ' + args[0] + ' could not be found!');
-                          prompt();
-                        }
-                      }
-                    );
-                  }
-                }
-              );
-            } else if (content === '\\b') {
-              if (line.length > 0) {
-                line = line.substr(0, line.length - 1);
-                stdout('\b');
+      const prompt = () => {
+        let line = '';
+  
+        stdout('\\n$ ');
+  
+        const readPrint = () => {
+          stdin((content, eof) => {
+              if (eof) {
+                syscalls.terminate(0);
+                return;
               }
-              readPrint();
-            } else {
-              stdout(content);
-              line += content;
-              readPrint();
+              // TODO: Replace this with proper error codes for FS.
+              if (content === '\\n') {
+                stdout(content);
+                const args = line.split(' ');
+                syscalls.pathExists(
+                  args[0],
+                  exists => {
+                    if (exists) {
+                      syscalls.exec({
+                        path: args[0],
+                        args,
+                      }, prompt);
+                    } else {
+                      syscalls.pathExists(
+                        env.path + args[0],
+                        exists => {
+                          if (exists) {
+                            syscalls.exec({
+                              path: env.path + args[0],
+                              args,
+                            }, prompt);
+                          } else {
+                            stdout('command ' + args[0] + ' could not be found!');
+                            prompt();
+                          }
+                        }
+                      );
+                    }
+                  }
+                );
+              } else if (content === '\\b') {
+                if (line.length > 0) {
+                  line = line.substr(0, line.length - 1);
+                  stdout('\b');
+                }
+                readPrint();
+              } else {
+                stdout(content);
+                line += content;
+                readPrint();
+              }
             }
-          }
-        );
-      };
-      readPrint();
-    }
-    prompt();
+          );
+        };
+        readPrint();
+      }
+      prompt();
+    });
   `,
 };
 
@@ -100,7 +97,6 @@ const ls = {
   owner: 0,
   permissions: '755',
   content: `
-    syscalls.partyHard();
     const dir = args[1] || env.cwd;
     syscalls.dread(dir, content => {
       syscalls.write({
@@ -145,16 +141,23 @@ const cat = {
   permissions: '755',
   content: `
     const target = args[1] || '/bin/sh';
-    syscalls.fread(
-      target,
-      content => {
-        syscalls.write({
-          fd: 1,
-          content,
-        });
-        syscalls.terminate(0);
-      }
-    );
+    const readNext = () => {
+      syscalls.fread(
+        target,
+        (content, eof) => {
+          syscalls.write({
+            fd: 1,
+            content,
+          });
+          if (eof) {
+            syscalls.terminate(0);
+          } else {
+            readNext();
+          }
+        }
+      );
+    };
+    readNext();
   `,
 };
 
@@ -175,14 +178,20 @@ const std = {
   owner: 0,
   permissions: '644',
   content: `
-    // todo: make this work.
     const stdout = content => syscalls.write({
       content,
       fd: 1,
     });
 
-    module.exports = ({
+    const stdin = cb => syscalls.read(
+      {fd: 0},
+      cb
+    );
+
+    // eval export
+    ({
       stdout,
+      stdin,
     });
   `,
 }
