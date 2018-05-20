@@ -11,7 +11,11 @@ export enum ProcStatus {
 };
 
 export enum Err {
-  NO_SUCH_FILE,
+  NONE = 0,
+  ENOFILE,
+  ENOTFILE,
+  ENOTFOLDER,
+  EFILEEXISTS,
 };
 
 export interface Permissable {

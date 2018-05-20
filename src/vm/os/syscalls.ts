@@ -1,4 +1,4 @@
-import { ProcStatus } from './constants';
+import { ProcStatus, Err } from './constants';
 
 const syscalls = {
   partyHard: (arg, process, cb) => {
@@ -31,7 +31,7 @@ const syscalls = {
   },
   exec: ({ path, args }, process, cb) => {
     // once again, with permissions
-    process.os.execProcess(cb, path, args);
+    process.os.execProcess(path, args, cb);
   },
   dread: (arg, process, cb) => {
     process.os.filesystem.readDirContents(arg, cb);

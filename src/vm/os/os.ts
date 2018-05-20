@@ -34,7 +34,7 @@ class OS {
   }
 
   // Should probs move this to other things here.
-  execProcess(onTerminate, pathStr, args) {
+  execProcess(pathStr, args, onTerminate) {
     this.filesystem.readFromFile(
       pathStr,
       content => {
@@ -58,7 +58,7 @@ class OS {
 
   start () {
     this.status = Status.RUNNING;
-    this.execProcess(() => this.systemShutdown(), '/bin/sh');
+    this.execProcess('/bin/sh', [], () => this.systemShutdown());
   }
 };
 

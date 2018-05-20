@@ -1,6 +1,6 @@
 import Folder from './folder';
 import { TextFile, DeviceFile } from './file';
-import { FolderFile } from './constants';
+import { FolderFile, Err } from './constants';
 
 const noop = () => {};
 
@@ -94,25 +94,26 @@ class FileSystem {
     folder.children[fileName] = newFile;
   }
 
-  writeToFile(contents, pathStr, cb){
+  writeToFile(contents : string, pathStr : string, cb : (Err) => void){
     const file = this.getFile(pathStr);
     if (file instanceof Folder) { // TODO: move to typeof guard.
-      throw('lol u cant write to a folder');
+      cb(Err.ENOTFILE);
     }
     file.write(contents, noop);
-    cb();
+    cb(Err.NONE);
   }
 
-  readFromFile(pathStr, cb) {
+  readFromFile(pathStr : string, cb: (string, bool, Err) => void) {
     const file = this.getFile(pathStr);
     if (file instanceof Folder) {
-      throw('lol u cant read from a folder');
+      cb('', true, Err.ENOTFILE);
+    } else {
+      file.read((contents, eof) => cb(contents, eof, Err.NONE));
     }
-    file.read(cb);
   }
 
   // TODO: pass back error codes instead
-  pathExists(pathStr, cb) {
+  pathExists(pathStr, cb : (bool) => void) {
     try {
       const file = this.getFile(pathStr);
       cb(true);
@@ -121,12 +122,20 @@ class FileSystem {
     }
   }
 
-  readDirContents(pathStr, cb) {
-    const folder = this.getFile(pathStr);
-    if (!folder instanceof Folder) {
-      throw('lol that a folder');
-    }
-    cb(Object.keys(folder.children).join('\n'));
+  readDirContents(pathStr, cb : (string, Err) => void) {
+    this.pathExists(pathStr, (exists) => {
+      if (!exists) {
+        cb('', Err.ENOFILE);
+        return;
+      }
+      const folder = this.getFile(pathStr);
+      if (!(folder instanceof Folder)) {
+        cb('', Err.ENOTFOLDER)
+      } else {
+        cb(Object.keys(folder.children).join('\n'), Err.NONE);
+      }
+    });
+
   }
 
   mountDevice(device, pathStr){
