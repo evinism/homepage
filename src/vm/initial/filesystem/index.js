@@ -264,7 +264,7 @@ const about_me = {
 `| Hi! My name is Evin Sellin! I make computers do things.
 | Most of my experience is in webdev, but I'm interested
 | in many aspects of computing, such as machine learning,
-| distributed systems, and theory of computation. 
+| functional programming, and theory of computation.
 |
 | Feel free to email me at evinism@gmail.com or tweet at
 | my handle, @evinism.`,
