@@ -53,7 +53,10 @@ const syscalls = {
   },
   // tells whether or not the path exists
   pathExists: (arg, process, cb) => {
-    process.os.filesystem.pathExists(arg, cb);
+    process.os.filesystem.pathExists(
+      getAbsolutePathStr(arg, process.cwd),
+      cb
+    );
   },
   // tells the kernel to terminate the process.
   terminate: (arg, process, cb) => {

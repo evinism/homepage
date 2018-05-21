@@ -105,7 +105,9 @@ class FileSystem {
 
   readFromFile(pathStr : string, cb: (string, bool, Err) => void) {
     const file = this.getFile(pathStr);
-    if (file instanceof Folder) {
+    if (file === null) {
+      cb('', true, Err.ENOFILE);
+    } else if (file instanceof Folder) {
       cb('', true, Err.ENOTFILE);
     } else {
       file.read((contents, eof) => cb(contents, eof, Err.NONE));
@@ -114,10 +116,10 @@ class FileSystem {
 
   // TODO: pass back error codes instead
   pathExists(pathStr, cb : (bool) => void) {
-    try {
-      const file = this.getFile(pathStr);
+    const file = this.getFile(pathStr);
+    if (file) {
       cb(true);
-    } catch (err) {
+    } else {
       cb(false);
     }
   }

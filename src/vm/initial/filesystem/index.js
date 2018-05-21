@@ -47,7 +47,7 @@ const sh = {
       const prompt = () => {
         let line = '';
   
-        stdout('\\n$ ');
+        stdout('$ ');
   
         const readPrint = () => {
           stdin((content, eof) => {
@@ -115,11 +115,11 @@ const ls = {
   owner: 0,
   permissions: '755',
   content: `
-    const dir = args[1] || '/';
+    const dir = args[1] || '.';
     syscalls.dread(dir, content => {
       syscalls.write({
         fd: 1,
-        content,
+        content: content + '\\n',
       }, () => {
         syscalls.terminate(0);
       });
@@ -165,12 +165,22 @@ const cat = {
     const readNext = () => {
       syscalls.fread(
         target,
-        (content, eof) => {
+        (content, eof, err) => {
           syscalls.write({
             fd: 1,
             content,
           });
+          if (err) {
+            syscalls.write({
+              fd: 1,
+              content: 'An error occurred'
+            })
+          }
           if (eof) {
+            syscalls.write({
+              fd: 1,
+              content: '\\n'
+            })
             syscalls.terminate(0);
           } else {
             readNext();
@@ -180,18 +190,6 @@ const cat = {
     };
     readNext();
   `,
-};
-
-const cd = {
-  _isFile: true,
-  owner: 0,
-  permissions: '755',
-  content: `
-    if (args[1]) {
-      env.cwd = args[1];
-    }
-    syscalls.terminate(0);
-  `
 };
 
 const std = {
@@ -233,7 +231,6 @@ const fs = { name: 'root', owner: 0, perm: '644',
       sh,
       cat,
       ls,
-      cd,
       pwd,
       dicktown,
     }},
