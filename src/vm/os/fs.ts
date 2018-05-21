@@ -94,6 +94,27 @@ class FileSystem {
     folder.children[fileName] = newFile;
   }
 
+  removeFile(pathStr, cb : (Err) => void){
+    const path = toPath(pathStr);
+    const { folderPath, fileName } = splitPath(path);
+    const folder = traversePath(folderPath, this.root);
+    if (!folder) {
+      cb(Err.ENOFILE);
+      return;
+    }
+    const file = traversePath([fileName], folder);
+    if (!file) {
+      cb(Err.ENOFILE);
+      return;
+    }
+    if (file instanceof Folder) {
+      cb(Err.ENOTFILE);
+      return;
+    }
+    delete folder.children[fileName];
+    cb(Err.NONE);
+  }
+
   writeToFile(contents : string, pathStr : string, cb : (Err) => void){
     const file = this.getFile(pathStr);
     if (file instanceof Folder) { // TODO: move to typeof guard.

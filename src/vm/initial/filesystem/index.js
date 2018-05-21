@@ -147,6 +147,36 @@ const pwd = {
   `
 }
 
+const rm = {
+  _isFile: true,
+  owner: 0,
+  permissions: '755',
+  content: `
+    if (!args[1]) {
+      syscalls.write({
+        fd: 1,
+        content: 'usage: rm [file]\\n'
+      });
+      syscalls.terminate(1);
+    } else {
+      syscalls.rmFile(
+        args[1],
+        (err) => {
+          if (err) {
+            syscalls.write({
+              fd: 1,
+              content: 'An error occurred\\n',
+            });
+            syscalls.terminate(1);
+          } else {
+            syscalls.terminate(0);
+          }
+        }
+      );
+    }
+  `
+};
+
 const dicktown = {
   _isFile: true,
   owner: 0,
@@ -271,6 +301,7 @@ const fs = { name: 'root', owner: 0, perm: '644',
       cat,
       ls,
       pwd,
+      rm,
       dicktown,
     }},
     lib: { owner: 0, perm: '644', children: {

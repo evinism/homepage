@@ -34,6 +34,12 @@ const syscalls = {
       cb
     );
   },
+  rmFile: (arg, process, cb) => {
+    process.os.filesystem.removeFile(
+      getAbsolutePathStr(arg, process.cwd),
+      cb
+    );
+  },
   // spins up a new process
   exec: ({ path, args }, process, cb) => {
     // once again, with permissions
