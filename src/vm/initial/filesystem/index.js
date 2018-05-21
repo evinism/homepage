@@ -59,6 +59,10 @@ const sh = {
               if (content === '\\n') {
                 stdout(content);
                 const args = line.trim().split(' ');
+                if(!args[0]) {
+                  prompt();
+                  return;
+                }
                 if (!builtins[args[0]]) {
                   syscalls.pathExists(
                     args[0],
@@ -78,7 +82,7 @@ const sh = {
                                 args,
                               }, prompt);
                             } else {
-                              stdout('command ' + args[0] + ' could not be found!');
+                              stdout('command ' + args[0] + ' could not be found!\\n');
                               prompt();
                             }
                           }
@@ -136,7 +140,7 @@ const pwd = {
     syscalls.getcwd(null, (cwd, err) => {
       syscalls.write({
         fd: 1,
-        content: cwd
+        content: cwd + '\\n'
       });
       syscalls.terminate(0);
     })
@@ -161,7 +165,7 @@ const cat = {
   owner: 0,
   permissions: '755',
   content: `
-    const target = args[1] || '/bin/sh';
+    const target = args[1] || '/dev/keyboard';
     const readNext = () => {
       syscalls.fread(
         target,
@@ -215,14 +219,49 @@ const std = {
   `,
 }
 
-
-
-const helloWorld = {
+const hello_world = {
   _isFile: true,
   owner: 0,
   permissions: '755',
   content: 'Hello, world!',
 };
+
+const about_me = {
+  _isFile: true,
+  owner: 1,
+  permissions: '644',
+  content: 
+`| Hi! My name is Evin Sellin! I make computers do things.
+| Most of my experience is in webdev, but I'm interested
+| in many aspects of computing, such as machine learning,
+| distributed systems, and theory of computation. 
+|
+| Feel free to email me at evinism@gmail.com or tweet at
+| my handle, @evinism.`,
+};
+
+const about_this_interface = {
+  _isFile: true,
+  owner: 1,
+  permissions: '644',
+  content:
+`| lol this thing isn't posix compliant but i sure wish it was.
+| This interface was inspired by https://github.com/rhelmot/linjus
+| To get an idea of what it consists of, try executing cat /bin/sh
+| or cat /dev/keyboard`
+}
+
+const links = {
+  _isFile: true,
+  owner: 1,
+  permissions: '644',
+  content: 
+`Github: https://github.com/evinism
+Medium: https://medium.com/@evinsellin/
+Twitter: https://twitter.com/evinism
+LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/`
+}
+
 
 const fs = { name: 'root', owner: 0, perm: '644',
   children: {
@@ -238,8 +277,11 @@ const fs = { name: 'root', owner: 0, perm: '644',
       std,
     }},
     users: { owner: 0, perm: 644, children: {
-      root: { owner: 0, perm: 644, children: {
-        helloWorld,
+      web: { owner: 1, perm: 644, children: {
+        hello_world,
+        about_me,
+        about_this_interface,
+        links,
       }}
     }}
   }

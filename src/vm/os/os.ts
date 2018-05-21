@@ -59,7 +59,7 @@ class OS {
 
   start () {
     this.status = Status.RUNNING;
-    this.execProcess('/bin/sh', [], '/', () => this.systemShutdown());
+    this.execProcess('/bin/sh', [], '/users/web/', () => this.systemShutdown());
   }
 };
 
