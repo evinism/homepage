@@ -96,7 +96,13 @@ const syscalls = {
     const { name, id, password } = process.user
     cb({ name, id, password }, Err.NONE);
   },
-
+  win: (arg, process, cb) => {
+    if(process.user.id !== 0) {
+      cb(Err.EPERM)
+    }
+    alert('a winner is you');
+    cb(Err.NONE);
+  },
 }
 
 export default syscalls;
