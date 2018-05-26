@@ -242,20 +242,50 @@ const su = {
   permissions: '644',
   suid: true,
   content: `
-    const defaultShell = '/bin/sh';
-    syscalls.pathExists(
-      defaultShell,
-      exists => {
-        if (exists) {
-          syscalls.exec({
-            path: defaultShell,
-            args: [],
-          }, () => syscalls.terminate(0));
-        } else {
-          syscalls.terminate(1);
+    const require = syscalls.fread('/lib/std', stdlib => {
+      const { stdout, stdin } = eval(stdlib);
+      const defaultShell = '/bin/sh';
+      const checkPassword = success => {
+        stdout('Password for root?');
+        let passwd = '';
+        const nextChar = () => {
+          stdin((nextStr, eof) => {
+            if(nextStr !== '\\n') {
+              passwd = passwd + nextStr;
+              nextChar();
+            } else {
+              continuation();
+            }
+          });
         }
-      }
-    );
+        nextChar();
+        const continuation = () => {
+          // Todo: make this read from /etc/passwd
+          if (passwd === 'catzz') {
+            stdout('\\n');
+            success();
+          } else {
+            stdout('\\nIncorrect password for root\\n');
+            syscalls.terminate(0);
+          }
+        };
+      };
+      checkPassword(() => {
+        syscalls.pathExists(
+          defaultShell,
+          exists => {
+            if (exists) {
+              syscalls.exec({
+                path: defaultShell,
+                args: [],
+              }, () => syscalls.terminate(0));
+            } else {
+              syscalls.terminate(1);
+            }
+          }
+        );
+      });
+    });
   `
 }
 
