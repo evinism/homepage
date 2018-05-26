@@ -7,8 +7,8 @@ const syscalls = {
     console.log('wooo!!!'); cb(Err.none);
   },
   log: (arg, process, cb) => {
-    console.log('arg');
-    cb();
+    console.log(arg);
+    cb(Err.NONE);
   },
   write: (arg, process, cb) => {
     const { content, fd } = arg;
@@ -82,12 +82,12 @@ const syscalls = {
 
     const wd = getAbsolutePathStr(arg, process.cwd);
 
-    process.os.filesystem.pathExists(wd, exists => {
-      if (exists) {
+    process.os.filesystem.ensureFolder(wd, err => {
+      if (!err) {
         process.cwd = wd;
         cb(Err.NONE);
       } else {
-        cb(Err.ENOFOLDER);
+        cb(err);
       }
     });
   }

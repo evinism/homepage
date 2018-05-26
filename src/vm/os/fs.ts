@@ -145,6 +145,17 @@ class FileSystem {
     }
   }
 
+  ensureFolder(pathStr, cb : (Err) => void) {
+    const file = this.getFile(pathStr);
+    if (!file) {
+      cb(Err.ENOFOLDER);
+    } else if(!(file instanceof Folder)) {
+      cb(Err.ENOTFOLDER);
+    } else {
+      cb(Err.NONE);
+    }
+  }
+
   readDirContents(pathStr, cb : (string, Err) => void) {
     this.pathExists(pathStr, (exists) => {
       if (!exists) {

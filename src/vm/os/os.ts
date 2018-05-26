@@ -1,5 +1,6 @@
 import Filesystem from './fs';
 import Process from './process';
+import User from './user';
 import { Status } from './constants';
 import FileSystem from './fs';
 
@@ -32,6 +33,10 @@ class OS {
     this.filesystem = new Filesystem(fs);
   }
 
+  initUsers(users){
+
+  }
+
   // Should probs move this to other things here.
   execProcess(pathStr, args, wd, onTerminate) {
     this.filesystem.readFromFile(
@@ -47,7 +52,6 @@ class OS {
           args || [],
         );
         proc.start();
-        console.log(proc);
       }
     );
   }

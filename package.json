@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "react": "^16.3.2",
-    "react-dom": "^16.3.2"
+    "react-dom": "^16.3.2",
+    "react-string-replace": "^0.4.1"
   }
 }

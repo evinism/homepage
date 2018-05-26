@@ -32,7 +32,7 @@ const sh = {
             args[1] || '/',
             (err) => {
               if (err) {
-                stdout('An error occurred');
+                stdout('An error occurred\\n');
               }
               cb();
             }
@@ -249,13 +249,6 @@ const std = {
   `,
 }
 
-const hello_world = {
-  _isFile: true,
-  owner: 0,
-  permissions: '755',
-  content: 'Hello, world!',
-};
-
 const about_me = {
   _isFile: true,
   owner: 1,
@@ -264,7 +257,8 @@ const about_me = {
 `| Hi! My name is Evin Sellin! I make computers do things.
 | Most of my experience is in webdev, but I'm interested
 | in many aspects of computing, such as machine learning,
-| functional programming, and theory of computation.
+| functional programming, theory of computation, and web
+| performance!
 |
 | Feel free to email me at evinism@gmail.com or tweet at
 | my handle, @evinism.`,
@@ -309,7 +303,6 @@ const fs = { name: 'root', owner: 0, perm: '644',
     }},
     users: { owner: 0, perm: 644, children: {
       web: { owner: 1, perm: 644, children: {
-        hello_world,
         about_me,
         about_this_interface,
         links,
