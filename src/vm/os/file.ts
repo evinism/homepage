@@ -11,6 +11,7 @@ import { Device, FolderFile, ReadWritable } from './constants';
 export class TextFile implements FolderFile, ReadWritable {
   owner : number;
   permissions : string;
+  suid : boolean;
   content : string;
 
   constructor(init){
@@ -18,11 +19,13 @@ export class TextFile implements FolderFile, ReadWritable {
       owner,
       permissions,
       content,
+      suid,
     } = init;
 
     this.owner = owner;
     this.permissions = permissions;
     this.content = content;
+    this.suid = suid;
   }
 
   read(cb) {
@@ -39,11 +42,13 @@ export class DeviceFile implements FolderFile, ReadWritable {
   device : Device;
   owner : number;
   permissions : string; // perms-style string again.
+  suid : boolean;
 
   constructor(device){
     this.device = device;
     this.owner = 0;
     this.permissions = "644";
+    this.suid = false;
   }
 
   read(cb) {

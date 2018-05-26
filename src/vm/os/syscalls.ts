@@ -47,6 +47,7 @@ const syscalls = {
       getAbsolutePathStr(path, process.cwd),
       args,
       process.cwd,
+      process.user,
       cb
     );
   },
@@ -90,7 +91,10 @@ const syscalls = {
         cb(err);
       }
     });
-  }
+  },
+  getuname: (arg, process, cb) => {
+    cb(process.user.name, Err.NONE);
+  },
 }
 
 export default syscalls;

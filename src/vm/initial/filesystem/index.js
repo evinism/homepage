@@ -177,19 +177,6 @@ const rm = {
   `
 };
 
-const dicktown = {
-  _isFile: true,
-  owner: 0,
-  permissions: '755',
-  content: `
-    syscalls.write({
-      fd: 1,
-      content: "d i c k t o w n that's right it's dicktown"
-    });
-    syscalls.terminate(0);
-  `
-}
-
 const cat = {
   _isFile: true,
   owner: 0,
@@ -249,6 +236,45 @@ const std = {
   `,
 }
 
+const su = {
+  _isFile: true,
+  owner: 0,
+  permissions: '644',
+  suid: true,
+  content: `
+    const defaultShell = '/bin/sh';
+    syscalls.pathExists(
+      defaultShell,
+      exists => {
+        if (exists) {
+          syscalls.exec({
+            path: defaultShell,
+            args: [],
+          }, () => syscalls.terminate(0));
+        } else {
+          syscalls.terminate(1);
+        }
+      }
+    );
+  `
+}
+
+const whoami = {
+  _isFile: true,
+  owner: 0,
+  permissions: '644',
+  content: `
+    syscalls.getuname(null, (name, err) => {
+      syscalls.write({
+        fd: 1,
+        content: name + '\\n'
+      }, () => {
+        syscalls.terminate(0);
+      })
+    });
+  `
+}
+
 const about_me = {
   _isFile: true,
   owner: 1,
@@ -287,16 +313,29 @@ LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/`
 }
 
 
+const passwd = {
+  _isFile: true,
+  owner: 0,
+  permissions: '644',
+  content:
+`root:BLAH:0
+web:BLAH:1`,
+}
+
 const fs = { name: 'root', owner: 0, perm: '644',
   children: {
-    dev: { owner: 0, perm: '644', children: {} },
     bin: { owner: 0, perm: '644', children: {
       sh,
       cat,
       ls,
       pwd,
       rm,
-      dicktown,
+      su,
+      whoami,
+    }},
+    dev: { owner: 0, perm: '644', children: {} },
+    etc: { owner: 0, perm: '644', children: {
+      passwd,
     }},
     lib: { owner: 0, perm: '644', children: {
       std,

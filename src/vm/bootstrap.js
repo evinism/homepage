@@ -19,6 +19,8 @@ const bootstrap = async ({keydownPipe, keypressPipe, screenPipe}) => {
   await startupAnim(screen);
 
   const os = new OS();
+  // TODO: move this out of bootstrap into OS
+  // Instead use a REGISTER DEVICE type call.
   os.initFS(initialFilesystem);
   os.filesystem.mountDevice(keyboard, '/dev/keyboard');
   os.filesystem.mountDevice(screen, '/dev/screen');

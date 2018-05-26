@@ -1,5 +1,6 @@
 import { ProcStatus, FolderFile } from './constants';
 import OS from './os';
+import User from './user';
 import runInSandbox from './sandbox';
 import syscalls from './syscalls';
 
@@ -22,36 +23,36 @@ const configSyscalls = process => {
 };
 
 class Process {
-  owner : number;
   os : OS;
   source : string;
   status : ProcStatus;
   onTerminate : any;
+  user : User;
   cwd : string;
   env : object;
   args : Array<string>;
-  fds: Array<FolderFile>; // Should be actual files.
+  fds : Array<FolderFile>; // Should be actual files.
 
   constructor(
-    owner : number,
+    user : User,
     os : OS,
     source : string,
     onTerminate,
     env : object,
     cwd : string,
     args : Array<string>,
-  ){
+  ) {
     this.fds = [
       os.filesystem.getFile('/dev/keyboard'), //stdin
       os.filesystem.getFile('/dev/screen'), //stdout
       os.filesystem.getFile('/dev/screen'), //stderr
     ];
-    this.owner = owner;
     this.source = source;
     this.os = os;
     this.status = ProcStatus.PENDING;
     this.onTerminate = onTerminate;
     this.env = env;
+    this.user = user;
     this.cwd = cwd;
     this.args = args;
   }

@@ -9,6 +9,7 @@ const makeFS = (entry) => {
     return new TextFile({
       owner: entry.owner,
       permissions: entry.perm,
+      suid: entry.suid,
       content: entry.content,
     });
   } else {
@@ -123,6 +124,19 @@ class FileSystem {
     file.write(contents, noop);
     cb(Err.NONE);
   }
+
+  readFileMetadata(pathStr: string, cb){
+    const file = this.getFile(pathStr);
+    if (file === null) {
+      cb(null, Err.ENOFILE);
+    } else {
+      cb({
+        owner: file.owner,
+        permissions: file.permissions,
+        suid: file.suid === true,
+      });
+    }
+  };
 
   readFromFile(pathStr : string, cb: (string, bool, Err) => void) {
     const file = this.getFile(pathStr);
