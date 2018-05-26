@@ -4,7 +4,7 @@
       has: (_, prop) => { return !definedItems.includes(prop) },
       get: (_, prop) => { 
         if (prop !== Symbol.unscopables) {
-          throw('referencing undefined variable ' + prop.toString());
+          return undefined;
         }
       },
       set: (_, prop) => { throw('setting undefined variable ' + prop.toString()); },
@@ -18,7 +18,12 @@
       'eval',
       'args',
       'env',
-      Symbol.unscopables
+      Symbol.unscopables,
+       // for userspace MD5, grumble...
+       // at this rate i might just make a crypto syscall.
+      'encodeURIComponent',
+      'unescape',
+      'String',
     ];
 
     with(only(closure)) {(function(){

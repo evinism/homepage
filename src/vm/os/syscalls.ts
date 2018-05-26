@@ -92,9 +92,11 @@ const syscalls = {
       }
     });
   },
-  getuname: (arg, process, cb) => {
-    cb(process.user.name, Err.NONE);
+  getudata: (arg, process, cb) => {
+    const { name, id, password } = process.user
+    cb({ name, id, password }, Err.NONE);
   },
+
 }
 
 export default syscalls;
