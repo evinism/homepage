@@ -12,7 +12,13 @@ class App extends React.Component {
   }
 
   componentDidMount(){
-    window.addEventListener('click', this.refocus);
+    window.addEventListener('click', this.handleWindowClick);
+  }
+
+  handleWindowClick = () => {
+    if(window.getSelection().isCollapsed){
+      this.refocus();
+    }
   }
 
   refocus = () => {
