@@ -3,6 +3,10 @@ body {
   background-color: black;
 }
 
+.app {
+  position: relative;
+}
+
 .multiplier1 {
   background: repeating-linear-gradient(
     45deg,
@@ -44,7 +48,7 @@ pre {
 }
 
 /* LOL @ this button tho */
-button {
+input {
   position: absolute;
   bottom: 0;
 }

@@ -64,13 +64,17 @@ class App extends React.Component {
   render(){
     const { os } = this.props;
     return (
-      <div onKeyPress={this.handleKeypress} onKeyDown={this.handleKeydown}>
+      <div className="app">
         <Screen output={this.state.output} />
-        <button
+        <input
+          onKeyPress={this.handleKeypress}
+          onKeyDown={this.handleKeydown}
           ref={this.setButtonRef} 
+          type="text"
           autoFocus 
-          style={{opacity: '0.01'}}
-        >mee</button>
+          value=""
+          style={{opacity: '0.0001'}}
+        />
       </div>
     );
   }
