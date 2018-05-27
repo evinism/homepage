@@ -379,6 +379,7 @@ const about_this_interface = {
   permissions: '644',
   content:
 `| lol this thing isn't posix compliant but i sure wish it was.
+| Source code is hosted at https://github.com/evinism/homepage
 | This interface was inspired by https://github.com/rhelmot/linjus
 | To get an idea of what it consists of, try executing cat /bin/sh
 | or cat /dev/keyboard`
@@ -389,12 +390,52 @@ const links = {
   owner: 1,
   permissions: '644',
   content: 
-`Github: https://github.com/evinism
-Medium: https://medium.com/@evinsellin/
-Twitter: https://twitter.com/evinism
-LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/`
+`| Github: https://github.com/evinism
+| Medium: https://medium.com/@evinsellin/
+| Twitter: https://twitter.com/evinism
+| LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/`
 }
 
+const projects = {
+  _isFile: true,
+  owner: 1,
+  permissions: '644',
+  content:
+`| === Webapps ===
+| Lambda Explorer
+|  Lambda Explorer is a tutorial/REPL for the lambda calculus
+|  with a pretty clean interface. Like all things, it could
+|  use a little work, but is otherwise pretty interesting.
+|  Link: https://lambda-explorer.net/
+|
+| quick-pad
+|  Quick-pad is an authless collaborative notepad that makes
+|  creating new notes and sharing them extremely quickly.
+|  Link: https://www.quick-pad.org/
+|
+| === Articles ===
+| What exactly is Turing Completeness?
+|  A quick introduction to computation, giving us the tools to 
+|  tackling the question "Is this programming language Turing 
+|  Complete" beyond simply SPACE(N) completeness.
+|  Link: https://medium.com/@evinsellin/what-exactly-is-turing-completeness-a08cc36b26e2
+|
+| Teaching Monads Slightly Differently
+|  A description of problems I see with teaching monads (outside
+|  of statically typed functional languages) and an explanation
+|  using a different style 
+|  Link: https://medium.com/@evinsellin/teaching-monads-slightly-differently-2af62c4af8ce
+| 
+| === Talk(s) ===
+| The Hows and Whys of Frontend Web Performance
+|  Descriptive Blurb: We focus heavily on the performance of
+|  our apps from a backend perspective, but we often overlook
+|  the massive impact that frontend load performance tuning has 
+|  on a user's experience. In this talk, we'll go through what 
+|  "performance" even means from a frontend perspective and how
+|  to use the tools at our disposal to make our webapps feel fast.
+|  Given at the Santa Barbara JS meetup in May 2018`
+};
 
 const passwd = {
   _isFile: true,
@@ -424,11 +465,12 @@ const fs = { name: 'root', owner: 0, perm: '644',
     lib: { owner: 0, perm: '644', children: {
       std,
     }},
-    users: { owner: 0, perm: 644, children: {
-      web: { owner: 1, perm: 644, children: {
+    users: { owner: 0, perm: '644', children: {
+      web: { owner: 1, perm: '644', children: {
         about_me,
         about_this_interface,
         links,
+        projects,
       }}
     }}
   }
