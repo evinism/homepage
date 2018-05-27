@@ -14,8 +14,6 @@ const bootstrap = async ({keydownPipe, keypressPipe, screenPipe}) => {
   await startupAnim(screen);
 
   const os = new OS();
-  // TODO: move this out of bootstrap into OS
-  // Instead use a REGISTER DEVICE type call.
   os.registerDevice(keyboard, DeviceType.KEYBOARD);
   os.registerDevice(screen, DeviceType.SCREEN);
   os.start();

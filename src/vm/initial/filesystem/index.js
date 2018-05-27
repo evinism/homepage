@@ -4,14 +4,15 @@
   {
     _isFile: true
     owner:
-    permissions:
+    permissions: '75'// Two octets bc no groups.
+    suid?: bool,
     contents:
   }
 
   folder:
   {
     owner:
-    permissions:
+    permissions: //
     children: {
       fileName: file
     }
@@ -21,7 +22,7 @@
 const sh = {
   _isFile: true,
   owner: 0,
-  permissions: '755',
+  permissions: '75',
   content: `
     const require = syscalls.fread('/lib/std', stdlib => {
       const { stdout, stdin, shellExec } = eval(stdlib);
@@ -69,7 +70,7 @@ const sh = {
 const ls = {
   _isFile: true,
   owner: 0,
-  permissions: '755',
+  permissions: '75',
   content: `
     const dir = args[1] || '.';
     syscalls.dread(dir, content => {
@@ -86,7 +87,7 @@ const ls = {
 const pwd = {
   _isFile: true,
   owner: 0,
-  permissions: '755',
+  permissions: '75',
   content: `
     // eww on this null thing
     syscalls.getcwd(null, (cwd, err) => {
@@ -102,7 +103,7 @@ const pwd = {
 const rm = {
   _isFile: true,
   owner: 0,
-  permissions: '755',
+  permissions: '75',
   content: `
     if (!args[1]) {
       syscalls.write({
@@ -132,7 +133,7 @@ const rm = {
 const cat = {
   _isFile: true,
   owner: 0,
-  permissions: '755',
+  permissions: '75',
   content: `
     const target = args[1] || '/dev/keyboard';
     const readNext = () => {
@@ -249,7 +250,7 @@ const std = {
 const su = {
   _isFile: true,
   owner: 0,
-  permissions: '644',
+  permissions: '75',
   suid: true,
   content: `
     const require = syscalls.fread('/lib/std', stdlib => {
@@ -303,7 +304,7 @@ const su = {
 const sudo = {
   _isFile: true, 
   owner: 0,
-  permissions: '755',
+  permissions: '75',
   suid: true,
   content: `
   const require = syscalls.fread('/lib/std', stdlib => {
@@ -345,7 +346,7 @@ const sudo = {
 const whoami = {
   _isFile: true,
   owner: 0,
-  permissions: '644',
+  permissions: '75',
   content: `
     syscalls.getudata(null, ({name}, err) => {
       syscalls.write({
@@ -361,7 +362,7 @@ const whoami = {
 const about_me = {
   _isFile: true,
   owner: 1,
-  permissions: '644',
+  permissions: '64',
   content: 
 `| Hi! My name is Evin Sellin! I make computers do things.
 | Most of my experience is in webdev, but I'm interested
@@ -376,7 +377,7 @@ const about_me = {
 const about_this_interface = {
   _isFile: true,
   owner: 1,
-  permissions: '644',
+  permissions: '64',
   content:
 `| lol this thing isn't posix compliant but i sure wish it was.
 | Source code is hosted at https://github.com/evinism/homepage
@@ -388,7 +389,7 @@ const about_this_interface = {
 const links = {
   _isFile: true,
   owner: 1,
-  permissions: '644',
+  permissions: '64',
   content: 
 `| Github: https://github.com/evinism
 | Medium: https://medium.com/@evinsellin/
@@ -399,7 +400,7 @@ const links = {
 const projects = {
   _isFile: true,
   owner: 1,
-  permissions: '644',
+  permissions: '64',
   content:
 `| === Webapps ===
 | Lambda Explorer
@@ -440,15 +441,15 @@ const projects = {
 const passwd = {
   _isFile: true,
   owner: 0,
-  permissions: '644',
+  permissions: '64',
   content:
 `root:0684fd858f99d05b74f80f0b21f4db29:0
 web:5f4dcc3b5aa765d61d8327deb882cf99:1`,
 }
 
-const fs = { name: 'root', owner: 0, perm: '644',
+const fs = { name: 'root', owner: 0, perm: '75',
   children: {
-    bin: { owner: 0, perm: '644', children: {
+    bin: { owner: 0, perm: '75', children: {
       sh,
       cat,
       ls,
@@ -458,15 +459,15 @@ const fs = { name: 'root', owner: 0, perm: '644',
       sudo,
       whoami,
     }},
-    dev: { owner: 0, perm: '644', children: {} },
-    etc: { owner: 0, perm: '644', children: {
+    dev: { owner: 0, perm: '75', children: {} },
+    etc: { owner: 0, perm: '75', children: {
       passwd,
     }},
-    lib: { owner: 0, perm: '644', children: {
+    lib: { owner: 0, perm: '75', children: {
       std,
     }},
-    users: { owner: 0, perm: '644', children: {
-      web: { owner: 1, perm: '644', children: {
+    users: { owner: 0, perm: '75', children: {
+      web: { owner: 1, perm: '75', children: {
         about_me,
         about_this_interface,
         links,
