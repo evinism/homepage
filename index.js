@@ -1,4 +1,5 @@
-// import another component
-import main from './main';
+// import a CSS module
+import classes from './main.css';
+import mountComponent from './src';
 
-main();
+mountComponent(document.getElementById('mount'));

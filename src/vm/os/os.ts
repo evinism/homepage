@@ -1,8 +1,11 @@
 import Filesystem from './fs';
 import Process from './process';
 import User from './user';
-import { Status } from './constants';
+import { Status, Device } from './constants';
 import FileSystem from './fs';
+import initialFilesystem from '../initial/filesystem';
+import DeviceType from '../vmtypes';
+
 
 const motd = `
 ---------
@@ -31,6 +34,7 @@ class OS {
   users : Array<User> = [];
   cwd = '/';
   filesystem : FileSystem = undefined;
+  devices : Array<[Device, DeviceType]> = [];
 
   env = {
     path: '/bin/',
@@ -55,6 +59,22 @@ class OS {
       }
     );
   };
+
+  registerDevice = (dev, deviceType) => {
+    this.devices.push([dev, deviceType]);
+  }
+
+  mountDevices = () => {
+    // rn just overwrite every file with latest pushed device of that type
+    // hahahha i am an incredible coder
+    const mapping = {
+      [DeviceType.KEYBOARD]: '/dev/keyboard',
+      [DeviceType.SCREEN]: '/dev/screen',
+    };
+    this.devices.forEach(([dev, deviceType]) => {
+      this.filesystem.mountDevice(dev, mapping[deviceType]);
+    });
+  }
 
   // Should probs move this to other things here.
   execProcess(pathStr, args, wd, user, onTerminate) {
@@ -96,6 +116,8 @@ class OS {
   start () {
     // TODO: This start function should be the one initializing the FS
     // Not the bootstrapper
+    this.initFS(initialFilesystem);
+    this.mountDevices();
     this.initUsers(() =>{
       const webUser = this.users.find(user => user.id === 1);
       this.status = Status.RUNNING;
