@@ -24,7 +24,7 @@ const sh = {
   owner: 0,
   permissions: '75',
   content: `
-    const require = syscalls.fread('/lib/std', stdlib => {
+    syscalls.open({ path: '/lib/std' }, fd => { syscalls.read({fd}, (stdlib, err) => {
       const { stdout, stdin, shellExec } = eval(stdlib);
 
       if (env.motd) {
@@ -63,8 +63,7 @@ const sh = {
         readPrint();
       }
       prompt();
-    });
-  `,
+    })});`,
 };
 
 const ls = {
@@ -135,34 +134,65 @@ const cat = {
   owner: 0,
   permissions: '75',
   content: `
-    const target = args[1] || '/dev/keyboard';
-    const readNext = () => {
-      syscalls.fread(
-        target,
-        (content, eof, err) => {
+    const targets = args.slice(1);
+    let remainingFiles;
+    if(targets.length > 0) {
+      remainingFiles = targets.length;
+      targets.forEach(openAndCat);
+    } else {
+      remainingFiles = 1;
+      catfd(0);
+    }
+
+    function openAndCat(path){
+      syscalls.open({path, perms: 'r' }, (fd, err) => {
+        if (err) {
           syscalls.write({
             fd: 1,
-            content,
+            content: 'An error occurred'
           });
-          if (err) {
-            syscalls.write({
-              fd: 1,
-              content: 'An error occurred'
-            })
-          }
-          if (eof) {
-            syscalls.write({
-              fd: 1,
-              content: '\\n'
-            })
-            syscalls.terminate(0);
-          } else {
-            readNext();
-          }
+        } else {
+          catfd(fd);
         }
-      );
-    };
-    readNext();
+      });
+    }
+
+    function catfd(fd){
+      const readNext = () => {
+        syscalls.read(
+          { fd },
+          (content, eof, err) => {
+            syscalls.write({
+              fd: 1,
+              content,
+            });
+            if (err) {
+              syscalls.write({
+                fd: 1,
+                content: 'An error occurred'
+              });
+            }
+            if (eof) {
+              syscalls.write({
+                fd: 1,
+                content: '\\n'
+              })
+              finishAFile();
+            } else {
+              readNext();
+            }
+          }
+        );
+      };
+      readNext();
+    }
+
+    function finishAFile(){
+      remainingFiles--;
+      if(remainingFiles === 0) {
+        syscalls.terminate(0);
+      }
+    }
   `,
 };
 

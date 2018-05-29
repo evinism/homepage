@@ -18,6 +18,7 @@ export enum Err {
   ENOTFOLDER,
   EFILEEXISTS,
   EPERM,
+  EBADFD,
 };
 
 export interface Permissable {

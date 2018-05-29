@@ -13,11 +13,36 @@ const syscalls = {
   write: (arg, process, cb) => {
     const { content, fd } = arg;
     //TODO PERMS check. Probs do in the FS, not here.
-    process.fds[fd].write(content, cb);
+    if (process.fds[fd]) {
+      process.fds[fd].write(content, cb);
+    } else {
+      cb(Err.EBADFD);
+    }
   },
   read: (arg, process, cb) => {
-    const { content, fd } = arg;
-    process.fds[fd].read(cb);
+    const { fd } = arg;
+    if (process.fds[fd]) {
+      process.fds[fd].read(cb);
+    } else {
+      cb('', true, Err.EBADFD);
+    }
+  },
+  open: (arg, process, cb) => {
+    const { path, perms } = arg;
+    // TODO: perms on this call 
+    const absPath = getAbsolutePathStr(path, process.cwd);
+    const newFD = process.fds.length;
+    process.fds[newFD] = process.os.filesystem.getFile(absPath);
+    cb(newFD, Err.NONE);
+  },
+  close: (arg, process, cb) => {
+    const fd = arg;
+    if (process.fds[fd]) {
+      delete process.fds[fd];
+      cb(Err.NONE);
+    } else {
+      cb(Err.EBADFD);
+    }
   },
   fwrite: (arg, process, cb) => {
     // todo: write with permissions.
