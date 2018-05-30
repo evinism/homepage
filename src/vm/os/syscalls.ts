@@ -91,7 +91,7 @@ const syscalls = {
     );
   },
   // tells the kernel to terminate the process.
-  terminate: (arg, process, cb) => {
+  terminate: (arg, process, _) => {
     process.terminate();
   },
   // gets the current working directory of the process

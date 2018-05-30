@@ -1,33 +1,173 @@
-(function(){
-  function only(definedItems){
-    return new Proxy({}, {
-      has: (_, prop) => { return !definedItems.includes(prop) },
-      get: (_, prop) => { 
-        if (prop !== Symbol.unscopables) {
-          return undefined;
-        }
-      },
-      set: (_, prop) => { throw('setting undefined variable ' + prop.toString()); },
-    });
+/* Message types:
+-- outgoing --
+ ready
+  data: null
+ syscall
+  data: {
+    name: name of the syscall
+    id: uuid //or incremented
+    arg: the one singular arg
   }
 
-  window.runInSandbox = function(source, syscalls, args, env) {
-    const closure = [
-      'source',
-      'syscalls',
-      'eval',
-      'args',
-      'env',
-      Symbol.unscopables,
-       // for userspace MD5, grumble...
-       // at this rate i might just make a crypto syscall.
-      'encodeURIComponent',
-      'unescape',
-      'String',
-    ];
+-- incoming --
+ script:
+  data: {
+    type: 'script',
+    source: 'src'
+    syscallNames: ['name1', 'name2', 'etc'],
+    args: ['arg1', 'arg2', 'etc'],
+    env: {envObj},
+  }
+ syscallResponse
+  data: {
+    id: uuid // or incremented
+    args: [array, of, args],
+  }
+*/
 
-    with(only(closure)) {(function(){
+
+const sandboxText = iframeId => `
+<!doctype html>
+<html>
+  <head>
+    <script>
+      function runScript(source, syscalls, args, env){
         eval(source);
-    })();}
-  };
-})();
+      };
+
+      (function(){
+        let scriptContents = null;
+        let id = 30000;
+
+        const syscallCBs = {};
+
+        function makeSyscall(name, arg, cb){
+          syscallCBs[id] = cb;
+          post({type: 'syscall', name, arg, id });
+          id++;
+        }
+
+        function handleSyscallResponse(id, args){
+          syscallCBs[id] && syscallCBs[id](...args);
+        }
+
+        function syscallsFromNames(syscallNames){
+          return syscallNames.reduce((acc, name) => {
+            acc[name] = (arg, cb) => makeSyscall(name, arg, cb)
+            return acc;
+          }, {});
+        }
+
+        function loadScript(source, syscallNames, args, env){
+          runScript(source, syscallsFromNames(syscallNames), args, env);
+        }
+
+        function receiveMessage(msg){
+          switch(msg.type){
+            case 'script':
+              loadScript(msg.source, msg.syscallNames, msg.args, msg.env);
+              break;
+            case 'syscallResponse':
+              handleSyscallResponse(msg.id, msg.args)
+              break;
+          }
+        }
+
+        function post(msg){
+          window.parent.postMessage(JSON.stringify({ msg, iframeId: ${JSON.stringify(iframeId)}}), '*');
+        }
+
+        function listen(fn) {
+          const recv = evt => fn(JSON.parse(evt.data));
+          window.addEventListener("message", recv, false);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          listen(receiveMessage);
+          post({ type: 'ready' });
+        });
+      })();
+
+    </script>
+  </head>
+</html>
+`;
+
+let iframeId = 2000;
+
+class ProcessSandbox {
+  constructor(source, syscalls, args, env){
+    this.source = source;
+    this.syscalls = syscalls;
+    this.args = args;
+    this.env = env;
+
+    // wow this is garbage.
+    this.iframeId = iframeId;
+    iframeId++;
+
+    // initialization of the iframe
+    const iframe = document.createElement('iframe');
+    this.iframe = iframe;
+
+    document.body.appendChild(iframe);
+    iframe.contentWindow.document.open();
+    iframe.contentWindow.document.write(sandboxText(this.iframeId));
+    iframe.contentWindow.document.close();
+    this.listeners = [];
+    this.listen(this.handleEvent.bind(this));
+  }
+
+  post(msg){
+    this.iframe.contentWindow.postMessage(JSON.stringify(msg), '*');
+  }
+
+  listen(fn) {
+    const recv = evt => {
+      const { msg, iframeId } = JSON.parse(evt.data);
+      if(iframeId === this.iframeId) {
+        fn(msg);
+      }
+    }
+    window.addEventListener("message", recv, false);
+    this.listeners.push(recv);
+  }
+
+  handleEvent(evt){
+    switch(evt.type){
+      case 'ready':
+        this.post({
+          type: 'script',
+          source: this.source,
+          syscallNames: Object.keys(this.syscalls),
+          args: this.args,
+          env: this.env
+        });
+        break;
+      case 'syscall':
+        this.syscalls[evt.name](evt.arg, (...args) => {
+          this.post({
+            type: 'syscallResponse',
+            id: evt.id,
+            args,
+          });
+        });
+
+        // special case for the terminate case... a little weird to put it here but whatevs.
+        if(evt.name === 'terminate'){
+          this.cleanup();
+        }
+        break;
+    }
+  }
+
+  cleanup(){
+    document.body.removeChild(this.iframe);
+    this.listeners.forEach(fn => window.removeEventListener('message', fn));
+    this.listeners = [];
+  }
+};
+
+window.runInSandbox = function(source, syscalls, args, env) {
+  new ProcessSandbox(source, syscalls, args, env);
+}

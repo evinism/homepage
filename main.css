@@ -72,3 +72,7 @@ input {
     background-color: 44ff44;
   }
 }
+
+iframe {
+  display: none;
+}
