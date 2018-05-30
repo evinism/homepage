@@ -2,7 +2,7 @@ import Folder from './folder';
 import { TextFile, DeviceFile } from './file';
 import { FolderFile, Err } from './constants';
 
-const noop = () => {};
+const noop = (...args) => {};
 
 const makeFS = (entry) => {
   if (entry._isFile) {
@@ -79,20 +79,23 @@ class FileSystem {
     return traversePath(toPath(pathStr), this.root);
   }
 
-  newFile(newFile, pathStr){
+  newFile(newFile, pathStr, cb = noop){
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
     const folder = traversePath(folderPath, this.root);
 
     if (!(folder instanceof Folder)) {
-      throw('lol that aint a folderpath');
+      cb(Err.ENOFOLDER);
+      return;
     }
-
+    
     if (folder[fileName]) {
-      throw('lol that file exists');
+      cb(Err.EFILEEXISTS);
+      return;
     }
 
     folder.children[fileName] = newFile;
+    cb(Err.NONE);
   }
 
   removeFile(pathStr, cb : (Err) => void){

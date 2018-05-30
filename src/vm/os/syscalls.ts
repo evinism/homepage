@@ -30,10 +30,24 @@ const syscalls = {
   open: (arg, process, cb) => {
     const { path, perms } = arg;
     // TODO: perms on this call 
+    // TODO: Promisify stuff in fs, ugh...
     const absPath = getAbsolutePathStr(path, process.cwd);
     const newFD = process.fds.length;
-    process.fds[newFD] = process.os.filesystem.getFile(absPath);
-    cb(newFD, Err.NONE);
+    let file = process.os.filesystem.getFile(absPath);
+    if (!file && perms.indexOf('c') >= 0) {
+      process.os.filesystem.newFile('', absPath, err => {
+        file = process.os.filesystem.getFile(absPath);
+        if (!err) {
+          process.fds[newFD] = file;
+          cb(newFD, Err.NONE);
+        } else {
+          cb(-1, err);
+        }
+      });
+    } else {
+      process.fds[newFD] = file;
+      cb(newFD, Err.NONE);
+    }
   },
   close: (arg, process, cb) => {
     const fd = arg;

@@ -389,12 +389,46 @@ const whoami = {
   `
 }
 
+const touch = {
+  _isFile: true,
+  owner: 0,
+  permissions: '75',
+  content: `
+    if (args.length < 1) {
+      const helpStr = 'Usage: touch [name1] [name2]\\n';
+      syscalls.write({fd: 0, content: helpstr})
+    }
+    syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
+      if (err) {
+        syscalls.write({fd:0, content: 'An error occurred\\n'})
+        syscalls.terminate(1);
+      } else {
+        syscalls.terminate(0);
+      }
+    });
+  `
+}
+
+/// === actual info below!! ===
+const getBday = () => {
+  var birthday = new Date("1993-8-11");
+  var today = new Date();
+  var years = today.getFullYear() - birthday.getFullYear();
+
+  birthday.setFullYear(today.getFullYear());
+  if (today < birthday) {
+      years--;
+  }
+  return years;
+}
+
 const about_me = {
   _isFile: true,
   owner: 1,
   permissions: '64',
   content: 
-`| Hi! My name is Evin Sellin! I make computers do things.
+`| Hi! My name is Evin Sellin! I'm a ${getBday()} year old dork who
+| spends a lot of time making computers do dumb things.
 | Most of my experience is in webdev, but I'm interested
 | in many aspects of computing, such as machine learning,
 | functional programming, theory of computation, and web
@@ -432,7 +466,11 @@ const projects = {
   owner: 1,
   permissions: '64',
   content:
-`| === Webapps ===
+`| ========================
+| === Projects To Date ===
+| ========================
+|
+| --- Webapps ---
 | Lambda Explorer
 |  Lambda Explorer is a tutorial/REPL for the lambda calculus
 |  with a pretty clean interface. Like all things, it could
@@ -444,7 +482,7 @@ const projects = {
 |  creating new notes and sharing them extremely quickly.
 |  Link: https://www.quick-pad.org/
 |
-| === Articles ===
+| --- Articles ---
 | What exactly is Turing Completeness?
 |  A quick introduction to computation, giving us the tools to 
 |  tackling the question "Is this programming language Turing 
@@ -457,7 +495,7 @@ const projects = {
 |  using a different style 
 |  Link: https://medium.com/@evinsellin/teaching-monads-slightly-differently-2af62c4af8ce
 | 
-| === Talk(s) ===
+| --- Talk(s) ---
 | The Hows and Whys of Frontend Web Performance
 |  Descriptive Blurb: We focus heavily on the performance of
 |  our apps from a backend perspective, but we often overlook
@@ -487,6 +525,7 @@ const fs = { name: 'root', owner: 0, perm: '75',
       rm,
       su,
       sudo,
+      touch,
       whoami,
     }},
     dev: { owner: 0, perm: '75', children: {} },
