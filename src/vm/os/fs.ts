@@ -79,7 +79,7 @@ class FileSystem {
     return traversePath(toPath(pathStr), this.root);
   }
 
-  newFile(newFile, pathStr, cb = noop){
+  newFile(file, pathStr, cb = noop){
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
     const folder = traversePath(folderPath, this.root);
@@ -94,8 +94,21 @@ class FileSystem {
       return;
     }
 
-    folder.children[fileName] = newFile;
+    folder.children[fileName] = file;
     cb(Err.NONE);
+  }
+
+  newTextFile(contents, path, owner, cb){
+    this.newFile(
+      new TextFile({
+        // TODO: Fix this
+        owner: 0,
+        permissions: '64',
+        content: contents, // ewww on naming conventions here.
+      }),
+      path,
+      cb,
+    );
   }
 
   removeFile(pathStr, cb : (Err) => void){

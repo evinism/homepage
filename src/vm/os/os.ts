@@ -54,7 +54,7 @@ class OS {
       '/etc/passwd',
       passwd => {
         this.users = 
-          passwd.split('\n').map(makeUserFromEntry);
+          passwd.split('\n').map(makeUserFromEntry).filter(Boolean);
         cb();
       }
     );

@@ -19,6 +19,7 @@ export enum Err {
   EFILEEXISTS,
   EPERM,
   EBADFD,
+  EUNWRITABLE,
 };
 
 export interface Permissable {

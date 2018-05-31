@@ -1,5 +1,6 @@
 import Pipe from '../../../shared/pipe';
 import { Device } from '../constants';
+import { Err } from '../constants';
 
 class Keyboard implements Device {
   pending : Array<(string, boolean) => void>;
@@ -59,7 +60,7 @@ class Keyboard implements Device {
   }
 
   write (content, cb) {
-    cb(false);
+    cb(Err.EUNWRITABLE);
   }
 };
 

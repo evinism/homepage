@@ -1,6 +1,7 @@
 import { ScreenCommand } from '../../../shared/screenTypes';
 import { Device } from '../constants';
 import Pipe from '../../../shared/pipe';
+import { Err } from '../constants';
 
 class Screen implements Device {
   outpipe: Pipe<ScreenCommand>;
@@ -10,7 +11,7 @@ class Screen implements Device {
   }
 
   read (cb) {
-    cb('', true);
+    cb('', Err.NONE);
   }
 
   write (content : string, cb : any) {
@@ -25,7 +26,7 @@ class Screen implements Device {
         content,
       });
     }
-    cb(true);
+    cb(Err.NONE);
   }
 
   writeToScreen (screenCommand : ScreenCommand) {

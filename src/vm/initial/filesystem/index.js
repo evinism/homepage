@@ -149,8 +149,10 @@ const cat = {
         if (err) {
           syscalls.write({
             fd: 1,
-            content: 'An error occurred'
+            content: 'An error occurred in opening the file\\n'
           });
+          syscalls.terminate(err);
+          return;
         } else {
           catfd(fd);
         }
@@ -169,14 +171,12 @@ const cat = {
             if (err) {
               syscalls.write({
                 fd: 1,
-                content: 'An error occurred'
+                content: 'An error occurred in reading from the file'
               });
+              syscalls.terminate(err);
+              return;
             }
             if (eof) {
-              syscalls.write({
-                fd: 1,
-                content: '\\n'
-              })
               finishAFile();
             } else {
               readNext();
@@ -307,7 +307,7 @@ const su = {
               success();
             } else {
               stdout('\\nIncorrect password for root\\n');
-              syscalls.terminate(0);
+              syscalls.terminate(1);
             }
           });
         };
@@ -409,6 +409,66 @@ const touch = {
   `
 }
 
+const write = {
+  _isFile: true,
+  owner: 0,
+  permissions: '75',
+  content: `
+  syscalls.fread('/lib/std', stdlib => {
+    const {stdin, stdout} = eval(stdlib);
+
+    if(args.length !== 2) {
+      stdout('Usage: write [file]\\nWrites a file, listens until EOF\\n');
+      syscalls.terminate(0);
+      return;
+    }
+    const path = args[1];
+    let text = '';
+
+    // Copied from 
+    const readPrint = () => {
+      stdin((content, eof) => {
+          if (eof) {
+            writeTextToFile();
+          } else if (content === '\\b') {
+            if (text.length > 0) {
+              text = text.substr(0, text.length - 1);
+              stdout('\b');
+            }
+            readPrint();
+          } else {
+            stdout(content);
+            text += content;
+            readPrint();
+          }
+        }
+      );
+    };
+    readPrint();
+
+    const writeTextToFile = () => {
+      syscalls.open({ path, perms: 'wc' }, (fd, err) => {
+        if (!err) {
+          syscalls.write({
+            fd,
+            content: text,
+          }, err => {
+            if (err) {
+              debugger;
+              stdout('An error occurred in writing the file\\n');
+            }
+            syscalls.terminate(err);
+          });
+        } else {
+          stdout('An error occurred in opening the file\\n');
+          syscalls.terminate(err);
+        }
+      });
+    }
+  });
+  `
+};
+
 /// === actual info below!! ===
 const getBday = () => {
   var birthday = new Date("1993-8-11");
@@ -435,7 +495,8 @@ const about_me = {
 | performance!
 |
 | Feel free to email me at evinism@gmail.com or tweet at
-| my handle, @evinism.`,
+| my handle, @evinism.
+`,
 };
 
 const about_this_interface = {
@@ -447,7 +508,8 @@ const about_this_interface = {
 | Source code is hosted at https://github.com/evinism/homepage
 | This interface was inspired by https://github.com/rhelmot/linjus
 | To get an idea of what it consists of, try executing cat /bin/sh
-| or cat /dev/keyboard`
+| or cat /dev/keyboard
+`
 }
 
 const links = {
@@ -458,7 +520,8 @@ const links = {
 `| Github: https://github.com/evinism
 | Medium: https://medium.com/@evinsellin/
 | Twitter: https://twitter.com/evinism
-| LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/`
+| LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/
+`
 }
 
 const projects = {
@@ -503,7 +566,8 @@ const projects = {
 |  on a user's experience. In this talk, we'll go through what 
 |  "performance" even means from a frontend perspective and how
 |  to use the tools at our disposal to make our webapps feel fast.
-|  Given at the Santa Barbara JS meetup in May 2018`
+|  Given at the Santa Barbara JS meetup in May 2018
+`
 };
 
 const passwd = {
@@ -512,7 +576,8 @@ const passwd = {
   permissions: '64',
   content:
 `root:0684fd858f99d05b74f80f0b21f4db29:0
-web:5f4dcc3b5aa765d61d8327deb882cf99:1`,
+web:5f4dcc3b5aa765d61d8327deb882cf99:1
+`,
 }
 
 const fs = { name: 'root', owner: 0, perm: '75',
@@ -527,6 +592,7 @@ const fs = { name: 'root', owner: 0, perm: '75',
       sudo,
       touch,
       whoami,
+      write,
     }},
     dev: { owner: 0, perm: '75', children: {} },
     etc: { owner: 0, perm: '75', children: {

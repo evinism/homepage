@@ -35,7 +35,7 @@ const syscalls = {
     const newFD = process.fds.length;
     let file = process.os.filesystem.getFile(absPath);
     if (!file && perms.indexOf('c') >= 0) {
-      process.os.filesystem.newFile('', absPath, err => {
+      process.os.filesystem.newTextFile('', absPath, process.user.id, err => {
         file = process.os.filesystem.getFile(absPath);
         if (!err) {
           process.fds[newFD] = file;
@@ -44,9 +44,11 @@ const syscalls = {
           cb(-1, err);
         }
       });
-    } else {
+    } else if(file) {
       process.fds[newFD] = file;
       cb(newFD, Err.NONE);
+    } else {
+      cb(0, Err.ENOFILE);
     }
   },
   close: (arg, process, cb) => {

@@ -1,4 +1,5 @@
 import { Device, FolderFile, ReadWritable } from './constants';
+import { Err } from './constants';
 
 /* 
   interface file extends permissable 
@@ -29,12 +30,12 @@ export class TextFile implements FolderFile, ReadWritable {
   }
 
   read(cb) {
-    cb(this.content, true);
+    cb(this.content, true, Err.NONE);
   }
 
   write(content, cb) {
     this.content = content;
-    cb(true);
+    cb(Err.NONE);
   }
 }
 
