@@ -17,10 +17,6 @@ class Keyboard implements Device {
     let toSend;
     let eof = false;
     switch(keyCode){
-      case 8706:
-        toSend = '\n';
-        eof = true;
-        break;
       case 13:
         toSend = "\n";
         break;
@@ -40,6 +36,13 @@ class Keyboard implements Device {
     switch(keyCode){
       case 8:
         toSend = "\b";
+        break;
+      case 68:
+        if (native.metaKey) {
+          native.preventDefault();
+          toSend = '\n';
+          eof = true;
+        }
         break;
       default:
         break;

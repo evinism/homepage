@@ -454,7 +454,6 @@ const write = {
             content: text,
           }, err => {
             if (err) {
-              debugger;
               stdout('An error occurred in writing the file\\n');
             }
             syscalls.terminate(err);
