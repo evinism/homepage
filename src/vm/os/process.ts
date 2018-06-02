@@ -2,7 +2,7 @@ import { ProcStatus, FolderFile } from './constants';
 import OS from './os';
 import User from './user';
 import runInSandbox from './sandbox';
-import syscalls from './syscalls';
+import syscalls, { syscallSchemas } from './syscalls';
 
 const configSyscalls = process => {
   const ensureRunning = cb => (...args) => {
@@ -15,7 +15,25 @@ const configSyscalls = process => {
     .keys(syscalls)
     .map(key => ({
         key, 
-        cb: (arg, cb) => syscalls[key](arg, process, ensureRunning(cb)),
+        cb: (arg, cb) => {
+          let execSyscall = () => syscalls[key](arg, process, ensureRunning(cb));
+          // if there's a schema for the syscall
+          // check that it makes sense
+          if (syscallSchemas[key]) {
+            syscallSchemas[key]
+              .isValid(arg)
+              .then(isValid => {
+                // TODO: Make this actually fail with an error.
+                // we should put error in the first arg, because otherwise, this is silly.
+                if (!isValid) {
+                  console.error('Schema validation failed for ' + key);
+                }
+                execSyscall();
+              });
+          } else {
+            execSyscall();
+          }
+        },
     })).reduce(
       (acc, {key, cb}) => Object.assign(acc, { [key]: cb }),
       {}

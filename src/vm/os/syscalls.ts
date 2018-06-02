@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import { ProcStatus, Err } from './constants';
 import { getAbsolutePathStr } from './util';
 
@@ -145,5 +146,33 @@ const syscalls = {
     cb(Err.NONE);
   },
 }
+
+// if the schema exists in the syscall schema, it'll be
+// considered a precondition for the arg that should be checked.
+// obvs we can't do this through typechecking.
+export const syscallSchemas = {
+  write: yup.object().shape({
+    data: yup.string().required(),
+    fd: yup.number().positive().required(),
+  }),
+  read: yup.object().shape({
+    fd: yup.number().positive().required(), // lol at inconsistency
+  }),
+  open: yup.object().shape({
+    path: yup.string().required(),
+    perms: yup.string().matches(/^c?r?a?w?$/), // CRAW!!!
+  }),
+  close: yup.number().positive(),
+  fwrite: yup.object().shape({
+    data: yup.string().required(),
+    path: yup.string().required(),
+  }),
+  fread: yup.string().required(),
+  rmFile: yup.string().required(),
+  execProcess: yup.object().shape({
+    path: yup.string().required(),
+    args: yup.array().of(yup.string())
+  }),
+};
 
 export default syscalls;

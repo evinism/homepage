@@ -24,7 +24,7 @@ const sh = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.open({ path: '/lib/std' }, fd => { syscalls.read({fd}, (stdlib, err) => {
+    syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
       const { stdout, stdin, shellExec } = eval(stdlib);
 
       if (env.motd) {
@@ -394,14 +394,13 @@ const touch = {
   owner: 0,
   permissions: '75',
   data: `
-    if (args.length < 1) {
+    if (args.length < 2) {
       const helpStr = 'Usage: touch [name1] [name2]\\n';
-      syscalls.write({fd: 0, data: helpstr})
+      syscalls.write({fd: 1, data: helpStr})
     }
     syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
       if (err) {
-        debugger;
-        syscalls.write({fd:0, data: 'An error occurred\\n'})
+        syscalls.write({fd:1, data: 'An error occurred\\n'})
         syscalls.terminate(1);
       } else {
         syscalls.terminate(0);
@@ -448,7 +447,7 @@ const write = {
     readPrint();
 
     const writeTextToFile = () => {
-      syscalls.open({ path, perms: 'wc' }, (fd, err) => {
+      syscalls.open({ path, perms: 'cw' }, (fd, err) => {
         if (!err) {
           syscalls.write({
             fd,

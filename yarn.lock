@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@babel/runtime@^7.0.0-beta.47":
+  version "7.0.0-beta.49"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.49.tgz#03b3bf07eb982072c8e851dd2ddd5110282e61bf"
+  dependencies:
+    core-js "^2.5.6"
+    regenerator-runtime "^0.11.1"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -1154,6 +1161,10 @@ core-js@^2.4.0, core-js@^2.5.0:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.6.tgz#0fe6d45bf3cac3ac364a9d72de7576f4eb221b9d"
 
+core-js@^2.5.6:
+  version "2.5.7"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
+
 core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -1645,6 +1656,10 @@ fill-range@^4.0.0:
 flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
+
+fn-name@~2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -2193,7 +2208,7 @@ lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
-lodash@^4.17.4:
+lodash@^4.17.10, lodash@^4.17.4:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
@@ -2966,13 +2981,17 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-"prop-types@^0.14.9 || ^15.3.0 || ^16.0.0", prop-types@^15.6.0:
+prop-types@^15.6.0:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.1.tgz#36644453564255ddda391191fb3a125cbdf654ca"
   dependencies:
     fbjs "^0.8.16"
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
+
+property-expr@^1.2.0:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/property-expr/-/property-expr-1.3.2.tgz#2df60082c243e79118924ecb8f7ae7183b4fc43e"
 
 proto-list@~1.2.1:
   version "1.2.4"
@@ -3053,12 +3072,6 @@ rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-autolink-text2@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/react-autolink-text2/-/react-autolink-text2-3.2.0.tgz#f0df734d0463fde0b8505a66c581bd16eb129cd8"
-  dependencies:
-    prop-types "^0.14.9 || ^15.3.0 || ^16.0.0"
-
 react-dom@^16.3.2:
   version "16.4.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.0.tgz#099f067dd5827ce36a29eaf9a6cdc7cbf6216b1e"
@@ -3122,7 +3135,7 @@ regenerate@^1.2.1:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.0.tgz#4a856ec4b56e4077c557589cae85e7a4c8869a11"
 
-regenerator-runtime@^0.11.0:
+regenerator-runtime@^0.11.0, regenerator-runtime@^0.11.1:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
 
@@ -3553,6 +3566,10 @@ svgo@^1.0.5:
     unquote "~1.1.1"
     util.promisify "~1.0.0"
 
+synchronous-promise@^1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/synchronous-promise/-/synchronous-promise-1.0.18.tgz#936e8763e6554088cdcf78dc64f7473b972fcefc"
+
 tar@^4:
   version "4.4.4"
   resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.4.tgz#ec8409fae9f665a4355cc3b4087d0820232bb8cd"
@@ -3619,6 +3636,10 @@ toml@^2.3.3:
 tomlify-j0.4@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/tomlify-j0.4/-/tomlify-j0.4-3.0.0.tgz#99414d45268c3a3b8bf38be82145b7bba34b7473"
+
+toposort@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/toposort/-/toposort-2.0.2.tgz#ae21768175d1559d48bef35420b2f4962f09c330"
 
 trim-right@^1.0.1:
   version "1.0.1"
@@ -3785,3 +3806,14 @@ xtend@^4.0.0, xtend@~4.0.1:
 yallist@^3.0.0, yallist@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.2.tgz#8452b4bb7e83c7c188d8041c1a837c773d6d8bb9"
+
+yup@^0.25.1:
+  version "0.25.1"
+  resolved "https://registry.yarnpkg.com/yup/-/yup-0.25.1.tgz#09afe22af635fe11cf830a96ff4b906f8008f34e"
+  dependencies:
+    "@babel/runtime" "^7.0.0-beta.47"
+    fn-name "~2.0.1"
+    lodash "^4.17.10"
+    property-expr "^1.2.0"
+    synchronous-promise "^1.0.18"
+    toposort "^2.0.2"
