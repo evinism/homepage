@@ -36,12 +36,12 @@ const syscalls = {
     let file = process.os.filesystem.getFile(absPath);
     if (!file && perms.indexOf('c') >= 0) {
       process.os.filesystem.newTextFile('', absPath, process.user.id, err => {
-        file = process.os.filesystem.getFile(absPath);
         if (!err) {
+          file = process.os.filesystem.getFile(absPath);
           process.fds[newFD] = file;
           cb(newFD, Err.NONE);
         } else {
-          cb(-1, err);
+          cb(0, err);
         }
       });
     } else if(file) {

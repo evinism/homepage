@@ -2,6 +2,8 @@ import Folder from './folder';
 import { TextFile, DeviceFile } from './file';
 import { FolderFile, Err } from './constants';
 
+export const validIdentifier = name => (/^[^*/\\?"<>\|]+$/.test(name));
+
 const noop = (...args) => {};
 
 const makeFS = (entry) => {
@@ -82,6 +84,12 @@ class FileSystem {
   mountFile(file, pathStr, cb = noop){
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
+
+    if (!validIdentifier(fileName)) {
+      cb(Err.EBADFNAME);
+      return;
+    }
+
     const folder = traversePath(folderPath, this.root);
 
     if (!(folder instanceof Folder)) {
@@ -101,7 +109,6 @@ class FileSystem {
   newTextFile(data, path, owner, cb){
     this.mountFile(
       new TextFile({
-        // TODO: Fix this
         owner: 0,
         permissions: '64',
         data,

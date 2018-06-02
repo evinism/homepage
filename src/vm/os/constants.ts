@@ -20,6 +20,7 @@ export enum Err {
   EPERM,
   EBADFD,
   EUNWRITABLE,
+  EBADFNAME,
 };
 
 export interface Permissable {

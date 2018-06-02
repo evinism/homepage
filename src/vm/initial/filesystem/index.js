@@ -400,6 +400,7 @@ const touch = {
     }
     syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
       if (err) {
+        debugger;
         syscalls.write({fd:0, data: 'An error occurred\\n'})
         syscalls.terminate(1);
       } else {
