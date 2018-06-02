@@ -4,17 +4,17 @@ import { getAbsolutePathStr } from './util';
 // The last thing to a cb should always be an error code
 const syscalls = {
   partyHard: (arg, process, cb) => {
-    console.log('wooo!!!'); cb(Err.none);
+    console.log('wooo!!!'); cb(Err.NONE);
   },
   log: (arg, process, cb) => {
     console.log(arg);
     cb(Err.NONE);
   },
   write: (arg, process, cb) => {
-    const { content, fd } = arg;
+    const { data, fd } = arg;
     //TODO PERMS check. Probs do in the FS, not here.
     if (process.fds[fd]) {
-      process.fds[fd].write(content, cb);
+      process.fds[fd].write(data, cb);
     } else {
       cb(Err.EBADFD);
     }
@@ -63,7 +63,7 @@ const syscalls = {
   fwrite: (arg, process, cb) => {
     // todo: write with permissions.
     process.os.filesystem.writeToFile(
-      arg.content,
+      arg.data,
       getAbsolutePathStr(arg.path, process.cwd),
       cb
     );

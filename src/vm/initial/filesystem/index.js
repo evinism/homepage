@@ -6,7 +6,7 @@
     owner:
     permissions: '75'// Two octets bc no groups.
     suid?: bool,
-    contents:
+    data:
   }
 
   folder:
@@ -23,7 +23,7 @@ const sh = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     syscalls.open({ path: '/lib/std' }, fd => { syscalls.read({fd}, (stdlib, err) => {
       const { stdout, stdin, shellExec } = eval(stdlib);
 
@@ -37,24 +37,24 @@ const sh = {
         stdout('$ ');
   
         const readPrint = () => {
-          stdin((content, eof) => {
+          stdin((data, eof) => {
               if (eof) {
                 syscalls.terminate(0);
                 return;
               }
               // TODO: Replace this with proper error codes for FS.
-              if (content === '\\n') {
-                stdout(content);
+              if (data === '\\n') {
+                stdout(data);
                 shellExec(line, prompt);
-              } else if (content === '\\b') {
+              } else if (data === '\\b') {
                 if (line.length > 0) {
                   line = line.substr(0, line.length - 1);
                   stdout('\b');
                 }
                 readPrint();
               } else {
-                stdout(content);
-                line += content;
+                stdout(data);
+                line += data;
                 readPrint();
               }
             }
@@ -70,12 +70,12 @@ const ls = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     const dir = args[1] || '.';
-    syscalls.dread(dir, content => {
+    syscalls.dread(dir, data => {
       syscalls.write({
         fd: 1,
-        content: content + '\\n',
+        data: data + '\\n',
       }, () => {
         syscalls.terminate(0);
       });
@@ -87,12 +87,12 @@ const pwd = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     // eww on this null thing
     syscalls.getcwd(null, (cwd, err) => {
       syscalls.write({
         fd: 1,
-        content: cwd + '\\n'
+        data: cwd + '\\n'
       });
       syscalls.terminate(0);
     })
@@ -103,11 +103,11 @@ const rm = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     if (!args[1]) {
       syscalls.write({
         fd: 1,
-        content: 'usage: rm [file]\\n'
+        data: 'usage: rm [file]\\n'
       });
       syscalls.terminate(1);
     } else {
@@ -117,7 +117,7 @@ const rm = {
           if (err) {
             syscalls.write({
               fd: 1,
-              content: 'An error occurred\\n',
+              data: 'An error occurred\\n',
             });
             syscalls.terminate(1);
           } else {
@@ -133,7 +133,7 @@ const cat = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     const targets = args.slice(1);
     let remainingFiles;
     if(targets.length > 0) {
@@ -149,7 +149,7 @@ const cat = {
         if (err) {
           syscalls.write({
             fd: 1,
-            content: 'An error occurred in opening the file\\n'
+            data: 'An error occurred in opening the file\\n'
           });
           syscalls.terminate(err);
           return;
@@ -163,15 +163,15 @@ const cat = {
       const readNext = () => {
         syscalls.read(
           { fd },
-          (content, eof, err) => {
+          (data, eof, err) => {
             syscalls.write({
               fd: 1,
-              content,
+              data,
             });
             if (err) {
               syscalls.write({
                 fd: 1,
-                content: 'An error occurred in reading from the file'
+                data: 'An error occurred in reading from the file'
               });
               syscalls.terminate(err);
               return;
@@ -200,9 +200,9 @@ const std = {
   _isFile: true,
   owner: 0,
   permissions: '644',
-  content: `
-    const stdout = content => syscalls.write({
-      content,
+  data: `
+    const stdout = data => syscalls.write({
+      data,
       fd: 1,
     });
 
@@ -282,7 +282,7 @@ const su = {
   owner: 0,
   permissions: '75',
   suid: true,
-  content: `
+  data: `
     const require = syscalls.fread('/lib/std', stdlib => {
       const { stdout, stdin, md5 } = eval(stdlib);
       const defaultShell = '/bin/sh';
@@ -336,7 +336,7 @@ const sudo = {
   owner: 0,
   permissions: '75',
   suid: true,
-  content: `
+  data: `
   const require = syscalls.fread('/lib/std', stdlib => {
     const { stdout, stdin, md5, shellExec } = eval(stdlib);
     const defaultShell = '/bin/sh';
@@ -377,11 +377,11 @@ const whoami = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     syscalls.getudata(null, ({name}, err) => {
       syscalls.write({
         fd: 1,
-        content: name + '\\n'
+        data: name + '\\n'
       }, () => {
         syscalls.terminate(0);
       })
@@ -393,14 +393,14 @@ const touch = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
     if (args.length < 1) {
       const helpStr = 'Usage: touch [name1] [name2]\\n';
-      syscalls.write({fd: 0, content: helpstr})
+      syscalls.write({fd: 0, data: helpstr})
     }
     syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
       if (err) {
-        syscalls.write({fd:0, content: 'An error occurred\\n'})
+        syscalls.write({fd:0, data: 'An error occurred\\n'})
         syscalls.terminate(1);
       } else {
         syscalls.terminate(0);
@@ -413,7 +413,7 @@ const write = {
   _isFile: true,
   owner: 0,
   permissions: '75',
-  content: `
+  data: `
   syscalls.fread('/lib/std', stdlib => {
     const {stdin, stdout} = eval(stdlib);
 
@@ -427,18 +427,18 @@ const write = {
 
     // Copied from 
     const readPrint = () => {
-      stdin((content, eof) => {
+      stdin((data, eof) => {
           if (eof) {
             writeTextToFile();
-          } else if (content === '\\b') {
+          } else if (data === '\\b') {
             if (text.length > 0) {
               text = text.substr(0, text.length - 1);
               stdout('\b');
             }
             readPrint();
           } else {
-            stdout(content);
-            text += content;
+            stdout(data);
+            text += data;
             readPrint();
           }
         }
@@ -451,7 +451,7 @@ const write = {
         if (!err) {
           syscalls.write({
             fd,
-            content: text,
+            data: text,
           }, err => {
             if (err) {
               stdout('An error occurred in writing the file\\n');
@@ -485,7 +485,7 @@ const about_me = {
   _isFile: true,
   owner: 1,
   permissions: '64',
-  content: 
+  data: 
 `| Hi! My name is Evin Sellin! I'm a ${getBday()} year old dork who
 | spends a lot of time making computers do dumb things.
 | Most of my experience is in webdev, but I'm interested
@@ -502,7 +502,7 @@ const about_this_interface = {
   _isFile: true,
   owner: 1,
   permissions: '64',
-  content:
+  data:
 `| lol this thing isn't posix compliant but i sure wish it was.
 | Source code is hosted at https://github.com/evinism/homepage
 | This interface was inspired by https://github.com/rhelmot/linjus
@@ -515,7 +515,7 @@ const links = {
   _isFile: true,
   owner: 1,
   permissions: '64',
-  content: 
+  data: 
 `| Github: https://github.com/evinism
 | Medium: https://medium.com/@evinsellin/
 | Twitter: https://twitter.com/evinism
@@ -527,7 +527,7 @@ const projects = {
   _isFile: true,
   owner: 1,
   permissions: '64',
-  content:
+  data:
 `| ========================
 | === Projects To Date ===
 | ========================
@@ -573,7 +573,7 @@ const passwd = {
   _isFile: true,
   owner: 0,
   permissions: '64',
-  content:
+  data:
 `root:0684fd858f99d05b74f80f0b21f4db29:0
 web:5f4dcc3b5aa765d61d8327deb882cf99:1
 `,

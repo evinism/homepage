@@ -54,7 +54,7 @@ input {
 }
 
 .cursor {
-  content: ' ';
+  data: ' ';
   animation: cursorBlink 0.7s infinite;
 }
 

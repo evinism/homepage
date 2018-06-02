@@ -10,7 +10,7 @@ const makeFS = (entry) => {
       owner: entry.owner,
       permissions: entry.perm,
       suid: entry.suid,
-      content: entry.content,
+      data: entry.data,
     });
   } else {
     const children = Object
@@ -79,7 +79,7 @@ class FileSystem {
     return traversePath(toPath(pathStr), this.root);
   }
 
-  newFile(file, pathStr, cb = noop){
+  mountFile(file, pathStr, cb = noop){
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
     const folder = traversePath(folderPath, this.root);
@@ -98,13 +98,13 @@ class FileSystem {
     cb(Err.NONE);
   }
 
-  newTextFile(contents, path, owner, cb){
-    this.newFile(
+  newTextFile(data, path, owner, cb){
+    this.mountFile(
       new TextFile({
         // TODO: Fix this
         owner: 0,
         permissions: '64',
-        content: contents, // ewww on naming conventions here.
+        data,
       }),
       path,
       cb,
@@ -132,12 +132,12 @@ class FileSystem {
     cb(Err.NONE);
   }
 
-  writeToFile(contents : string, pathStr : string, cb : (Err) => void){
+  writeToFile(data : string, pathStr : string, cb : (Err) => void){
     const file = this.getFile(pathStr);
     if (file instanceof Folder) { // TODO: move to typeof guard.
       cb(Err.ENOTFILE);
     }
-    file.write(contents, noop);
+    file.write(data, noop);
     cb(Err.NONE);
   }
 
@@ -161,7 +161,7 @@ class FileSystem {
     } else if (file instanceof Folder) {
       cb('', true, Err.ENOTFILE);
     } else {
-      file.read((contents, eof) => cb(contents, eof, Err.NONE));
+      file.read((data, eof) => cb(data, eof, Err.NONE));
     }
   }
 
@@ -203,7 +203,7 @@ class FileSystem {
   }
 
   mountDevice(device, pathStr){
-    this.newFile(new DeviceFile(device), pathStr);
+    this.mountFile(new DeviceFile(device), pathStr);
   }
 }
 

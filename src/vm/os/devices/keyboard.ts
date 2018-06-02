@@ -62,7 +62,7 @@ class Keyboard implements Device {
     this.pending.push(cb);
   }
 
-  write (content, cb) {
+  write (data, cb) {
     cb(Err.EUNWRITABLE);
   }
 };

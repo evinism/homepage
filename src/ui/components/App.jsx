@@ -36,7 +36,7 @@ class App extends React.Component {
     }
     switch(cmd.type){
       case 'appendCommand': {
-        const str = cmd.content;
+        const str = cmd.data;
         this.setState(({ output }) => ({ output: output + str }), cb);
         break;
       }

@@ -1,6 +1,6 @@
 export interface AppendCommand {
   type: 'appendCommand',
-  content: string
+  data: string
 }
 
 export interface RemoveCommand {

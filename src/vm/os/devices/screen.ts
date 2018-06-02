@@ -14,8 +14,8 @@ class Screen implements Device {
     cb('', Err.NONE);
   }
 
-  write (content : string, cb : any) {
-    if (content === '\b') {
+  write (data : string, cb : any) {
+    if (data === '\b') {
       this.outpipe.fire({
         type: 'removeCommand',
         amount: 1,
@@ -23,7 +23,7 @@ class Screen implements Device {
     } else {
       this.outpipe.fire({
         type: 'appendCommand',
-        content,
+        data,
       });
     }
     cb(Err.NONE);

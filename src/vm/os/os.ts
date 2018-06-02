@@ -81,7 +81,7 @@ class OS {
     this.filesystem.readFileMetadata(pathStr, ({suid, owner}) => {
       this.filesystem.readFromFile(
         pathStr,
-        (content) => {
+        (data) => {
           let activeUser = user;
           if (suid) {
             activeUser = this.users.find(
@@ -95,7 +95,7 @@ class OS {
           const proc = new Process(
             activeUser,
             this,
-            content,
+            data,
             onTerminate,
             this.env,
             wd,
