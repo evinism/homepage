@@ -77,7 +77,7 @@ class FileSystem {
     this.root = makeFS(fsSnapshot);
   }
 
-  getFile(pathStr) {
+  getFolderFile(pathStr) {
     return traversePath(toPath(pathStr), this.root);
   }
 
@@ -140,7 +140,7 @@ class FileSystem {
   }
 
   writeToFile(data : string, pathStr : string, cb : (Err) => void){
-    const file = this.getFile(pathStr);
+    const file = this.getFolderFile(pathStr);
     if (file instanceof Folder) { // TODO: move to typeof guard.
       cb(Err.ENOTFILE);
     }
@@ -149,7 +149,7 @@ class FileSystem {
   }
 
   readFileMetadata(pathStr: string, cb){
-    const file = this.getFile(pathStr);
+    const file = this.getFolderFile(pathStr);
     if (file === null) {
       cb(null, Err.ENOFILE);
     } else {
@@ -162,7 +162,7 @@ class FileSystem {
   };
 
   readFromFile(pathStr : string, cb: (string, bool, Err) => void) {
-    const file = this.getFile(pathStr);
+    const file = this.getFolderFile(pathStr);
     if (file === null) {
       cb('', true, Err.ENOFILE);
     } else if (file instanceof Folder) {
@@ -174,7 +174,7 @@ class FileSystem {
 
   // TODO: pass back error codes instead
   pathExists(pathStr, cb : (bool) => void) {
-    const file = this.getFile(pathStr);
+    const file = this.getFolderFile(pathStr);
     if (file) {
       cb(true);
     } else {
@@ -183,7 +183,7 @@ class FileSystem {
   }
 
   ensureFolder(pathStr, cb : (Err) => void) {
-    const file = this.getFile(pathStr);
+    const file = this.getFolderFile(pathStr);
     if (!file) {
       cb(Err.ENOFOLDER);
     } else if(!(file instanceof Folder)) {
@@ -199,7 +199,7 @@ class FileSystem {
         cb('', Err.ENOFILE);
         return;
       }
-      const folder = this.getFile(pathStr);
+      const folder = this.getFolderFile(pathStr);
       if (!(folder instanceof Folder)) {
         cb('', Err.ENOTFOLDER)
       } else {

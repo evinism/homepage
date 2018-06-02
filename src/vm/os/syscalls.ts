@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import { ProcStatus, Err } from './constants';
 import { getAbsolutePathStr } from './util';
+import Folder from './folder';
 
 // The last thing to a cb should always be an error code
 const syscalls = {
@@ -34,22 +35,25 @@ const syscalls = {
     // TODO: Promisify stuff in fs, ugh...
     const absPath = getAbsolutePathStr(path, process.cwd);
     const newFD = process.fds.length;
-    let file = process.os.filesystem.getFile(absPath);
+    let file = process.os.filesystem.getFolderFile(absPath);
+    // todo: move this logic to be in fs
     if (!file && perms.indexOf('c') >= 0) {
       process.os.filesystem.newTextFile('', absPath, process.user.id, err => {
         if (!err) {
-          file = process.os.filesystem.getFile(absPath);
+          file = process.os.filesystem.getFolderFile(absPath);
           process.fds[newFD] = file;
           cb(newFD, Err.NONE);
         } else {
           cb(0, err);
         }
       });
-    } else if(file) {
+    } else if(!file) {
+      cb(0, Err.ENOFILE);
+    } else if (file instanceof Folder) {
+      cb(0, Err.ENOTFILE);
+    } else {
       process.fds[newFD] = file;
       cb(newFD, Err.NONE);
-    } else {
-      cb(0, Err.ENOFILE);
     }
   },
   close: (arg, process, cb) => {
