@@ -109,7 +109,8 @@ class OS {
   }
 
   systemShutdown(){
-    this.filesystem.writeToFile('\nGoodbye!', '/dev/screen', NOOP);
+    this.filesystem.writeToFile('\nShutting down OS...\nGoodbye!\n', '/dev/screen', NOOP);
+    this.filesystem.writeToFile('\u0004', '/dev/screen', NOOP);
     this.status = Status.FINISHED;
   }
 

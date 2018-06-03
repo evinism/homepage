@@ -131,6 +131,27 @@ class FileSystem {
     );
   }
 
+  removeFolder(pathStr, cb : (Err) => void) {
+    const path = toPath(pathStr);
+    const { folderPath, fileName : childFolderName } = splitPath(path);
+    const parentFolder = traversePath(folderPath, this.root);
+    if (!parentFolder) {
+      cb(Err.ENOFOLDER);
+      return;
+    }
+    const childFolder = traversePath([childFolderName], parentFolder);
+    if (!childFolder) {
+      cb(Err.ENOFOLDER);
+      return;
+    }
+    if (!(childFolder instanceof Folder)) {
+      cb(Err.ENOTFOLDER);
+      return;
+    }
+    delete parentFolder.children[childFolderName];
+    cb(Err.NONE);
+  }
+
   removeFile(pathStr, cb : (Err) => void){
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);

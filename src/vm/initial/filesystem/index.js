@@ -227,6 +227,9 @@ const std = {
           }
         );
       },
+      logout: (args, cb) => {
+        syscalls.terminate(0);
+      }
     };
 
     const shellExec = (line, shellCb) => {
@@ -476,7 +479,7 @@ const mkdir = {
     if(args.length < 2) {
       syscalls.write({
         fd: 1,
-        data: 'Usage: mkdir [dir1] [dir2]'
+        data: 'Usage: mkdir [dir1] [dir2]\\n'
       });
     }
     const makeNext = rest => {
@@ -500,7 +503,41 @@ const mkdir = {
     }
     makeNext(args.slice(1));
   `
-}
+};
+
+const rmdir = {
+  _isFile: true,
+  owner: 0,
+  permissions: '75',
+  data: `
+    if(args.length < 2) {
+      syscalls.write({
+        fd: 1,
+        data: 'Usage: rmdir [dir1] [dir2]\\n'
+      });
+    }
+    const rmNext = rest => {
+      if(rest.length === 0) {
+        syscalls.terminate(0);
+        return;
+      }
+      const next = rest[0];
+      rest = rest.slice(1);
+      syscalls.rmDir(next, err => {
+        if(err){
+          syscalls.write({
+            fd: 1,
+            data: 'An error occured while removing directory ' + next + '\\n',
+          });
+          syscalls.terminate(1);
+        } else {
+          rmNext(rest);
+        }
+      });
+    }
+    rmNext(args.slice(1));
+`
+};
 
 /// === actual info below!! ===
 const getBday = () => {
@@ -622,6 +659,7 @@ const fs = { name: 'root', owner: 0, perm: '75',
       mkdir,
       pwd,
       rm,
+      rmdir,
       su,
       sudo,
       touch,

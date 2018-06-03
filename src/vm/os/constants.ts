@@ -1,7 +1,7 @@
 export enum Status {
   HALTED,
   RUNNING,
-  FINISHED,
+  FINISHED = 3,
 };
 
 export enum ProcStatus {

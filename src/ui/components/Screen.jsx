@@ -1,4 +1,5 @@
 import React from 'react';
+import cx from 'classnames';
 
 class Screen extends React.Component {
   constructor(props){
@@ -11,7 +12,7 @@ class Screen extends React.Component {
       <div className="multiplier1">
         <div className="multiplier2">
           <div className="screen-wrapper"> 
-            <div className="screen" ref={this.screen}>
+            <div className={cx('screen', {off: this.props.off})} ref={this.screen}>
               <pre>
                 {this.props.output}
                 <span className='cursor'> </span></pre>

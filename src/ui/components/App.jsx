@@ -2,9 +2,17 @@ import React from 'react';
 import OsProvider from './OsProvider';
 import Screen from './screen';
 
+// lol lenses
+const changeParam = key => fn => (state) => ({
+  ...state,
+  [key]: fn(state[key])
+});
+
+const changeOutput = changeParam('output');
+const changeOff = changeParam('off');
 
 class App extends React.Component {
-  state = { output: '' };
+  state = { output: '', off: false };
 
   constructor(props){
     super(props);
@@ -37,16 +45,19 @@ class App extends React.Component {
     switch(cmd.type){
       case 'appendCommand': {
         const str = cmd.data;
-        this.setState(({ output }) => ({ output: output + str }), cb);
+        this.setState(changeOutput(output => output + str), cb);
         break;
       }
       case 'clearCommand': {
-        this.setState(() => ({ output: ''}), cb);
+        this.setState(changeOutput(() => ''), cb);
         break;
       }
       case 'removeCommand': {
-        this.setState(({ output }) => ({ output: output.substr(0, output.length - 1)}), cb);
+        this.setState(changeOutput(output => output.substr(0, output.length - 1)), cb);
         break;
+      }
+      case 'offCommand': {
+        this.setState(changeOff(() => true));
       }
       default:
         return;
@@ -71,7 +82,7 @@ class App extends React.Component {
     const { os } = this.props;
     return (
       <div className="app">
-        <Screen output={this.state.output} />
+        <Screen output={this.state.output} off={this.state.off} />
         <input
           onKeyPress={this.handleKeypress}
           onKeyDown={this.handleKeydown}

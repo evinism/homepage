@@ -93,6 +93,12 @@ const syscalls = {
       cb
     );
   },
+  rmDir: (arg, process, cb) => {
+    process.os.filesystem.removeFolder(
+      getAbsolutePathStr(arg, process.cwd),
+      cb
+    );
+  },
   // spins up a new process
   exec: ({ path, args }, process, cb) => {
     // once again, with permissions

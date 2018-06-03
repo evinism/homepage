@@ -20,6 +20,10 @@ class Screen implements Device {
         type: 'removeCommand',
         amount: 1,
       });
+    } else if(data === '\u0004') {
+      this.outpipe.fire({
+        type: 'offCommand',
+      });
     } else {
       this.outpipe.fire({
         type: 'appendCommand',

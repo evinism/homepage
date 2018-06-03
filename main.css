@@ -35,12 +35,19 @@ body {
   min-height: calc(100vh - 20px);
 }
 
+
 .screen {
   font-size: 1.4em;
   border: 3px solid #44ff44;
   padding-left: 10px;
   color: #44ff44;
   min-height: calc(100vh - 30px);
+  transition: color 1.5s ease-in 0.5s, border 1.5s ease-in 0.5s;
+}
+
+.screen.off {
+  border: 3px solid #242;
+  color: black;
 }
 
 pre {
@@ -56,6 +63,10 @@ input {
 .cursor {
   data: ' ';
   animation: cursorBlink 0.7s infinite;
+}
+
+.screen.off .cursor {
+  display: none;
 }
 
 @keyframes cursorBlink {

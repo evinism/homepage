@@ -12,4 +12,8 @@ export interface ClearCommand {
   type: 'clearCommand',
 }
 
-export type ScreenCommand = AppendCommand | RemoveCommand | ClearCommand;
+export interface OffCommand {
+  type: 'offCommand',
+}
+
+export type ScreenCommand = AppendCommand | RemoveCommand | ClearCommand | OffCommand;
