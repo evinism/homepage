@@ -86,6 +86,13 @@ const syscalls = {
       cb
     );
   },
+  mkDir: (arg, process, cb) => {
+    process.os.filesystem.makeDir(
+      getAbsolutePathStr(arg, process.cwd),
+      process.user.id,
+      cb
+    );
+  },
   // spins up a new process
   exec: ({ path, args }, process, cb) => {
     // once again, with permissions

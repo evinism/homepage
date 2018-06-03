@@ -468,6 +468,40 @@ const write = {
   `
 };
 
+const mkdir = {
+  _isFile: true,
+  owner: 0,
+  permissions: '75',
+  data: `
+    if(args.length < 2) {
+      syscalls.write({
+        fd: 1,
+        data: 'Usage: mkdir [dir1] [dir2]'
+      });
+    }
+    const makeNext = rest => {
+      if(rest.length === 0) {
+        syscalls.terminate(0);
+        return;
+      }
+      const next = rest[0];
+      rest = rest.slice(1);
+      syscalls.mkDir(next, err => {
+        if(err){
+          syscalls.write({
+            fd: 1,
+            data: 'An error occured while making directory ' + next + '\\n',
+          });
+          syscalls.terminate(1);
+        } else {
+          makeNext(rest);
+        }
+      });
+    }
+    makeNext(args.slice(1));
+  `
+}
+
 /// === actual info below!! ===
 const getBday = () => {
   var birthday = new Date("1993-8-11");
@@ -585,6 +619,7 @@ const fs = { name: 'root', owner: 0, perm: '75',
       sh,
       cat,
       ls,
+      mkdir,
       pwd,
       rm,
       su,

@@ -81,7 +81,7 @@ class FileSystem {
     return traversePath(toPath(pathStr), this.root);
   }
 
-  mountFile(file, pathStr, cb = noop){
+  mountFolderFile(file, pathStr, cb = noop){
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
 
@@ -97,7 +97,7 @@ class FileSystem {
       return;
     }
     
-    if (folder[fileName]) {
+    if (folder.children[fileName]) {
       cb(Err.EFILEEXISTS);
       return;
     }
@@ -106,10 +106,23 @@ class FileSystem {
     cb(Err.NONE);
   }
 
+  makeDir(path, owner, cb){
+    const { folderPath, fileName } = splitPath(path);
+    this.mountFolderFile(
+      new Folder({
+        owner,
+        permissions: '64',
+        children: [],
+      }),
+      path,
+      cb
+    );
+  }
+
   newTextFile(data, path, owner, cb){
-    this.mountFile(
+    this.mountFolderFile(
       new TextFile({
-        owner: 0,
+        owner,
         permissions: '64',
         data,
       }),
@@ -210,7 +223,7 @@ class FileSystem {
   }
 
   mountDevice(device, pathStr){
-    this.mountFile(new DeviceFile(device), pathStr);
+    this.mountFolderFile(new DeviceFile(device), pathStr);
   }
 }
 
