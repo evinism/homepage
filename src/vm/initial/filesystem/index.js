@@ -619,10 +619,10 @@ const about_this_interface = {
   permissions: '64',
   data:
 `| Source code is hosted at https://github.com/evinism/homepage
-| This interface was inspired by my freind's Audrey's project,
+| This interface was inspired by my friend Audrey's project,
 | hosted at https://github.com/rhelmot/linjus. To get an idea of
-| what it consists of, try executing cat /bin/sh or looking through
-| the root directory.
+| what this consists of, try executing cat /bin/sh or looking
+| through the root directory.
 |
 | There's a short puzzle in here! See if you can look through the
 | syscalls for something unusual...
