@@ -124,8 +124,8 @@ class ProcessSandbox {
 
   listen(fn) {
     const recv = evt => {
-      const { msg, iframeId } = JSON.parse(evt.data);
-      if(iframeId === this.iframeId) {
+      if(evt.source === this.iframe.contentWindow) {
+        const { msg } = JSON.parse(evt.data);
         fn(msg);
       }
     }

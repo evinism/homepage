@@ -35,6 +35,13 @@ body {
   min-height: calc(100vh - 20px);
 }
 
+a {
+  color: #44ff44;
+}
+
+a:hover {
+  color: #aaffaa;
+}
 
 .screen {
   font-size: 1.4em;

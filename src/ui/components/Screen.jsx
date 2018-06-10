@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactAutolinker from './Autolinker';
 import cx from 'classnames';
 
 class Screen extends React.Component {
@@ -14,7 +15,16 @@ class Screen extends React.Component {
           <div className="screen-wrapper"> 
             <div className={cx('screen', {off: this.props.off})} ref={this.screen}>
               <pre>
-                {this.props.output}
+                <ReactAutolinker
+                  text={this.props.output}
+                  tagName="span"
+                  options={{
+                    urls: { tldMatches: false },
+                    stripPrefix: false,
+                    stripTrailingSlash: false,
+                    mention: 'twitter',
+                  }}
+                />
                 <span className='cursor'> </span></pre>
             </div>
           </div>

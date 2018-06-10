@@ -104,7 +104,8 @@ const sh = {
         readPrint();
       }
       prompt();
-    })});`,
+    })});
+`,
 };
 
 const ls = {
