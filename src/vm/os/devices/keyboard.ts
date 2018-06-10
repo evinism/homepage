@@ -37,6 +37,10 @@ class Keyboard implements Device {
       case 8:
         toSend = "\b";
         break;
+      case 9:
+        native.preventDefault();
+        toSend = "\t";
+        break;
       case 68:
         if (native.metaKey) {
           native.preventDefault();

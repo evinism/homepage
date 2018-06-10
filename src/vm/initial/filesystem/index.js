@@ -25,7 +25,7 @@ const sh = {
   permissions: '75',
   data: `
     syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
-      const { stdout, stdin, shellExec } = eval(stdlib);
+      const { stdout, stdin, shellExec, sharedStart } = eval(stdlib);
 
       if (env.motd) {
         stdout(env.motd);
@@ -35,7 +35,44 @@ const sh = {
         let line = '';
   
         stdout('$ ');
-  
+
+        const tabComplete = (shouldShowTabResults, cont) => {
+          const args = line.trimStart().split(' ');
+          // for now, just disable tab completion. 
+          // later, make a method for getExecInPath in stdlib or something like that.
+          if (args.length === 1) {
+            cont();
+            return;
+          }
+          const pathArr = args[args.length - 1].split('/');
+          // if it ends in a slash, we want to preserve that??
+          // This code is awful.
+          const pathToCheck = pathArr.slice(0, -1).concat('').join('/');
+          const partial = pathArr.slice(-1)[0];
+          syscalls.dread(pathToCheck, data => {
+            const dirs = data
+              .split('\\n')
+              .filter(dir =>
+                dir.indexOf(partial) === 0
+              );
+            const completionData = sharedStart(dirs);
+            const additionalData = completionData.slice(partial.length);
+            if (!additionalData) {
+              if (shouldShowTabResults && dirs.length > 0) {
+                stdout('\\n' + dirs.concat('$ ' + line).join('\\n'));
+                cont();
+              } else {
+                cont();
+              }
+            } else {
+              line += additionalData;
+              additionalData && stdout(additionalData);
+              cont();
+            }
+          });
+        };
+
+        let lastData = null;
         const readPrint = () => {
           stdin((data, eof) => {
               if (eof) {
@@ -52,11 +89,15 @@ const sh = {
                   stdout('\b');
                 }
                 readPrint();
+              } else if (data === '\\t') {
+                const showTabResults = lastData === '\\t';
+                tabComplete(showTabResults, readPrint);
               } else {
                 stdout(data);
                 line += data;
                 readPrint();
               }
+              lastData = data;
             }
           );
         };
@@ -270,12 +311,28 @@ const std = {
       }
     }
 
+    const sharedStart = arrOfStrings => {
+      if (arrOfStrings.length === 0) {
+        return '';
+      }
+      const first = arrOfStrings[0];
+      const rest = arrOfStrings.slice(1);
+      const substrIndex = first.split('').findIndex(
+        (char, idx) => (!rest.every(str => str[idx] === char))
+      );
+      if (substrIndex < 0) {
+        return first;
+      }
+      return first.substr(0, substrIndex);
+    };
+
     // eval export
     ({
       stdout,
       stdin,
       shellExec,
       md5: md5Exp.md5,
+      sharedStart,
     });
   `,
 }
