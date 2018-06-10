@@ -158,9 +158,10 @@ const syscalls = {
   win: (arg, process, cb) => {
     if(process.user.id !== 0) {
       cb(Err.EPERM)
+    } else {
+      alert('a winner is you');
+      cb(Err.NONE);
     }
-    alert('a winner is you');
-    cb(Err.NONE);
   },
 }
 
