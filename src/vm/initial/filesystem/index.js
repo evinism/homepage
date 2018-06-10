@@ -596,33 +596,19 @@ const rmdir = {
 `
 };
 
-/// === actual info below!! ===
-const getBday = () => {
-  var birthday = new Date("1993-8-11");
-  var today = new Date();
-  var years = today.getFullYear() - birthday.getFullYear();
-
-  birthday.setFullYear(today.getFullYear());
-  if (today < birthday) {
-      years--;
-  }
-  return years;
-}
-
 const about_me = {
   _isFile: true,
   owner: 1,
   permissions: '64',
   data: 
-`| Hi! My name is Evin Sellin! I'm a ${getBday()} year old dork who
-| spends a lot of time making computers do dumb things.
-| Most of my experience is in webdev, but I'm interested
-| in many aspects of computing, such as machine learning,
-| functional programming, theory of computation, and web
-| performance!
+`| Hi! My name is Evin Sellin! I spend a lot of time making
+| computers do dumb things. Most of my experience is in webdev,
+| but I'm interested in many aspects of computing, such as
+| machine learning, functional programming, theory of computation,
+| and web performance!
 |
-| Feel free to email me at evinism@gmail.com or tweet at
-| my handle, @evinism.
+| Feel free to email me at evinism@gmail.com or tweet at @evinism
+| to contact me.
 `,
 };
 
@@ -631,11 +617,14 @@ const about_this_interface = {
   owner: 1,
   permissions: '64',
   data:
-`| lol this thing isn't posix compliant but i sure wish it was.
-| Source code is hosted at https://github.com/evinism/homepage
-| This interface was inspired by https://github.com/rhelmot/linjus
-| To get an idea of what it consists of, try executing cat /bin/sh
-| or cat /dev/keyboard
+`| Source code is hosted at https://github.com/evinism/homepage
+| This interface was inspired by my freind's Audrey's project,
+| hosted at https://github.com/rhelmot/linjus. To get an idea of
+| what it consists of, try executing cat /bin/sh or looking through
+| the root directory.
+|
+| There's a short puzzle in here! See if you can look through the
+| syscalls for something unusual...
 `
 }
 
