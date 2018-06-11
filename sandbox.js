@@ -59,7 +59,13 @@ const sandboxText = iframeId => `
         }
 
         function loadScript(source, syscallNames, args, env){
-          runScript(source, syscallsFromNames(syscallNames), args, env);
+          const syscalls =  syscallsFromNames(syscallNames);
+          try {
+            runScript(source, syscalls, args, env);
+          } catch (e) {
+            syscalls.write({ fd: 2, data: e.stack + '\\n' });
+            syscalls.terminate(1);
+          }
         }
 
         function receiveMessage(msg){
