@@ -2,12 +2,10 @@ import * as yup from 'yup';
 import { ProcStatus, Err } from './constants';
 import { getAbsolutePathStr } from './util';
 import Folder from './folder';
+import win from './win';
 
 // The last thing to a cb should always be an error code
 const syscalls = {
-  partyHard: (arg, process, cb) => {
-    console.log('wooo!!!'); cb(Err.NONE);
-  },
   log: (arg, process, cb) => {
     console.log(arg);
     cb(Err.NONE);
@@ -159,7 +157,7 @@ const syscalls = {
     if(process.user.id !== 0) {
       cb(Err.EPERM)
     } else {
-      alert('a winner is you');
+      win(process);
       cb(Err.NONE);
     }
   },
