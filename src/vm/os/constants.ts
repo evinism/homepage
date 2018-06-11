@@ -12,15 +12,15 @@ export enum ProcStatus {
 
 export enum Err {
   NONE = 0,
-  ENOFILE,
-  ENOFOLDER,
-  ENOTFILE,
-  ENOTFOLDER,
-  EFILEEXISTS,
-  EPERM,
-  EBADFD,
-  EUNWRITABLE,
-  EBADFNAME,
+  ENOFILE = 1,
+  ENOFOLDER = 2,
+  ENOTFILE = 3,
+  ENOTFOLDER = 4,
+  EFILEEXISTS = 5,
+  EPERM = 6,
+  EBADFD = 7,
+  EUNWRITABLE = 8,
+  EBADFNAME = 9,
 };
 
 export interface Permissable {

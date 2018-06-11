@@ -113,16 +113,23 @@ const ls = {
   owner: 0,
   permissions: '75',
   data: `
-    const dir = args[1] || '.';
-    syscalls.dread(dir, data => {
-      syscalls.write({
-        fd: 1,
-        data: data + '\\n',
-      }, () => {
-        syscalls.terminate(0);
+    syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
+      const { stdout, stderr, errStr } = eval(stdlib);
+      const dir = args[1] || '.';
+      syscalls.dread(dir, (data, err) => {
+        if (err) {
+          stderr('An error occurred ' + errStr(err) + '\\n');
+          syscalls.terminate(err);
+        } else {
+          const endChar = data.slice(-1) === '\\n'
+            ? ''
+            : '\\n';
+          stdout(data + endChar);
+          syscalls.terminate(0);
+        }
       });
-    });
-  `
+    })});
+`
 };
 
 const pwd = {
@@ -138,7 +145,7 @@ const pwd = {
       });
       syscalls.terminate(0);
     })
-  `
+`
 }
 
 const rm = {
@@ -146,29 +153,26 @@ const rm = {
   owner: 0,
   permissions: '75',
   data: `
-    if (!args[1]) {
-      syscalls.write({
-        fd: 1,
-        data: 'usage: rm [file]\\n'
-      });
-      syscalls.terminate(1);
-    } else {
-      syscalls.rmFile(
-        args[1],
-        (err) => {
-          if (err) {
-            syscalls.write({
-              fd: 1,
-              data: 'An error occurred\\n',
-            });
-            syscalls.terminate(1);
-          } else {
-            syscalls.terminate(0);
+    syscalls.fread('/lib/std', stdlib => {
+      const { stdout, stderr, errStr } = eval(stdlib);
+      if (!args[1]) {
+        stdout('usage: rm [file]\\n');
+        syscalls.terminate(0);
+      } else {
+        syscalls.rmFile(
+          args[1],
+          (err) => {
+            if (err) {
+              stderr('An error occurred ' + errStr(err) +'\\n');
+              syscalls.terminate(1);
+            } else {
+              syscalls.terminate(0);
+            }
           }
-        }
-      );
-    }
-  `
+        );
+      }
+    });
+`
 };
 
 const cat = {
@@ -176,66 +180,69 @@ const cat = {
   owner: 0,
   permissions: '75',
   data: `
-    const targets = args.slice(1);
-    let remainingFiles;
-    if(targets.length > 0) {
-      remainingFiles = targets.length;
-      targets.forEach(openAndCat);
-    } else {
-      remainingFiles = 1;
-      catfd(0);
-    }
+    syscalls.fread('/lib/std', stdlib => {
+      const { errStr } = eval(stdlib);
+      const targets = args.slice(1);
+      let remainingFiles;
+      if(targets.length > 0) {
+        remainingFiles = targets.length;
+        targets.forEach(openAndCat);
+      } else {
+        remainingFiles = 1;
+        catfd(0);
+      }
 
-    function openAndCat(path){
-      syscalls.open({path, perms: 'r' }, (fd, err) => {
-        if (err) {
-          syscalls.write({
-            fd: 1,
-            data: 'An error occurred in opening the file\\n'
-          });
-          syscalls.terminate(err);
-          return;
-        } else {
-          catfd(fd);
-        }
-      });
-    }
-
-    function catfd(fd){
-      const readNext = () => {
-        syscalls.read(
-          { fd },
-          (data, eof, err) => {
+      function openAndCat(path){
+        syscalls.open({path, perms: 'r' }, (fd, err) => {
+          if (err) {
             syscalls.write({
               fd: 1,
-              data,
+              data: 'An error occurred in opening the file ' + errStr(err) + '\\n'
             });
-            if (err) {
+            syscalls.terminate(err);
+            return;
+          } else {
+            catfd(fd);
+          }
+        });
+      }
+
+      function catfd(fd){
+        const readNext = () => {
+          syscalls.read(
+            { fd },
+            (data, eof, err) => {
               syscalls.write({
                 fd: 1,
-                data: 'An error occurred in reading from the file'
+                data,
               });
-              syscalls.terminate(err);
-              return;
+              if (err) {
+                syscalls.write({
+                  fd: 1,
+                  data: 'An error occurred in reading from the file ' + errStr(err)
+                });
+                syscalls.terminate(err);
+                return;
+              }
+              if (eof) {
+                finishAFile();
+              } else {
+                readNext();
+              }
             }
-            if (eof) {
-              finishAFile();
-            } else {
-              readNext();
-            }
-          }
-        );
-      };
-      readNext();
-    }
-
-    function finishAFile(){
-      remainingFiles--;
-      if(remainingFiles === 0) {
-        syscalls.terminate(0);
+          );
+        };
+        readNext();
       }
-    }
-  `,
+
+      function finishAFile(){
+        remainingFiles--;
+        if(remainingFiles === 0) {
+          syscalls.terminate(0);
+        }
+      }
+    });
+`,
 };
 
 const std = {
@@ -246,6 +253,11 @@ const std = {
     const stdout = data => syscalls.write({
       data,
       fd: 1,
+    });
+
+    const stderr = data => syscalls.write({
+      data,
+      fd: 2,
     });
 
     const stdin = cb => syscalls.read(
@@ -327,15 +339,34 @@ const std = {
       return first.substr(0, substrIndex);
     };
 
+    // an arr bc syntax is easier like that.
+    const errCodes = [
+      'NONE',
+      'ENOFILE',
+      'ENOFOLDER',
+      'ENOTFILE',
+      'ENOTFOLDER',
+      'EFILEEXISTS',
+      'EPERM',
+      'EBADFD',
+      'EUNWRITABLE',
+      'EBADFNAME',
+    ];
+
+    const errStr = (err) => '(' + errCodes[err] + ')';
+
     // eval export
     ({
-      stdout,
       stdin,
+      stdout,
+      stderr,
       shellExec,
       md5: md5Exp.md5,
       sharedStart,
+      errCodes,
+      errStr,
     });
-  `,
+`,
 }
 
 const su = {
@@ -389,7 +420,7 @@ const su = {
         );
       });
     });
-  `
+`
 }
 
 const sudo = {
@@ -398,7 +429,7 @@ const sudo = {
   permissions: '75',
   suid: true,
   data: `
-  const require = syscalls.fread('/lib/std', stdlib => {
+  syscalls.fread('/lib/std', stdlib => {
     const { stdout, stdin, md5, shellExec } = eval(stdlib);
     const defaultShell = '/bin/sh';
     const checkPassword = success => {
@@ -431,7 +462,7 @@ const sudo = {
       shellExec(args.slice(1).join(' '), () => syscalls.terminate(0))
     });
   });
-  `
+`
 }
 
 const whoami = {
@@ -447,7 +478,7 @@ const whoami = {
         syscalls.terminate(0);
       })
     });
-  `
+`
 }
 
 const touch = {
@@ -455,19 +486,22 @@ const touch = {
   owner: 0,
   permissions: '75',
   data: `
-    if (args.length < 2) {
-      const helpStr = 'Usage: touch [name1] [name2]\\n';
-      syscalls.write({fd: 1, data: helpStr})
-    }
-    syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
-      if (err) {
-        syscalls.write({fd:1, data: 'An error occurred\\n'})
-        syscalls.terminate(1);
-      } else {
-        syscalls.terminate(0);
+    syscalls.fread('/lib/std', stdlib => {
+      const { stdout, stderr, errStr } = eval(stdlib);
+      if (args.length < 2) {
+        const helpStr = 'Usage: touch [name1] [name2]\\n';
+        syscalls.write({fd: 1, data: helpStr})
       }
+      syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
+        if (err) {
+          stderr('An error occurred ' + errStr(err) +  '\\n');
+          syscalls.terminate(1);
+        } else {
+          syscalls.terminate(0);
+        }
+      });
     });
-  `
+`
 }
 
 const write = {
@@ -475,58 +509,58 @@ const write = {
   owner: 0,
   permissions: '75',
   data: `
-  syscalls.fread('/lib/std', stdlib => {
-    const {stdin, stdout} = eval(stdlib);
+    syscalls.fread('/lib/std', stdlib => {
+      const { stdin, stdout, stderr, errStr } = eval(stdlib);
 
-    if(args.length !== 2) {
-      stdout('Usage: write [file]\\nWrites a file, listens until EOF\\n');
-      syscalls.terminate(0);
-      return;
-    }
-    const path = args[1];
-    let text = '';
+      if(args.length !== 2) {
+        stdout('Usage: write [file]\\nWrites a file, listens until EOF\\n');
+        syscalls.terminate(0);
+        return;
+      }
+      const path = args[1];
+      let text = '';
 
-    // Copied from 
-    const readPrint = () => {
-      stdin((data, eof) => {
-          if (eof) {
-            writeTextToFile();
-          } else if (data === '\\b') {
-            if (text.length > 0) {
-              text = text.substr(0, text.length - 1);
-              stdout('\b');
+      // Copied from 
+      const readPrint = () => {
+        stdin((data, eof) => {
+            if (eof) {
+              writeTextToFile();
+            } else if (data === '\\b') {
+              if (text.length > 0) {
+                text = text.substr(0, text.length - 1);
+                stdout('\b');
+              }
+              readPrint();
+            } else {
+              stdout(data);
+              text += data;
+              readPrint();
             }
-            readPrint();
-          } else {
-            stdout(data);
-            text += data;
-            readPrint();
           }
-        }
-      );
-    };
-    readPrint();
+        );
+      };
+      readPrint();
 
-    const writeTextToFile = () => {
-      syscalls.open({ path, perms: 'cw' }, (fd, err) => {
-        if (!err) {
-          syscalls.write({
-            fd,
-            data: text,
-          }, err => {
-            if (err) {
-              stdout('An error occurred in writing the file\\n');
-            }
+      const writeTextToFile = () => {
+        syscalls.open({ path, perms: 'cw' }, (fd, err) => {
+          if (!err) {
+            syscalls.write({
+              fd,
+              data: text,
+            }, err => {
+              if (err) {
+                stderr('An error occurred in writing the file' + errStr(err) + '\\n');
+              }
+              syscalls.terminate(err);
+            });
+          } else {
+            stderr('An error occurred in opening the file' + errStr(err) + '\\n');
             syscalls.terminate(err);
-          });
-        } else {
-          stdout('An error occurred in opening the file\\n');
-          syscalls.terminate(err);
-        }
-      });
-    }
-  });
-  `
+          }
+        });
+      }
+    });
+`
 };
 
 const mkdir = {
@@ -534,33 +568,30 @@ const mkdir = {
   owner: 0,
   permissions: '75',
   data: `
-    if(args.length < 2) {
-      syscalls.write({
-        fd: 1,
-        data: 'Usage: mkdir [dir1] [dir2]\\n'
-      });
-    }
-    const makeNext = rest => {
-      if(rest.length === 0) {
-        syscalls.terminate(0);
-        return;
+    syscalls.fread('/lib/std', stdlib => {
+      const { stdout, errStr } = eval(stdlib);
+      if(args.length < 2) {
+        stdout('Usage: mkdir [dir1] [dir2]\\n');
       }
-      const next = rest[0];
-      rest = rest.slice(1);
-      syscalls.mkDir(next, err => {
-        if(err){
-          syscalls.write({
-            fd: 1,
-            data: 'An error occured while making directory ' + next + '\\n',
-          });
-          syscalls.terminate(1);
-        } else {
-          makeNext(rest);
+      const makeNext = rest => {
+        if(rest.length === 0) {
+          syscalls.terminate(0);
+          return;
         }
-      });
-    }
-    makeNext(args.slice(1));
-  `
+        const next = rest[0];
+        rest = rest.slice(1);
+        syscalls.mkDir(next, err => {
+          if(err){
+            stderr('An error occured while making directory ' + next + ' ' + errStr(err) + '\\n');
+            syscalls.terminate(1);
+          } else {
+            makeNext(rest);
+          }
+        });
+      }
+      makeNext(args.slice(1));
+    });
+`
 };
 
 const rmdir = {
@@ -568,32 +599,29 @@ const rmdir = {
   owner: 0,
   permissions: '75',
   data: `
-    if(args.length < 2) {
-      syscalls.write({
-        fd: 1,
-        data: 'Usage: rmdir [dir1] [dir2]\\n'
-      });
-    }
-    const rmNext = rest => {
-      if(rest.length === 0) {
-        syscalls.terminate(0);
-        return;
+    syscalls.fread('/lib/std', stdlib => {
+      const { stdout, stderr, errStr } = eval(stdlib);
+      if(args.length < 2) {
+        stdout('Usage: rmdir [dir1] [dir2]\\n');
       }
-      const next = rest[0];
-      rest = rest.slice(1);
-      syscalls.rmDir(next, err => {
-        if(err){
-          syscalls.write({
-            fd: 1,
-            data: 'An error occured while removing directory ' + next + '\\n',
-          });
-          syscalls.terminate(1);
-        } else {
-          rmNext(rest);
+      const rmNext = rest => {
+        if(rest.length === 0) {
+          syscalls.terminate(0);
+          return;
         }
-      });
-    }
-    rmNext(args.slice(1));
+        const next = rest[0];
+        rest = rest.slice(1);
+        syscalls.rmDir(next, err => {
+          if(err){
+            stderr('An error occured while removing directory ' + next + ' ' + errStr(err) +'\\n');
+            syscalls.terminate(1);
+          } else {
+            rmNext(rest);
+          }
+        });
+      }
+      rmNext(args.slice(1));
+    });
 `
 };
 
@@ -674,7 +702,7 @@ const projects = {
 |  of statically typed functional languages) and an explanation
 |  using a different style 
 |  Link: https://medium.com/@evinsellin/teaching-monads-slightly-differently-2af62c4af8ce
-| 
+|
 | --- Talk(s) ---
 | The Hows and Whys of Frontend Web Performance
 |  Descriptive Blurb: We focus heavily on the performance of

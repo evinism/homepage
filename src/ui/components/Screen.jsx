@@ -22,7 +22,6 @@ class Screen extends React.Component {
                     urls: { tldMatches: false },
                     stripPrefix: false,
                     stripTrailingSlash: false,
-                    mention: 'twitter',
                   }}
                 />
                 <span className='cursor'> </span></pre>
