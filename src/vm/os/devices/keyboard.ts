@@ -42,7 +42,7 @@ class Keyboard implements Device {
         toSend = "\t";
         break;
       case 68:
-        if (native.metaKey) {
+        if (native.ctrlKey) {
           native.preventDefault();
           toSend = '\n';
           eof = true;

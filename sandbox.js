@@ -27,7 +27,7 @@
 
 
 const sandboxText = iframeId => `
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <script>
@@ -101,6 +101,8 @@ const sandboxText = iframeId => `
 
 let iframeId = 2000;
 
+const dataUrl = data => "data:text/html;base64," + btoa(data);
+
 class ProcessSandbox {
   constructor(source, syscalls, args, env){
     this.source = source;
@@ -117,9 +119,8 @@ class ProcessSandbox {
     this.iframe = iframe;
 
     document.body.appendChild(iframe);
-    iframe.contentWindow.document.open();
-    iframe.contentWindow.document.write(sandboxText(this.iframeId));
-    iframe.contentWindow.document.close();
+    iframe.sandbox = 'allow-scripts';
+    iframe.src = dataUrl(sandboxText(this.iframeId));
     this.listeners = [];
     this.listen(this.handleEvent.bind(this));
   }
