@@ -294,20 +294,20 @@ const std = {
       }
       if (!builtins[args[0]]) {
         syscalls.pathExists(
-          args[0],
+          env.path + args[0],
           exists => {
             if (exists) {
               syscalls.exec({
-                path: args[0],
+                path: env.path + args[0],
                 args,
               }, shellCb);
-            } else {
+            } else if (args[0].indexOf('/') > -1) {
               syscalls.pathExists(
-                env.path + args[0],
+                args[0],
                 exists => {
                   if (exists) {
                     syscalls.exec({
-                      path: env.path + args[0],
+                      path: args[0],
                       args,
                     }, shellCb);
                   } else {
@@ -316,6 +316,9 @@ const std = {
                   }
                 }
               );
+            } else {
+              stdout('command ' + args[0] + ' could not be found!\\n');
+              shellCb();
             }
           }
         );

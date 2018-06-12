@@ -5,7 +5,7 @@ const reducePath = (absPath) => {
   const out = absPath.substring(1).split('/').reduce(
     (acc, cur) => {
       if(cur === '.') {
-        return acc + '/';
+        return acc;
       } else if(cur === '..' && acc !== '') {
         return acc
           .split('/')
