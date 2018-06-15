@@ -25,6 +25,9 @@ const sh = {
   permissions: '75',
   data: `
     syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
+      // For the reader:
+      // All of these are nice helper functions that ultimately call syscalls in the
+      // exact same way-- we could replace them inline. They don't do anything magic.
       const { stdout, stdin, shellExec, sharedStart, controlledIO } = eval(stdlib);
 
       if (env.motd) {
