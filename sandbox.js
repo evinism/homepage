@@ -38,6 +38,7 @@ const sandboxText = iframeId => `
       (function(){
         let scriptContents = null;
         let id = 30000;
+        let syscalls;
 
         const syscallCBs = {};
 
@@ -48,7 +49,12 @@ const sandboxText = iframeId => `
         }
 
         function handleSyscallResponse(id, args){
-          syscallCBs[id] && syscallCBs[id](...args);
+          try {
+            syscallCBs[id] && syscallCBs[id](...args);
+          } catch (e) {
+            syscalls.write({ fd: 2, data: e.message + '\\n' });
+            syscalls.terminate(1);
+          }
         }
 
         function syscallsFromNames(syscallNames){
@@ -59,11 +65,11 @@ const sandboxText = iframeId => `
         }
 
         function loadScript(source, syscallNames, args, env){
-          const syscalls =  syscallsFromNames(syscallNames);
+          syscalls = syscallsFromNames(syscallNames);
           try {
             runScript(source, syscalls, args, env);
           } catch (e) {
-            syscalls.write({ fd: 2, data: e.stack + '\\n' });
+            syscalls.write({ fd: 2, data: e.message + '\\n' });
             syscalls.terminate(1);
           }
         }

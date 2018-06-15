@@ -572,7 +572,7 @@ const mkdir = {
   permissions: '75',
   data: `
     syscalls.fread('/lib/std', stdlib => {
-      const { stdout, errStr } = eval(stdlib);
+      const { stdout, stderr, errStr } = eval(stdlib);
       if(args.length < 2) {
         stdout('Usage: mkdir [dir1] [dir2]\\n');
       }
