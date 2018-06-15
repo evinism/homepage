@@ -31,6 +31,7 @@ export interface Permissable {
 export interface Device {
   read: any,
   write: any, // TODO: Fix this stuff.
+  ioctl: any,
 };
 
 type ReadCB = (string, boolean) => void;

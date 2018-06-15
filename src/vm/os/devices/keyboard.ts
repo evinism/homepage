@@ -69,6 +69,10 @@ class Keyboard implements Device {
   write (data, cb) {
     cb(Err.EUNWRITABLE);
   }
+
+  ioctl (data, cb) {
+    cb(Err.NONE);
+  }
 };
 
 export default Keyboard;

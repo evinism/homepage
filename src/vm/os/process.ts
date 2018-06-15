@@ -61,9 +61,9 @@ class Process {
     args : Array<string>,
   ) {
     this.fds = [
-      os.filesystem.getFolderFile('/dev/keyboard'), //stdin
-      os.filesystem.getFolderFile('/dev/screen'), //stdout
-      os.filesystem.getFolderFile('/dev/screen'), //stderr
+      os.filesystem.getFolderFile('/dev/tty'), //stdin
+      os.filesystem.getFolderFile('/dev/tty'), //stdout
+      os.filesystem.getFolderFile('/dev/tty'), //stderr
     ];
     this.source = source;
     this.os = os;

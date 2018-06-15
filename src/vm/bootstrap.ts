@@ -1,6 +1,8 @@
 // devices
 import Keyboard from './os/devices/keyboard';
 import Screen from './os/devices/screen';
+import Tty from './os/devices/tty';
+
 import DeviceType from './vmtypes';
 
 // actual os
@@ -10,12 +12,14 @@ import OS from './os';
 const bootstrap = async ({keydownPipe, keypressPipe, screenPipe}) => {
   const screen = new Screen(screenPipe);
   const keyboard = new Keyboard(keypressPipe, keydownPipe);
+  const tty = new Tty(keyboard, screen);
 
   await startupAnim(screen);
 
   const os = new OS();
   os.registerDevice(keyboard, DeviceType.KEYBOARD);
   os.registerDevice(screen, DeviceType.SCREEN);
+  os.registerDevice(tty, DeviceType.TTY);
   os.start();
 
   window.os = os;

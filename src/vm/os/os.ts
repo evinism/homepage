@@ -70,6 +70,7 @@ class OS {
     const mapping = {
       [DeviceType.KEYBOARD]: '/dev/keyboard',
       [DeviceType.SCREEN]: '/dev/screen',
+      [DeviceType.TTY]: '/dev/tty',
     };
     this.devices.forEach(([dev, deviceType]) => {
       this.filesystem.mountDevice(dev, mapping[deviceType]);

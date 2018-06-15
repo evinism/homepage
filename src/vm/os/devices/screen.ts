@@ -36,6 +36,10 @@ class Screen implements Device {
   writeToScreen (screenCommand : ScreenCommand) {
     this.outpipe.fire(screenCommand);
   }
+
+  ioctl (data, cb) {
+    cb(Err.NONE);
+  }
 };
 
 export default Screen;
