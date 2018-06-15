@@ -25,14 +25,14 @@ const sh = {
   permissions: '75',
   data: `
     syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
-      const { stdout, stdin, shellExec, sharedStart, ioPassthrough } = eval(stdlib);
+      const { stdout, stdin, shellExec, sharedStart, controlledIO } = eval(stdlib);
 
       if (env.motd) {
         stdout(env.motd);
       }
 
       const prompt = () => {
-        ioPassthrough(true);
+        controlledIO(true);
 
         let line = '';
   
@@ -78,14 +78,14 @@ const sh = {
         const readPrint = () => {
           stdin((data, eof) => {
               if (eof) {
-                ioPassthrough(false);
+                controlledIO(false);
                 syscalls.terminate(0);
                 return;
               }
               // TODO: Replace this with proper error codes for FS.
               if (data === '\\n') {
                 stdout(data);
-                ioPassthrough(false);
+                controlledIO(false);
                 shellExec(line, prompt);
               } else if (data === '\\b') {
                 if (line.length > 0) {
@@ -269,10 +269,14 @@ const std = {
       cb
     );
 
-    const ioPassthrough = (passthrough) => {
+    const controlledIO = (controlled) => {
       syscalls.ioctl({ fd: 1, cmd: {
         type: 'setPassthroughCommand',
-        data: passthrough,
+        data: controlled,
+      }});
+      syscalls.ioctl({ fd: 1, cmd: {
+        type: 'setEchoCommand',
+        data: controlled,
       }});
     }
 
@@ -375,7 +379,7 @@ const std = {
       stdin,
       stdout,
       stderr,
-      ioPassthrough,
+      controlledIO,
       shellExec,
       md5: md5Exp.md5,
       sharedStart,
@@ -392,8 +396,8 @@ const su = {
   suid: true,
   data: `
     const require = syscalls.fread('/lib/std', stdlib => {
-      const { stdout, stdin, md5, ioPassthrough } = eval(stdlib);
-      ioPassthrough(true); // TODO: make this just disable writing, to simplify su
+      const { stdout, stdin, md5, controlledIO } = eval(stdlib);
+      controlledIO(true); // TODO: make this just disable writing, to simplify su
 
       const defaultShell = '/bin/sh';
       const checkPassword = success => {
@@ -417,7 +421,7 @@ const su = {
               success();
             } else {
               stdout('\\nIncorrect password for root\\n');
-              ioPassthrough(false);
+              controlledIO(false);
               syscalls.terminate(1);
             }
           });
@@ -428,16 +432,16 @@ const su = {
           defaultShell,
           exists => {
             if (exists) {
-              ioPassthrough(false);
+              controlledIO(false);
               syscalls.exec({
                 path: defaultShell,
                 args: [],
               }, () => {
-                ioPassthrough(false);
+                controlledIO(false);
                 syscalls.terminate(0)
               });
             } else {
-              ioPassthrough(false);
+              controlledIO(false);
               syscalls.terminate(1);
             }
           }
@@ -454,8 +458,8 @@ const sudo = {
   suid: true,
   data: `
   syscalls.fread('/lib/std', stdlib => {
-    const { stdout, stdin, md5, shellExec, ioPassthrough } = eval(stdlib);
-    ioPassthrough(true);
+    const { stdout, stdin, md5, shellExec, controlledIO } = eval(stdlib);
+    controlledIO(true);
 
     const defaultShell = '/bin/sh';
     const checkPassword = success => {
@@ -479,7 +483,7 @@ const sudo = {
             success();
           } else {
             stdout('\\nIncorrect password for root\\n');
-            ioPassthrough(false);
+            controlledIO(false);
             syscalls.terminate(0);
           }
         });
@@ -537,12 +541,12 @@ const write = {
   permissions: '75',
   data: `
     syscalls.fread('/lib/std', stdlib => {
-      const { stdin, stdout, stderr, errStr, ioPassthrough } = eval(stdlib);
-      ioPassthrough(true);
+      const { stdin, stdout, stderr, errStr, controlledIO } = eval(stdlib);
+      controlledIO(true);
 
       if(args.length !== 2) {
         stdout('Usage: write [file]\\nWrites a file, listens until EOF\\n');
-        ioPassthrough(false);
+        controlledIO(false);
         syscalls.terminate(0);
         return;
       }
@@ -580,12 +584,12 @@ const write = {
               if (err) {
                 stderr('An error occurred in writing the file' + errStr(err) + '\\n');
               }
-              ioPassthrough(false);
+              controlledIO(false);
               syscalls.terminate(err);
             });
           } else {
             stderr('An error occurred in opening the file' + errStr(err) + '\\n');
-            ioPassthrough(false);
+            controlledIO(false);
             syscalls.terminate(err);
           }
         });

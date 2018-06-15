@@ -11,6 +11,7 @@ class Tty implements Device {
   screen : Screen;
 
   isPassthrough : boolean = false;
+  echoDisabled : boolean = true;
   line : string = '';
 
   constructor(keyboard, screen){
@@ -19,13 +20,19 @@ class Tty implements Device {
   }
 
   read(cb) {
+    const writeIfEcho = data => {
+      if (!this.echoDisabled) {
+        this.write(data, NOOP);
+      }
+    }
+
     // So, here's the deal...
     // I want to be able to have the input echo and not actually submit 
     // until enter's pressed, but I also want tab completion and history
     // Solution: Fancy programs, such as the shell, can use a passthrough
-    // to make it so 1: the shell doesn't echo, and 2: the shell has full
-    // access to the keyboard and such, but only when it wants to.
-    // This should always be off while switching programs, as a general rule.
+    // to make it so the shell has full access to the keyboard and such,
+    // but only when it wants to. This should always be off while switching 
+    // programs, as a general rule.
     if (!this.isPassthrough) {
       const prompt = () => this.keyboard.read((data, eof) => {
         if (eof) {
@@ -34,23 +41,26 @@ class Tty implements Device {
           return;
         } else if (data === '\n') {
           cb(this.line + data, false);
-          this.write(data, NOOP);
+          writeIfEcho(data);
           this.line = '';
         } else if (data === '\b') {
           if (this.line.length > 0) {
             this.line = this.line.substr(0, this.line.length - 1);
-            this.write(data, NOOP);
+            writeIfEcho(data);
           }
           prompt();
         } else {
           this.line = this.line + data;
-          this.write(data, NOOP);
+          writeIfEcho(data);
           prompt();
         }
       });
       prompt();
     } else {
-      return this.keyboard.read(cb);
+      return this.keyboard.read((data, eof) => {
+        writeIfEcho(data);
+        cb(data, eof);
+      });
     }
   }
 
@@ -62,6 +72,9 @@ class Tty implements Device {
     switch(cmd.type) {
       case 'setPassthroughCommand': {
         this.isPassthrough = cmd.data
+      }
+      case 'setEchoCommand': {
+        this.echoDisabled = cmd.data
       }
     }
     cb(Err.NONE);
