@@ -1,5 +1,5 @@
 export interface SetEchoCommand {
-  type: 'setEchoCommand',
+  type: 'setPassthroughCommand',
   data: boolean,
 }
 

@@ -2,6 +2,7 @@ import * as yup from 'yup';
 import { ProcStatus, Err } from './constants';
 import { getAbsolutePathStr } from './util';
 import Folder from './folder';
+import { DeviceFile } from './file';
 import win from './win';
 
 // The last thing to a cb should always be an error code
@@ -153,6 +154,19 @@ const syscalls = {
     const { name, id, password } = process.user
     cb({ name, id, password }, Err.NONE);
   },
+  ioctl: (arg, process, cb) => {
+    const { fd, cmd } = arg;
+    if (!process.fds[fd]) {
+      cb(Err.EBADFD);
+      return;
+    }
+    const dev = process.fds[fd];
+    if (!(dev instanceof DeviceFile)) { // todo: figure out how to not have this be terrible
+      cb(Err.ENOTDEVICE);
+      return;
+    }
+    dev.device.ioctl(cmd, cb);
+  },
   win: (arg, process, cb) => {
     if(process.user.id !== 0) {
       cb(Err.EPERM)
@@ -188,6 +202,10 @@ export const syscallSchemas = {
   execProcess: yup.object().shape({
     path: yup.string().required(),
     args: yup.array().of(yup.string())
+  }),
+  ioctl: yup.object().shape({
+    fd: yup.number().positive().required(),
+    cmd: yup.object().required(),
   }),
 };
 
