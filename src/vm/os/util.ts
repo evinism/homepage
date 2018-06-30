@@ -1,22 +1,26 @@
 // this is some jank stuff yo.
 // shoul probs be moved to be internal to filesystem.
 
-const reducePath = (absPath) => {
-  const out = absPath.substring(1).split('/').reduce(
-    (acc, cur) => {
-      if(cur === '.') {
-        return acc;
-      } else if(cur === '..' && acc !== '') {
-        return acc
-          .split('/')
-          .slice(0, -1)
-          .join('/');
-      }
-      return acc + '/' + cur;
-    },
-    ''
-  );
-  return out;
+const nextPath = (curPath, nextFile) => {
+  switch(nextFile) {
+    case '.':
+      return curPath;
+    case '..':
+      return curPath.slice(0, -1);
+    default:
+      return curPath.concat(nextFile);
+  }
+}
+
+const reducePath = absPath => {
+  const trailingSlash = absPath[absPath.length - 1] === '/';
+
+  const out = '/' + absPath
+    .split('/')
+    .filter(Boolean)
+    .reduce(nextPath, [])
+    .join('/');
+  return (trailingSlash && out !== '/') ? out + '/': out;
 }
 
 export const getAbsolutePathStr = (relStr, cwd) => {

@@ -128,7 +128,7 @@ const ls = {
           stderr('An error occurred ' + errStr(err) + '\\n');
           syscalls.terminate(err);
         } else {
-          const endChar = data.slice(-1) === '\\n'
+          const endChar = data === ''
             ? ''
             : '\\n';
           stdout(data + endChar);
