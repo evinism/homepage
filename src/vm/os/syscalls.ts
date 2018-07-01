@@ -25,7 +25,7 @@ const syscalls = {
     if (process.fds[fd]) {
       process.fds[fd].read(cb);
     } else {
-      cb('', true, Err.EBADFD);
+      cb(Err.EBADFD, '', true);
     }
   },
   open: (arg, process, cb) => {
@@ -41,18 +41,18 @@ const syscalls = {
         if (!err) {
           file = process.os.filesystem.getFolderFile(absPath);
           process.fds[newFD] = file;
-          cb(newFD, Err.NONE);
+          cb(Err.NONE, newFD);
         } else {
-          cb(0, err);
+          cb(err, 0);
         }
       });
     } else if(!file) {
-      cb(0, Err.ENOFILE);
+      cb(Err.ENOFILE, 0);
     } else if (file instanceof Folder) {
-      cb(0, Err.ENOTFILE);
+      cb(Err.ENOTFILE, 0);
     } else {
       process.fds[newFD] = file;
-      cb(newFD, Err.NONE);
+      cb(Err.NONE, newFD);
     }
   },
   close: (arg, process, cb) => {
@@ -120,7 +120,7 @@ const syscalls = {
   pathExists: (arg, process, cb) => {
     process.os.filesystem.pathExists(
       getAbsolutePathStr(arg, process.cwd),
-      cb
+      exists => cb(Err.NONE, exists) // Shim because fs.exists doesn't follow weird convention.
     );
   },
   // tells the kernel to terminate the process.
@@ -129,7 +129,7 @@ const syscalls = {
   },
   // gets the current working directory of the process
   getcwd: (arg, process, cb) => {
-    cb(process.cwd, Err.NONE);
+    cb(Err.NONE, process.cwd);
   },
   // sets the current working directory of the process
   setcwd: (arg, process, cb) => {
@@ -152,7 +152,7 @@ const syscalls = {
   },
   getudata: (arg, process, cb) => {
     const { name, id, password } = process.user
-    cb({ name, id, password }, Err.NONE);
+    cb(Err.NONE, { name, id, password });
   },
   ioctl: (arg, process, cb) => {
     const { fd, cmd } = arg;

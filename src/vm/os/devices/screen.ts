@@ -11,7 +11,7 @@ class Screen implements Device {
   }
 
   read (cb) {
-    cb('', Err.NONE);
+    cb(Err.NONE, '');
   }
 
   write (data : string, cb : any) {

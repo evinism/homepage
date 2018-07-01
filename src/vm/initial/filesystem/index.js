@@ -24,7 +24,7 @@ const sh = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       // For the reader:
       // All of these are nice helper functions that ultimately call syscalls in the
       // exact same way-- we could replace them inline. They don't do anything magic.
@@ -54,7 +54,7 @@ const sh = {
           // This code is awful.
           const pathToCheck = pathArr.slice(0, -1).concat('').join('/');
           const partial = pathArr.slice(-1)[0];
-          syscalls.dread(pathToCheck, data => {
+          syscalls.dread(pathToCheck, (_, data) => {
             const dirs = data
               .split('\\n')
               .filter(dir =>
@@ -111,7 +111,7 @@ const sh = {
         readPrint();
       }
       prompt();
-    })});
+    });
 `,
 };
 
@@ -120,10 +120,10 @@ const ls = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.open({ path: '/lib/std', perms: 'r' }, fd => { syscalls.read({fd}, (stdlib, err) => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
       const dir = args[1] || '.';
-      syscalls.dread(dir, (data, err) => {
+      syscalls.dread(dir, (err, data) => {
         if (err) {
           stderr('An error occurred ' + errStr(err) + '\\n');
           syscalls.terminate(err);
@@ -135,7 +135,7 @@ const ls = {
           syscalls.terminate(0);
         }
       });
-    })});
+    });
 `
 };
 
@@ -145,7 +145,7 @@ const pwd = {
   permissions: '75',
   data: `
     // eww on this null thing
-    syscalls.getcwd(null, (cwd, err) => {
+    syscalls.getcwd(null, (err, cwd) => {
       syscalls.write({
         fd: 1,
         data: cwd + '\\n'
@@ -160,7 +160,7 @@ const rm = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
       if (!args[1]) {
         stdout('usage: rm [file]\\n');
@@ -187,7 +187,7 @@ const cat = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { errStr } = eval(stdlib);
       const targets = args.slice(1);
       let remainingFiles;
@@ -200,7 +200,7 @@ const cat = {
       }
 
       function openAndCat(path){
-        syscalls.open({path, perms: 'r' }, (fd, err) => {
+        syscalls.open({path, perms: 'r' }, (err, fd) => {
           if (err) {
             syscalls.write({
               fd: 1,
@@ -218,7 +218,7 @@ const cat = {
         const readNext = () => {
           syscalls.read(
             { fd },
-            (data, eof, err) => {
+            (err, data, eof) => {
               syscalls.write({
                 fd: 1,
                 data,
@@ -324,7 +324,7 @@ const std = {
       if (!builtins[args[0]]) {
         syscalls.pathExists(
           env.path + args[0],
-          exists => {
+          (err, exists) => {
             if (exists) {
               syscalls.exec({
                 path: env.path + args[0],
@@ -333,7 +333,7 @@ const std = {
             } else if (args[0].indexOf('/') > -1) {
               syscalls.pathExists(
                 args[0],
-                exists => {
+                (err, exists) => {
                   if (exists) {
                     syscalls.exec({
                       path: args[0],
@@ -411,7 +411,7 @@ const su = {
   permissions: '75',
   suid: true,
   data: `
-    const require = syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stdin, md5, controlledIO, echoOn, echoOff } = eval(stdlib);
       const defaultShell = '/bin/sh';
       const checkPassword = success => {
@@ -419,7 +419,7 @@ const su = {
         stdout('Password for root?');
         stdin((data, eof) => {
           const typedPassword = data.slice(0, -1);
-          syscalls.getudata(null, ({ password: hashed }) => {
+          syscalls.getudata(null, (err, { password: hashed }) => {
             echoOn();
             if (md5(typedPassword) === hashed) {
               stdout('\\n');
@@ -434,7 +434,7 @@ const su = {
       checkPassword(() => {
         syscalls.pathExists(
           defaultShell,
-          exists => {
+          (err, exists) => {
             if (exists) {
               syscalls.exec({
                 path: defaultShell,
@@ -458,7 +458,7 @@ const sudo = {
   permissions: '75',
   suid: true,
   data: `
-  syscalls.fread('/lib/std', stdlib => {
+  syscalls.fread('/lib/std', (err, stdlib) => {
     const { stdout, stdin, md5, shellExec, echoOn, echoOff } = eval(stdlib);
 
     const defaultShell = '/bin/sh';
@@ -467,7 +467,7 @@ const sudo = {
       stdout('Password for root?');
       stdin((data, eof) => {
         const typedPassword = data.slice(0, -1);
-        syscalls.getudata(null, ({ password: hashed }) => {
+        syscalls.getudata(null, (err, { password: hashed }) => {
           echoOn();
           if (md5(typedPassword) === hashed) {
             stdout('\\n');
@@ -491,7 +491,7 @@ const whoami = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.getudata(null, ({name}, err) => {
+    syscalls.getudata(null, (err, {name}) => {
       syscalls.write({
         fd: 1,
         data: name + '\\n'
@@ -507,13 +507,13 @@ const touch = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
       if (args.length < 2) {
         const helpStr = 'Usage: touch [name1] [name2]\\n';
         syscalls.write({fd: 1, data: helpStr})
       }
-      syscalls.open({ path: args[1], perms: 'cw' }, (_, err) => {
+      syscalls.open({ path: args[1], perms: 'cw' }, (err, _) => {
         if (err) {
           stderr('An error occurred ' + errStr(err) +  '\\n');
           syscalls.terminate(1);
@@ -530,7 +530,7 @@ const write = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdin, stdout, stderr, errStr, controlledIO } = eval(stdlib);
       controlledIO(true);
 
@@ -565,7 +565,7 @@ const write = {
       readPrint();
 
       const writeTextToFile = () => {
-        syscalls.open({ path, perms: 'cw' }, (fd, err) => {
+        syscalls.open({ path, perms: 'cw' }, (err, fd) => {
           if (!err) {
             syscalls.write({
               fd,
@@ -593,7 +593,7 @@ const mkdir = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
       if(args.length < 2) {
         stdout('Usage: mkdir [dir1] [dir2]\\n');
@@ -624,7 +624,7 @@ const rmdir = {
   owner: 0,
   permissions: '75',
   data: `
-    syscalls.fread('/lib/std', stdlib => {
+    syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
       if(args.length < 2) {
         stdout('Usage: rmdir [dir1] [dir2]\\n');

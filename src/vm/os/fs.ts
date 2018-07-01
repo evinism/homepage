@@ -119,7 +119,7 @@ class FileSystem {
     );
   }
 
-  newTextFile(data, path, owner, cb){
+  newTextFile(data, path, owner, cb : (Err) => void){
     this.mountFolderFile(
       new TextFile({
         owner,
@@ -185,9 +185,9 @@ class FileSystem {
   readFileMetadata(pathStr: string, cb){
     const file = this.getFolderFile(pathStr);
     if (file === null) {
-      cb(null, Err.ENOFILE);
+      cb(Err.ENOFILE, null);
     } else {
-      cb({
+      cb(Err.NONE, {
         owner: file.owner,
         permissions: file.permissions,
         suid: file.suid === true,
@@ -195,14 +195,14 @@ class FileSystem {
     }
   };
 
-  readFromFile(pathStr : string, cb: (string, bool, Err) => void) {
+  readFromFile(pathStr : string, cb: (Err, string, bool) => void) {
     const file = this.getFolderFile(pathStr);
     if (file === null) {
-      cb('', true, Err.ENOFILE);
+      cb(Err.ENOFILE, '', true);
     } else if (file instanceof Folder) {
-      cb('', true, Err.ENOTFILE);
+      cb(Err.ENOTFILE, '', true);
     } else {
-      file.read((data, eof) => cb(data, eof, Err.NONE));
+      file.read((err, data, eof) => cb(err, data, eof));
     }
   }
 
@@ -227,17 +227,17 @@ class FileSystem {
     }
   }
 
-  readDirContents(pathStr, cb : (string, Err) => void) {
+  readDirContents(pathStr, cb : (Err, string) => void) {
     this.pathExists(pathStr, (exists) => {
       if (!exists) {
-        cb('', Err.ENOFILE);
+        cb(Err.ENOFILE, '');
         return;
       }
       const folder = this.getFolderFile(pathStr);
       if (!(folder instanceof Folder)) {
-        cb('', Err.ENOTFOLDER)
+        cb(Err.ENOTFOLDER, '')
       } else {
-        cb(Object.keys(folder.children).join('\n'), Err.NONE);
+        cb(Err.NONE, Object.keys(folder.children).join('\n'));
       }
     });
 

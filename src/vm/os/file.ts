@@ -30,7 +30,7 @@ export class TextFile implements FolderFile, ReadWritable {
   }
 
   read(cb) {
-    cb(this.data, true, Err.NONE);
+    cb(Err.NONE, this.data, true);
   }
 
   write(data, cb) {
