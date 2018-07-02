@@ -52,7 +52,7 @@ class OS {
   initUsers(cb){
     this.filesystem.readFromFile(
       '/etc/passwd',
-      passwd => {
+      (err, passwd) => {
         this.users = 
           passwd.split('\n').map(makeUserFromEntry).filter(Boolean);
         cb();
@@ -79,10 +79,10 @@ class OS {
 
   // Should probs move this to other things here.
   execProcess(pathStr, args, wd, user, onTerminate) {
-    this.filesystem.readFileMetadata(pathStr, ({suid, owner}) => {
+    this.filesystem.readFileMetadata(pathStr, (err, {suid, owner}) => {
       this.filesystem.readFromFile(
         pathStr,
-        (data) => {
+        (err, data) => {
           let activeUser = user;
           if (suid) {
             activeUser = this.users.find(

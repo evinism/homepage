@@ -22,6 +22,7 @@ export enum Err {
   EUNWRITABLE = 8,
   EBADFNAME = 9,
   ENOTDEVICE = 10,
+  EVALIDATION = 11,
 };
 
 export interface Permissable {

@@ -1,4 +1,4 @@
-import { ProcStatus, FolderFile } from './constants';
+import { ProcStatus, FolderFile, Err } from './constants';
 import OS from './os';
 import User from './user';
 import runInSandbox from './sandbox';
@@ -26,7 +26,9 @@ const configSyscalls = process => {
                 // TODO: Make this actually fail with an error.
                 // we should put error in the first arg, because otherwise, this is silly.
                 if (!isValid) {
-                  console.error('Schema validation failed for ' + key);
+                  console.error(`Schema validation failed for ${key}: ${JSON.stringify(arg)}`);
+                  cb(Err.EVALIDATION);
+                  return;
                 }
                 execSyscall();
               });
