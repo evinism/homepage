@@ -269,7 +269,7 @@ const std = {
 
     const stdin = cb => syscalls.read(
       {fd: 0},
-      cb
+      (_, data, eof) => cb(data, eof)
     );
 
     const controlledIO = (controlled) => {
@@ -384,6 +384,7 @@ const std = {
       'EUNWRITABLE',
       'EBADFNAME',
       'ENOTDEVICE',
+      'EVALIDATION',
     ];
 
     const errStr = (err) => '(' + errCodes[err] + ')';

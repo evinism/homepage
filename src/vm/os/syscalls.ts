@@ -177,12 +177,16 @@ const syscalls = {
   },
 }
 
+yup.addMethod(yup.string, 'requiredWithEmpty', function (msg = '$path must be defined') {
+  return this.test('requiredWithEmpty', msg, (value) => typeof value === 'string')
+})
+
 // if the schema exists in the syscall schema, it'll be
 // considered a precondition for the arg that should be checked.
 // obvs we can't do this through typechecking.
 export const syscallSchemas = {
   write: yup.object().shape({
-    data: yup.string().required(),
+    data: yup.string().requiredWithEmpty(),
     fd: yup.number().positive().required(),
   }),
   read: yup.object().shape({
@@ -194,7 +198,7 @@ export const syscallSchemas = {
   }),
   close: yup.number().positive(),
   fwrite: yup.object().shape({
-    data: yup.string().required(),
+    data: yup.string().requiredWithEmpty(),
     path: yup.string().required(),
   }),
   fread: yup.string().required(),

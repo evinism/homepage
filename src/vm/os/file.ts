@@ -53,7 +53,7 @@ export class DeviceFile implements FolderFile, ReadWritable {
   }
 
   read(cb) {
-    this.device.read(cb);
+    this.device.read((data, eof) => cb(Err.NONE, data, eof));
   }
 
   write(data, cb) {
