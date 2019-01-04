@@ -5,18 +5,24 @@
   "main": "index.js",
   "author": "Evin Sellin",
   "license": "MIT",
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "rm -rf dist && parcel build index.html && cp secret/* dist"
+  },
   "devDependencies": {
-    "babel-preset-react-app": "^3.1.1",
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
     "parcel-bundler": "^1.8.1",
-    "typescript": "^2.8.3"
+    "typescript": "^3.2.2"
   },
   "dependencies": {
-    "autolinker": "^1.6.2",
+    "autolinker": "^2.2.1",
     "classnames": "^2.2.5",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-string-replace": "^0.4.1",
-    "yup": "^0.25.1"
+    "yup": "^0.26.6"
   }
 }

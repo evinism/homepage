@@ -1,4 +1,4 @@
 // This is replaced by an actual secret win function on my machine!
 // Obvs this is silly because it's all clientside but whatever...
-const win = os => {};
+const win = ({os}) => {};
 export default win;
