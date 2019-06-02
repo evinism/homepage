@@ -190,7 +190,7 @@ export const syscallSchemas = {
     fd: yup.number().positive().required(),
   }),
   read: yup.object().shape({
-    fd: yup.number().positive().required(), // lol at inconsistency
+    fd: yup.number().integer().moreThan(-1).required(), // lol at inconsistency
   }),
   open: yup.object().shape({
     path: yup.string().required(),
