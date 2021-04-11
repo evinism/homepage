@@ -10,19 +10,19 @@
     "build": "parcel build index.html"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-0",
-    "@babel/plugin-proposal-class-properties": "^7.2.3",
-    "@babel/preset-react": "^7.0.0",
-    "parcel-bundler": "^1.8.1",
-    "typescript": "^3.2.2"
+    "@babel/core": "^7.13.15",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/preset-react": "^7.13.13",
+    "parcel-bundler": "^1.12.5",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
-    "autolinker": "^2.2.1",
-    "classnames": "^2.2.5",
+    "autolinker": "^3.14.3",
+    "classnames": "^2.3.1",
     "prop-types": "^15.6.1",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-string-replace": "^0.4.1",
-    "yup": "^0.26.6"
+    "yup": "^0.32.9"
   }
 }
