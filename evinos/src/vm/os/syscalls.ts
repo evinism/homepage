@@ -4,14 +4,15 @@ import { getAbsolutePathStr } from "./util";
 import Folder from "./folder";
 import { DeviceFile } from "./file";
 import win from "./homepage-secret/win";
+import Process from "./process";
 
 // The last thing to a cb should always be an error code
 const syscalls = {
-  log: (arg, process, cb) => {
+  log: (arg: any, process: Process, cb) => {
     console.log(arg);
     cb(Err.NONE);
   },
-  write: (arg, process, cb) => {
+  write: (arg: any, process: Process, cb) => {
     const { data, fd } = arg;
     //TODO PERMS check. Probs do in the FS, not here.
     if (process.fds[fd]) {
@@ -20,7 +21,7 @@ const syscalls = {
       cb(Err.EBADFD);
     }
   },
-  read: (arg, process, cb) => {
+  read: (arg: any, process: Process, cb) => {
     const { fd } = arg;
     if (process.fds[fd]) {
       process.fds[fd].read(cb);
@@ -28,7 +29,7 @@ const syscalls = {
       cb(Err.EBADFD, "", true);
     }
   },
-  open: (arg, process, cb) => {
+  open: (arg: any, process: Process, cb) => {
     const { path, perms } = arg;
     // TODO: perms on this call
     // TODO: Promisify stuff in fs, ugh...
@@ -55,7 +56,7 @@ const syscalls = {
       cb(Err.NONE, newFD);
     }
   },
-  close: (arg, process, cb) => {
+  close: (arg: any, process: Process, cb) => {
     const fd = arg;
     if (process.fds[fd]) {
       delete process.fds[fd];
@@ -64,7 +65,7 @@ const syscalls = {
       cb(Err.EBADFD);
     }
   },
-  fwrite: (arg, process, cb) => {
+  fwrite: (arg: any, process: Process, cb) => {
     // todo: write with permissions.
     process.os.filesystem.writeToFile(
       arg.data,
@@ -72,24 +73,24 @@ const syscalls = {
       cb
     );
   },
-  fread: (arg, process, cb) => {
+  fread: (arg: any, process: Process, cb) => {
     // todo: read with permissions.
     process.os.filesystem.readFromFile(
       getAbsolutePathStr(arg, process.cwd),
       cb
     );
   },
-  rmFile: (arg, process, cb) => {
+  rmFile: (arg: any, process: Process, cb) => {
     process.os.filesystem.removeFile(getAbsolutePathStr(arg, process.cwd), cb);
   },
-  mkDir: (arg, process, cb) => {
+  mkDir: (arg: any, process: Process, cb) => {
     process.os.filesystem.makeDir(
       getAbsolutePathStr(arg, process.cwd),
       process.user.id,
       cb
     );
   },
-  rmDir: (arg, process, cb) => {
+  rmDir: (arg: any, process: Process, cb) => {
     process.os.filesystem.removeFolder(
       getAbsolutePathStr(arg, process.cwd),
       cb
@@ -107,29 +108,29 @@ const syscalls = {
     );
   },
   // gets a list of everything in the folder
-  dread: (arg, process, cb) => {
+  dread: (arg: any, process: Process, cb) => {
     process.os.filesystem.readDirContents(
       getAbsolutePathStr(arg, process.cwd),
       cb
     );
   },
   // tells whether or not the path exists
-  pathExists: (arg, process, cb) => {
+  pathExists: (arg: any, process: Process, cb) => {
     process.os.filesystem.pathExists(
       getAbsolutePathStr(arg, process.cwd),
       (exists) => cb(Err.NONE, exists) // Shim because fs.exists doesn't follow weird convention.
     );
   },
   // tells the kernel to terminate the process.
-  terminate: (arg, process, _) => {
+  terminate: (arg: any, process: Process, _) => {
     process.terminate();
   },
   // gets the current working directory of the process
-  getcwd: (arg, process, cb) => {
+  getcwd: (arg: any, process: Process, cb) => {
     cb(Err.NONE, process.cwd);
   },
   // sets the current working directory of the process
-  setcwd: (arg, process, cb) => {
+  setcwd: (arg: any, process: Process, cb) => {
     arg = arg.trim();
     // cwd should always have trailing slash.
     if (arg[arg.length - 1] !== "/") {
@@ -147,11 +148,11 @@ const syscalls = {
       }
     });
   },
-  getudata: (arg, process, cb) => {
+  getudata: (arg: any, process: Process, cb) => {
     const { name, id, password } = process.user;
     cb(Err.NONE, { name, id, password });
   },
-  ioctl: (arg, process, cb) => {
+  ioctl: (arg: any, process: Process, cb) => {
     const { fd, cmd } = arg;
     if (!process.fds[fd]) {
       cb(Err.EBADFD);
@@ -165,7 +166,7 @@ const syscalls = {
     }
     dev.device.ioctl(cmd, cb);
   },
-  win: (arg, process, cb) => {
+  win: (arg: any, process: Process, cb) => {
     if (process.user.id !== 0) {
       cb(Err.EPERM);
     } else {
