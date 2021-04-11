@@ -1153,10 +1153,10 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-autolinker@^2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/autolinker/-/autolinker-2.2.2.tgz#6f75a9e9c2c7858a0490d7817fc412804045c06f"
-  integrity sha512-BMKcu6Zey3fqlYj/+DqnbVTLjYZz9jhFq87F8SaD4ebuPM+2nABQUfVYe7aoks5ltWkuYEE61Or63I8KSGZzOw==
+autolinker@^3.14.0:
+  version "3.14.3"
+  resolved "https://registry.yarnpkg.com/autolinker/-/autolinker-3.14.3.tgz#c61c424bc6077bcf2fc62803803ec2f58e15a7ec"
+  integrity sha512-t81i2bCpS+s+5FIhatoww9DmpjhbdiimuU9ATEuLxtZMQ7jLv9fyFn7SWNG8IkEfD4AmYyirL1ss9k1aqVWRvg==
   dependencies:
     tslib "^1.9.3"
 
@@ -4197,7 +4197,7 @@ process@^0.11.10:
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
   integrity sha1-czIwDoQBYb2j5podHZGn1LwW8YI=
 
-prop-types@^15.6.1:
+prop-types@^15.6.1, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -4301,6 +4301,14 @@ range-parser@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
+
+react-autolinker-wrapper@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/react-autolinker-wrapper/-/react-autolinker-wrapper-1.3.0.tgz#b360579a517918023086220ed7d70645e7e091fd"
+  integrity sha512-GexjjZC3iFJwbSDN2MRTi+HdyRBklCmyuSk4eJFOG3yU49eI1iwLWdhqeoTvXoHHXVkc12soFqNc3i0tVYGhLw==
+  dependencies:
+    autolinker "^3.14.0"
+    prop-types "^15.7.2"
 
 react-dom@^17.0.2:
   version "17.0.2"

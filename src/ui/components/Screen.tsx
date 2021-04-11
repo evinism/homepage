@@ -1,3 +1,4 @@
+import AutolinkerWrapper from "react-autolinker-wrapper";
 import cx from "classnames";
 
 interface ScreenProps {
@@ -12,7 +13,15 @@ const Screen = ({ output, off }: ScreenProps) => {
         <div className="screen-wrapper">
           <div className={cx("screen", { off })}>
             <pre>
-              {output}
+              <AutolinkerWrapper
+                text={output}
+                tagName="span"
+                options={{
+                  urls: { tldMatches: false },
+                  stripPrefix: false,
+                  stripTrailingSlash: false,
+                }}
+              />
               <span className="cursor"> </span>
             </pre>
           </div>
