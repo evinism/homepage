@@ -1,87 +1,80 @@
-import Folder from './folder';
-import { TextFile, DeviceFile } from './file';
-import { FolderFile, Err } from './constants';
+import Folder from "./folder";
+import { TextFile, DeviceFile } from "./file";
+import { FolderFile, Err, Device } from "./constants";
+import { FileNodeSnapshot, FileSystemSnapshot } from "./constants";
 
-export const validIdentifier = name => (/^[^*/\\?"<>\|]+$/.test(name));
+export const validIdentifier = (name: string) => /^[^*/\\?"<>\|]+$/.test(name);
 
-const noop = (...args) => {};
+const noop = (..._: any[]) => {};
 
-const makeFS = (entry) => {
+const makeFS = (entry: FileNodeSnapshot): TextFile | Folder => {
   if (entry._isFile) {
-    return new TextFile({
-      owner: entry.owner,
-      permissions: entry.perm,
-      suid: entry.suid,
-      data: entry.data,
-    });
+    return new TextFile(entry);
   } else {
-    const children = Object
-      .entries(entry.children)
-      .reduce((acc, [key, value]) => 
-        Object.assign(acc, { [key]: makeFS(value) })
-      , {});
+    const children = Object.entries(entry.children).reduce(
+      (acc, [key, value]) => Object.assign(acc, { [key]: makeFS(value) }),
+      {}
+    );
 
+    // TODO: Consistify this
     return new Folder({
       owner: entry.owner,
-      permissions: entry.perm,
+      permissions: entry.permissions,
       children,
     });
   }
-}
+};
 
 // TODO: error handling / not allowing extraneous stuff.
-const toPath = pathStr => {
-  if(pathStr[0] !== '/') {
-    throw('lol gimme a real path');
+const toPath = (pathStr: string) => {
+  if (pathStr[0] !== "/") {
+    throw "lol gimme a real path";
   }
 
   pathStr = pathStr.substr(1);
-  const path = pathStr.split('/');
-  if (path[path.length - 1] === '') {
+  const path = pathStr.split("/");
+  if (path[path.length - 1] === "") {
     path.pop();
   }
   return path;
-}
+};
 
 // TODO: error handling
 // (path, origin) => file?
-const traversePath = (path, origin) => {
-  const file = path.reduce(
-    (acc, cur) => {
-      if (!acc) {
-        return null;
-      }
-      return (acc.children[cur])
-    },
-    origin,
-  );
+const traversePath = (path: string[], origin) => {
+  const file = path.reduce((acc, cur) => {
+    if (!acc) {
+      return null;
+    }
+    return acc.children[cur];
+  }, origin);
   if (!file) {
     return null;
   }
-  
+
   return file;
 };
 
-const splitPath = (path) => {
+const splitPath = (path: string[]) => {
   const folderPath = path.slice(0, -1);
   return {
     fileName: path.slice(-1)[0],
     folderPath: folderPath,
-  }
+  };
 };
 
 class FileSystem {
-  root : FolderFile;
+  root: FolderFile;
 
-  constructor (fsSnapshot) {
+  constructor(fsSnapshot: FileSystemSnapshot) {
     this.root = makeFS(fsSnapshot);
   }
 
-  getFolderFile(pathStr) {
+  getFolderFile(pathStr: string) {
     return traversePath(toPath(pathStr), this.root);
   }
 
-  mountFolderFile(file, pathStr, cb = noop){
+  mountFolderFile(file, pathStr: string, cb: (err: Err) => void = noop) {
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
 
@@ -96,7 +89,7 @@ class FileSystem {
       cb(Err.ENOFOLDER);
       return;
     }
-    
+
     if (folder.children[fileName]) {
       cb(Err.EFILEEXISTS);
       return;
@@ -106,12 +99,12 @@ class FileSystem {
     cb(Err.NONE);
   }
 
-  makeDir(path, owner, cb){
+  makeDir(path, owner, cb: (err: Err) => void) {
     const { folderPath, fileName } = splitPath(path);
     this.mountFolderFile(
       new Folder({
         owner,
-        permissions: '64',
+        permissions: "64",
         children: [],
       }),
       path,
@@ -119,21 +112,21 @@ class FileSystem {
     );
   }
 
-  newTextFile(data, path, owner, cb : (Err) => void){
+  newTextFile(data, path, owner: number, cb: (err: Err) => void) {
     this.mountFolderFile(
       new TextFile({
         owner,
-        permissions: '64',
+        permissions: "64",
         data,
       }),
       path,
-      cb,
+      cb
     );
   }
 
-  removeFolder(pathStr, cb : (Err) => void) {
+  removeFolder(pathStr: string, cb: (err: Err) => void) {
     const path = toPath(pathStr);
-    const { folderPath, fileName : childFolderName } = splitPath(path);
+    const { folderPath, fileName: childFolderName } = splitPath(path);
     const parentFolder = traversePath(folderPath, this.root);
     if (!parentFolder) {
       cb(Err.ENOFOLDER);
@@ -152,7 +145,7 @@ class FileSystem {
     cb(Err.NONE);
   }
 
-  removeFile(pathStr, cb : (Err) => void){
+  removeFile(pathStr: string, cb: (err: Err) => void) {
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
     const folder = traversePath(folderPath, this.root);
@@ -173,16 +166,17 @@ class FileSystem {
     cb(Err.NONE);
   }
 
-  writeToFile(data : string, pathStr : string, cb : (Err) => void){
+  writeToFile(data: string, pathStr: string, cb: (err: Err) => void) {
     const file = this.getFolderFile(pathStr);
-    if (file instanceof Folder) { // TODO: move to typeof guard.
+    if (file instanceof Folder) {
+      // TODO: move to typeof guard.
       cb(Err.ENOTFILE);
     }
     file.write(data, noop);
     cb(Err.NONE);
   }
 
-  readFileMetadata(pathStr: string, cb){
+  readFileMetadata(pathStr: string, cb: (err: Err, data: any) => void) {
     const file = this.getFolderFile(pathStr);
     if (file === null) {
       cb(Err.ENOFILE, null);
@@ -193,21 +187,24 @@ class FileSystem {
         suid: file.suid === true,
       });
     }
-  };
+  }
 
-  readFromFile(pathStr : string, cb: (Err, string, bool) => void) {
+  readFromFile(
+    pathStr: string,
+    cb: (err: Err, data: string, eof: boolean) => void
+  ) {
     const file = this.getFolderFile(pathStr);
     if (file === null) {
-      cb(Err.ENOFILE, '', true);
+      cb(Err.ENOFILE, "", true);
     } else if (file instanceof Folder) {
-      cb(Err.ENOTFILE, '', true);
+      cb(Err.ENOTFILE, "", true);
     } else {
-      file.read((err, data, eof) => cb(err, data, eof));
+      file.read((err: Err, data: string, eof: boolean) => cb(err, data, eof));
     }
   }
 
   // TODO: pass back error codes instead
-  pathExists(pathStr, cb : (bool) => void) {
+  pathExists(pathStr: string, cb: (exists: boolean) => void) {
     const file = this.getFolderFile(pathStr);
     if (file) {
       cb(true);
@@ -216,34 +213,33 @@ class FileSystem {
     }
   }
 
-  ensureFolder(pathStr, cb : (Err) => void) {
+  ensureFolder(pathStr: string, cb: (err: Err) => void) {
     const file = this.getFolderFile(pathStr);
     if (!file) {
       cb(Err.ENOFOLDER);
-    } else if(!(file instanceof Folder)) {
+    } else if (!(file instanceof Folder)) {
       cb(Err.ENOTFOLDER);
     } else {
       cb(Err.NONE);
     }
   }
 
-  readDirContents(pathStr, cb : (Err, string) => void) {
+  readDirContents(pathStr, cb: (err: Err, contents: string) => void) {
     this.pathExists(pathStr, (exists) => {
       if (!exists) {
-        cb(Err.ENOFILE, '');
+        cb(Err.ENOFILE, "");
         return;
       }
       const folder = this.getFolderFile(pathStr);
       if (!(folder instanceof Folder)) {
-        cb(Err.ENOTFOLDER, '')
+        cb(Err.ENOTFOLDER, "");
       } else {
-        cb(Err.NONE, Object.keys(folder.children).join('\n'));
+        cb(Err.NONE, Object.keys(folder.children).join("\n"));
       }
     });
-
   }
 
-  mountDevice(device, pathStr){
+  mountDevice(device: Device, pathStr: string) {
     this.mountFolderFile(new DeviceFile(device), pathStr);
   }
 }

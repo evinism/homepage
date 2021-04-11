@@ -1,4 +1,4 @@
-import { FolderFile } from './constants';
+import { FolderFile, DirectorySnapshot } from "./constants";
 
 class Folder implements FolderFile {
   owner: number;
