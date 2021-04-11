@@ -41,7 +41,7 @@ const toPath = (pathStr: string) => {
 
 // TODO: error handling
 // (path, origin) => file?
-const traversePath = (path: string[], origin) => {
+const traversePath = (path: string[], origin: any) => {
   const file = path.reduce((acc, cur) => {
     if (!acc) {
       return null;
@@ -74,7 +74,7 @@ class FileSystem {
     return traversePath(toPath(pathStr), this.root);
   }
 
-  mountFolderFile(file, pathStr: string, cb: (err: Err) => void = noop) {
+  mountFolderFile(file: any, pathStr: string, cb: (err: Err) => void = noop) {
     const path = toPath(pathStr);
     const { folderPath, fileName } = splitPath(path);
 
@@ -224,7 +224,7 @@ class FileSystem {
     }
   }
 
-  readDirContents(pathStr, cb: (err: Err, contents: string) => void) {
+  readDirContents(pathStr: string, cb: (err: Err, contents: string) => void) {
     this.pathExists(pathStr, (exists) => {
       if (!exists) {
         cb(Err.ENOFILE, "");

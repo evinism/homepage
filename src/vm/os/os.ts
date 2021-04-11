@@ -1,7 +1,7 @@
 import Filesystem from "./fs";
 import Process from "./process";
 import User from "./user";
-import { Status, Device } from "./constants";
+import { Status, Device, FileSystemSnapshot } from "./constants";
 import FileSystem from "./fs";
 import initialFilesystem from "../initial/filesystem";
 import DeviceType from "../vmtypes";
@@ -18,7 +18,7 @@ WARNING: This is very much still a work in progress.
 const NOOP = () => {};
 
 // TODO: There's probably a better place for this
-function makeUserFromEntry(userStr) {
+function makeUserFromEntry(userStr: string) {
   const params = userStr.split(":");
   if (params.length < 3) {
     return;
@@ -43,18 +43,21 @@ class OS {
     return "0.0.1";
   }
 
-  initFS(fs) {
+  initFS(fs: FileSystemSnapshot) {
     this.filesystem = new Filesystem(fs);
   }
 
-  initUsers(cb) {
-    this.filesystem.readFromFile("/etc/passwd", (err, passwd) => {
-      this.users = passwd.split("\n").map(makeUserFromEntry).filter(Boolean);
+  initUsers(cb: () => void) {
+    this.filesystem!.readFromFile("/etc/passwd", (err, passwd) => {
+      this.users = passwd
+        .split("\n")
+        .map(makeUserFromEntry)
+        .filter((user) => user !== undefined) as User[];
       cb();
     });
   }
 
-  registerDevice = (dev, deviceType) => {
+  registerDevice = (dev: Device, deviceType: DeviceType) => {
     this.devices.push([dev, deviceType]);
   };
 
@@ -67,17 +70,23 @@ class OS {
       [DeviceType.TTY]: "/dev/tty",
     };
     this.devices.forEach(([dev, deviceType]) => {
-      this.filesystem.mountDevice(dev, mapping[deviceType]);
+      this.filesystem!.mountDevice(dev, mapping[deviceType]);
     });
   };
 
   // Should probs move this to other things here.
-  execProcess(pathStr, args, wd, user, onTerminate) {
-    this.filesystem.readFileMetadata(pathStr, (err, { suid, owner }) => {
-      this.filesystem.readFromFile(pathStr, (err, data) => {
+  execProcess(
+    pathStr: string,
+    args: string[],
+    wd: string,
+    user: User,
+    onTerminate
+  ) {
+    this.filesystem!.readFileMetadata(pathStr, (err, { suid, owner }) => {
+      this.filesystem!.readFromFile(pathStr, (err, data) => {
         let activeUser = user;
         if (suid) {
-          activeUser = this.users.find((user) => user.id === owner);
+          activeUser = this.users.find((user) => user.id === owner)!;
           if (!activeUser) {
             console.log("aaaa noa ctive user");
             activeUser = user;
@@ -98,12 +107,12 @@ class OS {
   }
 
   systemShutdown() {
-    this.filesystem.writeToFile(
+    this.filesystem!.writeToFile(
       "\nShutting down OS...\nGoodbye!\n",
       "/dev/screen",
       NOOP
     );
-    this.filesystem.writeToFile("\u0004", "/dev/screen", NOOP);
+    this.filesystem!.writeToFile("\u0004", "/dev/screen", NOOP);
     this.status = Status.FINISHED;
   }
 
@@ -115,7 +124,7 @@ class OS {
     this.initUsers(() => {
       const webUser = this.users.find((user) => user.id === 1);
       this.status = Status.RUNNING;
-      this.execProcess("/bin/sh", [], "/users/web/", webUser, () =>
+      this.execProcess("/bin/sh", [], "/users/web/", webUser!, () =>
         this.systemShutdown()
       );
     });
