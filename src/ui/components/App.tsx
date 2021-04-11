@@ -1,20 +1,38 @@
 import React from "react";
+import Pipe from "../../shared/pipe";
+import { ScreenCommand } from "../../shared/screenTypes";
+import OS from "../../vm/os";
 import OsProvider from "./OsProvider";
 import Screen from "./Screen";
 
+interface AppState {
+  output: string;
+  off: boolean;
+}
+
 // lol lenses
-const changeParam = (key) => (fn) => (state) => ({
-  ...state,
-  [key]: fn(state[key]),
-});
+function changeParam<K extends keyof AppState>(key: K) {
+  return (fn: (value: AppState[typeof key]) => void) => (state: AppState) => ({
+    ...state,
+    [key]: fn(state[key]),
+  });
+}
 
 const changeOutput = changeParam("output");
 const changeOff = changeParam("off");
 
-class App extends React.Component {
-  state = { output: "", off: false };
+interface AppProps {
+  screenPipe: Pipe<ScreenCommand>;
+  keypressPipe: Pipe<any>; // What are these?
+  keydownPipe: Pipe<any>; // What are these types??
+  os: OS;
+}
 
-  constructor(props) {
+class App extends React.Component<AppProps, AppState> {
+  state = { output: "", off: false };
+  button: undefined | HTMLButtonElement;
+
+  constructor(props: AppProps) {
     super(props);
     props.screenPipe.subscribe((str) => this.writeToScreen(str));
   }
@@ -38,7 +56,7 @@ class App extends React.Component {
     bodyElem.scrollTop = document.querySelector(".screen").clientHeight; // a little overkill but whatev
   };
 
-  writeToScreen(cmd) {
+  writeToScreen(cmd: ScreenCommand) {
     const cb = () => {
       this.scrollToBottom();
     };
@@ -88,7 +106,6 @@ class App extends React.Component {
   };
 
   render() {
-    const { os } = this.props;
     return (
       <div className="app">
         <Screen output={this.state.output} off={this.state.off} />
