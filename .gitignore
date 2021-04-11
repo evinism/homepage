@@ -1,6 +1,0 @@
-node_modules
-dist
-.cache
-src/vm/win.js
-*.txt
-secret
