@@ -42,7 +42,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   handleWindowClick = () => {
-    if (window.getSelection().isCollapsed) {
+    if (window.getSelection()?.isCollapsed) {
       this.refocus();
     }
   };
@@ -52,8 +52,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   scrollToBottom = () => {
-    const bodyElem = document.querySelector("body");
-    bodyElem.scrollTop = document.querySelector(".screen").clientHeight; // a little overkill but whatev
+    const screen = document.querySelector(".screen");
+    if (screen) {
+      document.body.scrollTop = screen.clientHeight;
+    }
   };
 
   writeToScreen(cmd: ScreenCommand) {
@@ -85,6 +87,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       case "offCommand": {
         this.setState(changeOff(() => true));
+        break;
       }
       default:
         return;
