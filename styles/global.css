@@ -25,3 +25,23 @@ img {
   max-width: 100%;
   display: block;
 }
+
+/* Stuff for homepage */
+iframe.process-sandbox {
+  display: none;
+}
+
+@keyframes cursorBlink {
+  0% {
+    background-color: transparent;
+  }
+  40% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: #44ff44;
+  }
+  90% {
+    background-color: #44ff44;
+  }
+}

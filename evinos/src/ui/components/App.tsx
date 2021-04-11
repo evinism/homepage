@@ -4,6 +4,7 @@ import { ScreenCommand } from "../../shared/screenTypes";
 import OS from "../../vm/os";
 import OsProvider from "./OsProvider";
 import Screen from "./Screen";
+import styles from "./App.module.scss";
 
 interface AppState {
   output: string;
@@ -53,10 +54,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   scrollToBottom = () => {
-    const screen = document.querySelector(".screen");
-    if (screen) {
-      document.body.scrollTop = screen.clientHeight;
-    }
+    window.scrollTo(0, document.body.scrollHeight);
   };
 
   writeToScreen(cmd: ScreenCommand) {
@@ -112,7 +110,7 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     return (
       <div
-        className="app"
+        className={styles.app}
         onKeyPress={this.handleKeypress}
         onKeyDown={this.handleKeydown}
         role="textbox"
