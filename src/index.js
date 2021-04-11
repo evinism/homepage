@@ -1,3 +1,4 @@
-import mountApp from './ui';
+import "./main.css";
+import mountApp from "./ui";
 
-export default mountApp;
+mountApp(document.getElementById("mount"));

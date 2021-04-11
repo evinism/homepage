@@ -120,14 +120,6 @@ class App extends React.Component<AppProps, AppState> {
         tabIndex={0}
       >
         <Screen output={this.state.output} off={this.state.off} />
-        {/*<input
-          onKeyPress={this.handleKeypress}
-          onKeyDown={this.handleKeydown}
-          type="text"
-          autoFocus
-          value=""
-          style={{ opacity: "0.0001" }}
-        />*/}
       </div>
     );
   }
