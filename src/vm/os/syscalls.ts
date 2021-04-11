@@ -4,15 +4,14 @@ import { getAbsolutePathStr } from "./util";
 import Folder from "./folder";
 import { DeviceFile } from "./file";
 import win from "./homepage-secret/win";
-import Process from "./process";
 
 // The last thing to a cb should always be an error code
 const syscalls = {
-  log: (arg: string, process: Process, cb) => {
+  log: (arg, process, cb) => {
     console.log(arg);
     cb(Err.NONE);
   },
-  write: (arg: any, process: Process, cb) => {
+  write: (arg, process, cb) => {
     const { data, fd } = arg;
     //TODO PERMS check. Probs do in the FS, not here.
     if (process.fds[fd]) {
@@ -21,7 +20,7 @@ const syscalls = {
       cb(Err.EBADFD);
     }
   },
-  read: (arg: any, process: Process, cb) => {
+  read: (arg, process, cb) => {
     const { fd } = arg;
     if (process.fds[fd]) {
       process.fds[fd].read(cb);
@@ -29,29 +28,24 @@ const syscalls = {
       cb(Err.EBADFD, "", true);
     }
   },
-  open: (arg: any, process: Process, cb) => {
+  open: (arg, process, cb) => {
     const { path, perms } = arg;
     // TODO: perms on this call
     // TODO: Promisify stuff in fs, ugh...
     const absPath = getAbsolutePathStr(path, process.cwd);
     const newFD = process.fds.length;
-    let file = process.os.filesystem!.getFolderFile(absPath);
+    let file = process.os.filesystem.getFolderFile(absPath);
     // todo: move this logic to be in fs
     if (!file && perms.indexOf("c") >= 0) {
-      process.os.filesystem!.newTextFile(
-        "",
-        absPath,
-        process.user.id,
-        (err) => {
-          if (!err) {
-            file = process.os.filesystem!.getFolderFile(absPath);
-            process.fds[newFD] = file;
-            cb(Err.NONE, newFD);
-          } else {
-            cb(err, 0);
-          }
+      process.os.filesystem.newTextFile("", absPath, process.user.id, (err) => {
+        if (!err) {
+          file = process.os.filesystem.getFolderFile(absPath);
+          process.fds[newFD] = file;
+          cb(Err.NONE, newFD);
+        } else {
+          cb(err, 0);
         }
-      );
+      });
     } else if (!file) {
       cb(Err.ENOFILE, 0);
     } else if (file instanceof Folder) {
@@ -61,7 +55,7 @@ const syscalls = {
       cb(Err.NONE, newFD);
     }
   },
-  close: (arg: any, process: Process, cb) => {
+  close: (arg, process, cb) => {
     const fd = arg;
     if (process.fds[fd]) {
       delete process.fds[fd];
@@ -70,39 +64,39 @@ const syscalls = {
       cb(Err.EBADFD);
     }
   },
-  fwrite: (arg: any, process: Process, cb) => {
+  fwrite: (arg, process, cb) => {
     // todo: write with permissions.
-    process.os.filesystem!.writeToFile(
+    process.os.filesystem.writeToFile(
       arg.data,
       getAbsolutePathStr(arg.path, process.cwd),
       cb
     );
   },
-  fread: (arg: any, process: Process, cb) => {
+  fread: (arg, process, cb) => {
     // todo: read with permissions.
-    process.os.filesystem!.readFromFile(
+    process.os.filesystem.readFromFile(
       getAbsolutePathStr(arg, process.cwd),
       cb
     );
   },
-  rmFile: (arg: any, process: Process, cb) => {
-    process.os.filesystem!.removeFile(getAbsolutePathStr(arg, process.cwd), cb);
+  rmFile: (arg, process, cb) => {
+    process.os.filesystem.removeFile(getAbsolutePathStr(arg, process.cwd), cb);
   },
-  mkDir: (arg: any, process: Process, cb) => {
-    process.os.filesystem!.makeDir(
+  mkDir: (arg, process, cb) => {
+    process.os.filesystem.makeDir(
       getAbsolutePathStr(arg, process.cwd),
       process.user.id,
       cb
     );
   },
-  rmDir: (arg: any, process: Process, cb) => {
-    process.os.filesystem!.removeFolder(
+  rmDir: (arg, process, cb) => {
+    process.os.filesystem.removeFolder(
       getAbsolutePathStr(arg, process.cwd),
       cb
     );
   },
   // spins up a new process
-  exec: ({ path, args }, process: Process, cb) => {
+  exec: ({ path, args }, process, cb) => {
     // once again, with permissions
     process.os.execProcess(
       getAbsolutePathStr(path, process.cwd),
@@ -113,29 +107,29 @@ const syscalls = {
     );
   },
   // gets a list of everything in the folder
-  dread: (arg: any, process: Process, cb) => {
-    process.os.filesystem!.readDirContents(
+  dread: (arg, process, cb) => {
+    process.os.filesystem.readDirContents(
       getAbsolutePathStr(arg, process.cwd),
       cb
     );
   },
   // tells whether or not the path exists
-  pathExists: (arg: any, process: Process, cb) => {
-    process.os.filesystem!.pathExists(
+  pathExists: (arg, process, cb) => {
+    process.os.filesystem.pathExists(
       getAbsolutePathStr(arg, process.cwd),
       (exists) => cb(Err.NONE, exists) // Shim because fs.exists doesn't follow weird convention.
     );
   },
   // tells the kernel to terminate the process.
-  terminate: (arg: any, process: Process, _) => {
-    process.terminate(0);
+  terminate: (arg, process, _) => {
+    process.terminate();
   },
   // gets the current working directory of the process
-  getcwd: (arg: any, process: Process, cb) => {
+  getcwd: (arg, process, cb) => {
     cb(Err.NONE, process.cwd);
   },
   // sets the current working directory of the process
-  setcwd: (arg: any, process: Process, cb) => {
+  setcwd: (arg, process, cb) => {
     arg = arg.trim();
     // cwd should always have trailing slash.
     if (arg[arg.length - 1] !== "/") {
@@ -144,7 +138,7 @@ const syscalls = {
 
     const wd = getAbsolutePathStr(arg, process.cwd);
 
-    process.os.filesystem!.ensureFolder(wd, (err) => {
+    process.os.filesystem.ensureFolder(wd, (err) => {
       if (!err) {
         process.cwd = wd;
         cb(Err.NONE);
@@ -153,11 +147,11 @@ const syscalls = {
       }
     });
   },
-  getudata: (arg: any, process: Process, cb) => {
+  getudata: (arg, process, cb) => {
     const { name, id, password } = process.user;
     cb(Err.NONE, { name, id, password });
   },
-  ioctl: (arg: any, process: Process, cb) => {
+  ioctl: (arg, process, cb) => {
     const { fd, cmd } = arg;
     if (!process.fds[fd]) {
       cb(Err.EBADFD);
@@ -171,7 +165,7 @@ const syscalls = {
     }
     dev.device.ioctl(cmd, cb);
   },
-  win: (arg: any, process: Process, cb) => {
+  win: (arg, process, cb) => {
     if (process.user.id !== 0) {
       cb(Err.EPERM);
     } else {
@@ -198,7 +192,7 @@ yup.addMethod(
 // obvs we can't do this through typechecking.
 export const syscallSchemas = {
   write: yup.object().shape({
-    data: yup.string(),
+    data: yup.string().requiredWithEmpty(),
     fd: yup.number().positive().required(),
   }),
   read: yup.object().shape({
@@ -210,7 +204,7 @@ export const syscallSchemas = {
   }),
   close: yup.number().positive(),
   fwrite: yup.object().shape({
-    data: yup.string(),
+    data: yup.string().requiredWithEmpty(),
     path: yup.string().required(),
   }),
   fread: yup.string().required(),
