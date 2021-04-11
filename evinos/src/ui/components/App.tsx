@@ -123,4 +123,4 @@ class App extends React.Component<AppProps, AppState> {
   }
 }
 
-export default OsProvider(App);
+export default OsProvider<{}>(App);
