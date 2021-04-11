@@ -1,9 +1,9 @@
-import * as yup from 'yup';
-import { ProcStatus, Err } from './constants';
-import { getAbsolutePathStr } from './util';
-import Folder from './folder';
-import { DeviceFile } from './file';
-import win from './win';
+import * as yup from "yup";
+import { ProcStatus, Err } from "./constants";
+import { getAbsolutePathStr } from "./util";
+import Folder from "./folder";
+import { DeviceFile } from "./file";
+import win from "./homepage-secret/win";
 
 // The last thing to a cb should always be an error code
 const syscalls = {
@@ -25,19 +25,19 @@ const syscalls = {
     if (process.fds[fd]) {
       process.fds[fd].read(cb);
     } else {
-      cb(Err.EBADFD, '', true);
+      cb(Err.EBADFD, "", true);
     }
   },
   open: (arg, process, cb) => {
     const { path, perms } = arg;
-    // TODO: perms on this call 
+    // TODO: perms on this call
     // TODO: Promisify stuff in fs, ugh...
     const absPath = getAbsolutePathStr(path, process.cwd);
     const newFD = process.fds.length;
     let file = process.os.filesystem.getFolderFile(absPath);
     // todo: move this logic to be in fs
-    if (!file && perms.indexOf('c') >= 0) {
-      process.os.filesystem.newTextFile('', absPath, process.user.id, err => {
+    if (!file && perms.indexOf("c") >= 0) {
+      process.os.filesystem.newTextFile("", absPath, process.user.id, (err) => {
         if (!err) {
           file = process.os.filesystem.getFolderFile(absPath);
           process.fds[newFD] = file;
@@ -46,7 +46,7 @@ const syscalls = {
           cb(err, 0);
         }
       });
-    } else if(!file) {
+    } else if (!file) {
       cb(Err.ENOFILE, 0);
     } else if (file instanceof Folder) {
       cb(Err.ENOTFILE, 0);
@@ -80,10 +80,7 @@ const syscalls = {
     );
   },
   rmFile: (arg, process, cb) => {
-    process.os.filesystem.removeFile(
-      getAbsolutePathStr(arg, process.cwd),
-      cb
-    );
+    process.os.filesystem.removeFile(getAbsolutePathStr(arg, process.cwd), cb);
   },
   mkDir: (arg, process, cb) => {
     process.os.filesystem.makeDir(
@@ -120,7 +117,7 @@ const syscalls = {
   pathExists: (arg, process, cb) => {
     process.os.filesystem.pathExists(
       getAbsolutePathStr(arg, process.cwd),
-      exists => cb(Err.NONE, exists) // Shim because fs.exists doesn't follow weird convention.
+      (exists) => cb(Err.NONE, exists) // Shim because fs.exists doesn't follow weird convention.
     );
   },
   // tells the kernel to terminate the process.
@@ -135,13 +132,13 @@ const syscalls = {
   setcwd: (arg, process, cb) => {
     arg = arg.trim();
     // cwd should always have trailing slash.
-    if (arg[arg.length - 1] !== '/') {
-      arg = arg + '/';
+    if (arg[arg.length - 1] !== "/") {
+      arg = arg + "/";
     }
 
     const wd = getAbsolutePathStr(arg, process.cwd);
 
-    process.os.filesystem.ensureFolder(wd, err => {
+    process.os.filesystem.ensureFolder(wd, (err) => {
       if (!err) {
         process.cwd = wd;
         cb(Err.NONE);
@@ -151,7 +148,7 @@ const syscalls = {
     });
   },
   getudata: (arg, process, cb) => {
-    const { name, id, password } = process.user
+    const { name, id, password } = process.user;
     cb(Err.NONE, { name, id, password });
   },
   ioctl: (arg, process, cb) => {
@@ -161,25 +158,34 @@ const syscalls = {
       return;
     }
     const dev = process.fds[fd];
-    if (!(dev instanceof DeviceFile)) { // todo: figure out how to not have this be terrible
+    if (!(dev instanceof DeviceFile)) {
+      // todo: figure out how to not have this be terrible
       cb(Err.ENOTDEVICE);
       return;
     }
     dev.device.ioctl(cmd, cb);
   },
   win: (arg, process, cb) => {
-    if(process.user.id !== 0) {
-      cb(Err.EPERM)
+    if (process.user.id !== 0) {
+      cb(Err.EPERM);
     } else {
       win(process);
       cb(Err.NONE);
     }
   },
-}
+};
 
-yup.addMethod(yup.string, 'requiredWithEmpty', function (msg = '$path must be defined') {
-  return this.test('requiredWithEmpty', msg, (value) => typeof value === 'string')
-})
+yup.addMethod(
+  yup.string,
+  "requiredWithEmpty",
+  function (msg = "$path must be defined") {
+    return this.test(
+      "requiredWithEmpty",
+      msg,
+      (value) => typeof value === "string"
+    );
+  }
+);
 
 // if the schema exists in the syscall schema, it'll be
 // considered a precondition for the arg that should be checked.
@@ -205,7 +211,7 @@ export const syscallSchemas = {
   rmFile: yup.string().required(),
   execProcess: yup.object().shape({
     path: yup.string().required(),
-    args: yup.array().of(yup.string())
+    args: yup.array().of(yup.string()),
   }),
   ioctl: yup.object().shape({
     fd: yup.number().positive().required(),

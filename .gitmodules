@@ -1,0 +1,3 @@
+[submodule "src/vm/os/homepage-secret"]
+	path = src/vm/os/homepage-secret
+	url = git@github.com:evinism/homepage-secret.git
