@@ -1,28 +1,9 @@
-
-/* shape is: 
-  file:
-  {
-    _isFile: true
-    owner:
-    permissions: '75'// Two octets bc no groups.
-    suid?: bool,
-    data:
-  }
-
-  folder:
-  {
-    owner:
-    permissions: //
-    children: {
-      fileName: file
-    }
-  }
-*/
+import { FileNodeSnapshot } from "../../os/constants";
 
 const sh = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       // For the reader:
@@ -116,9 +97,9 @@ const sh = {
 };
 
 const ls = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -136,13 +117,13 @@ const ls = {
         }
       });
     });
-`
+`,
 };
 
 const pwd = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     // eww on this null thing
     syscalls.getcwd(null, (err, cwd) => {
@@ -152,13 +133,13 @@ const pwd = {
       });
       syscalls.terminate(0);
     })
-`
-}
+`,
+};
 
 const rm = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -179,13 +160,13 @@ const rm = {
         );
       }
     });
-`
+`,
 };
 
 const cat = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { errStr } = eval(stdlib);
@@ -253,9 +234,9 @@ const cat = {
 };
 
 const std = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '644',
+  permissions: "644",
   data: `
     const stdout = data => syscalls.write({
       data,
@@ -404,12 +385,12 @@ const std = {
       errStr,
     });
 `,
-}
+};
 
 const su = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   suid: true,
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
@@ -450,13 +431,13 @@ const su = {
         );
       });
     });
-`
-}
+`,
+};
 
 const sudo = {
-  _isFile: true, 
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   suid: true,
   data: `
   syscalls.fread('/lib/std', (err, stdlib) => {
@@ -484,13 +465,13 @@ const sudo = {
       shellExec(args.slice(1).join(' '), () => syscalls.terminate(0))
     });
   });
-`
-}
+`,
+};
 
 const whoami = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.getudata(null, (err, {name}) => {
       syscalls.write({
@@ -500,13 +481,13 @@ const whoami = {
         syscalls.terminate(0);
       })
     });
-`
-}
+`,
+};
 
 const touch = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -523,13 +504,13 @@ const touch = {
         }
       });
     });
-`
-}
+`,
+};
 
 const write = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdin, stdout, stderr, errStr, controlledIO } = eval(stdlib);
@@ -586,13 +567,13 @@ const write = {
         });
       }
     });
-`
+`,
 };
 
 const mkdir = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -617,13 +598,13 @@ const mkdir = {
       }
       makeNext(args.slice(1));
     });
-`
+`,
 };
 
 const rmdir = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -648,15 +629,14 @@ const rmdir = {
       }
       rmNext(args.slice(1));
     });
-`
+`,
 };
 
 const about_me = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 1,
-  permissions: '64',
-  data: 
-`| Hi! My name is Evin Sellin! I spend a lot of time making
+  permissions: "64",
+  data: `| Hi! My name is Evin Sellin! I spend a lot of time making
 | computers do dumb things. Most of my experience is in webdev,
 | but I'm interested in many aspects of computing, such as
 | machine learning, functional programming, theory of computation,
@@ -668,11 +648,10 @@ const about_me = {
 };
 
 const about_this_interface = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 1,
-  permissions: '64',
-  data:
-`| Source code is hosted at https://github.com/evinism/homepage
+  permissions: "64",
+  data: `| Source code is hosted at https://github.com/evinism/homepage
 | This interface was inspired by my friend Audrey's project,
 | hosted at https://github.com/rhelmot/linjus. To get an idea of
 | what this consists of, try executing cat /bin/sh or looking
@@ -680,27 +659,25 @@ const about_this_interface = {
 |
 | There's a short puzzle in here! See if you can look through the
 | syscalls for something unusual...
-`
-}
+`,
+};
 
 const links = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 1,
-  permissions: '64',
-  data: 
-`| Github: https://github.com/evinism
+  permissions: "64",
+  data: `| Github: https://github.com/evinism
 | Medium: https://medium.com/@evinsellin/
 | Twitter: https://twitter.com/evinism
 | LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/
-`
-}
+`,
+};
 
 const projects = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 1,
-  permissions: '64',
-  data:
-`| ========================
+  permissions: "64",
+  data: `| ========================
 | === Projects To Date ===
 | ========================
 |
@@ -738,52 +715,73 @@ const projects = {
 |  "performance" even means from a frontend perspective and how
 |  to use the tools at our disposal to make our webapps feel fast.
 |  Given at the Santa Barbara JS meetup in May 2018
-`
+`,
 };
 
 const passwd = {
-  _isFile: true,
+  _isFile: true as true,
   owner: 0,
-  permissions: '64',
-  data:
-`root:0684fd858f99d05b74f80f0b21f4db29:0
+  permissions: "64",
+  data: `root:0684fd858f99d05b74f80f0b21f4db29:0
 web:5f4dcc3b5aa765d61d8327deb882cf99:1
 `,
-}
-
-const fs = { name: 'root', owner: 0, perm: '75',
-  children: {
-    bin: { owner: 0, perm: '75', children: {
-      sh,
-      cat,
-      ls,
-      mkdir,
-      pwd,
-      rm,
-      rmdir,
-      su,
-      sudo,
-      touch,
-      whoami,
-      write,
-    }},
-    dev: { owner: 0, perm: '75', children: {} },
-    etc: { owner: 0, perm: '75', children: {
-      passwd,
-    }},
-    lib: { owner: 0, perm: '75', children: {
-      std,
-    }},
-    users: { owner: 0, perm: '75', children: {
-      web: { owner: 1, perm: '75', children: {
-        about_me,
-        about_this_interface,
-        links,
-        projects,
-      }}
-    }}
-  }
 };
 
+const fs: FileNodeSnapshot = {
+  name: "root",
+  owner: 0,
+  permissions: "75",
+  children: {
+    bin: {
+      owner: 0,
+      permissions: "75",
+      children: {
+        sh,
+        cat,
+        ls,
+        mkdir,
+        pwd,
+        rm,
+        rmdir,
+        su,
+        sudo,
+        touch,
+        whoami,
+        write,
+      },
+    },
+    dev: { owner: 0, permissions: "75", children: {} },
+    etc: {
+      owner: 0,
+      permissions: "75",
+      children: {
+        passwd,
+      },
+    },
+    lib: {
+      owner: 0,
+      permissions: "75",
+      children: {
+        std,
+      },
+    },
+    users: {
+      owner: 0,
+      permissions: "75",
+      children: {
+        web: {
+          owner: 1,
+          permissions: "75",
+          children: {
+            about_me,
+            about_this_interface,
+            links,
+            projects,
+          },
+        },
+      },
+    },
+  },
+};
 
 export default fs;

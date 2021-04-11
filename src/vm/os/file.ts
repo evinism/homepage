@@ -1,5 +1,5 @@
-import { Device, FolderFile, ReadWritable } from './constants';
-import { Err } from './constants';
+import { Device, FileSnapshot, FolderFile, ReadWritable } from "./constants";
+import { Err } from "./constants";
 
 /* 
   interface file extends permissable 
@@ -10,23 +10,18 @@ import { Err } from './constants';
 */
 
 export class TextFile implements FolderFile, ReadWritable {
-  owner : number;
-  permissions : string;
-  suid : boolean;
-  data : string;
+  owner: number;
+  permissions: string;
+  suid: boolean;
+  data: string;
 
-  constructor(init){
-    const {
-      owner,
-      permissions,
-      data,
-      suid,
-    } = init;
+  constructor(init: FileSnapshot) {
+    const { owner, permissions, data, suid } = init;
 
     this.owner = owner;
     this.permissions = permissions;
     this.data = data;
-    this.suid = suid;
+    this.suid = !!suid;
   }
 
   read(cb) {
@@ -40,12 +35,12 @@ export class TextFile implements FolderFile, ReadWritable {
 }
 
 export class DeviceFile implements FolderFile, ReadWritable {
-  device : Device;
-  owner : number;
-  permissions : string; // perms-style string again.
-  suid : boolean;
+  device: Device;
+  owner: number;
+  permissions: string; // perms-style string again.
+  suid: boolean;
 
-  constructor(device){
+  constructor(device: Device) {
     this.device = device;
     this.owner = 0;
     this.permissions = "644";
