@@ -41,7 +41,7 @@ function osProvider<T>(Component: React.ComponentType<T & OsProvidedProps>) {
       return (
         <Component
           {...this.props}
-          os={this.os}
+          os={this.os!}
           keydownPipe={this.keydownPipe}
           keypressPipe={this.keypressPipe}
           screenPipe={this.screenPipe}

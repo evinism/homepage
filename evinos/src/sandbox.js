@@ -25,8 +25,7 @@
   }
 */
 
-
-const sandboxText = iframeId => `
+const sandboxText = (iframeId) => `
 <!DOCTYPE html>
 <html>
   <head>
@@ -86,7 +85,9 @@ const sandboxText = iframeId => `
         }
 
         function post(msg){
-          window.parent.postMessage(JSON.stringify({ msg, iframeId: ${JSON.stringify(iframeId)}}), '*');
+          window.parent.postMessage(JSON.stringify({ msg, iframeId: ${JSON.stringify(
+            iframeId
+          )}}), '*');
         }
 
         function listen(fn) {
@@ -107,10 +108,10 @@ const sandboxText = iframeId => `
 
 let iframeId = 2000;
 
-const dataUrl = data => "data:text/html;base64," + btoa(data);
+const dataUrl = (data) => "data:text/html;base64," + btoa(data);
 
 class ProcessSandbox {
-  constructor(source, syscalls, args, env){
+  constructor(source, syscalls, args, env) {
     this.source = source;
     this.syscalls = syscalls;
     this.args = args;
@@ -121,66 +122,67 @@ class ProcessSandbox {
     iframeId++;
 
     // initialization of the iframe
-    const iframe = document.createElement('iframe');
+    const iframe = document.createElement("iframe");
+    iframe.className = "process-sandbox";
     this.iframe = iframe;
 
     document.body.appendChild(iframe);
-    iframe.sandbox = 'allow-scripts';
+    iframe.sandbox = "allow-scripts";
     iframe.src = dataUrl(sandboxText(this.iframeId));
     this.listeners = [];
     this.listen(this.handleEvent.bind(this));
   }
 
-  post(msg){
-    this.iframe.contentWindow.postMessage(JSON.stringify(msg), '*');
+  post(msg) {
+    this.iframe.contentWindow.postMessage(JSON.stringify(msg), "*");
   }
 
   listen(fn) {
-    const recv = evt => {
-      if(evt.source === this.iframe.contentWindow) {
+    const recv = (evt) => {
+      if (evt.source === this.iframe.contentWindow) {
         const { msg } = JSON.parse(evt.data);
         fn(msg);
       }
-    }
+    };
     window.addEventListener("message", recv, false);
     this.listeners.push(recv);
   }
 
-  handleEvent(evt){
-    switch(evt.type){
-      case 'ready':
+  handleEvent(evt) {
+    switch (evt.type) {
+      case "ready":
         this.post({
-          type: 'script',
+          type: "script",
           source: this.source,
           syscallNames: Object.keys(this.syscalls),
           args: this.args,
-          env: this.env
+          env: this.env,
         });
         break;
-      case 'syscall':
+      case "syscall":
         this.syscalls[evt.name](evt.arg, (...args) => {
           this.post({
-            type: 'syscallResponse',
+            type: "syscallResponse",
             id: evt.id,
             args,
           });
         });
 
         // special case for the terminate case... a little weird to put it here but whatevs.
-        if(evt.name === 'terminate'){
+        if (evt.name === "terminate") {
           this.cleanup();
         }
         break;
     }
   }
 
-  cleanup(){
+  cleanup() {
     document.body.removeChild(this.iframe);
-    this.listeners.forEach(fn => window.removeEventListener('message', fn));
+    this.listeners.forEach((fn) => window.removeEventListener("message", fn));
     this.listeners = [];
   }
-};
-
-window.runInSandbox = function(source, syscalls, args, env) {
-  new ProcessSandbox(source, syscalls, args, env);
 }
+
+window.runInSandbox = function (source, syscalls, args, env) {
+  new ProcessSandbox(source, syscalls, args, env);
+};

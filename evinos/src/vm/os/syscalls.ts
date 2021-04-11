@@ -192,7 +192,7 @@ yup.addMethod(
 // obvs we can't do this through typechecking.
 export const syscallSchemas = {
   write: yup.object().shape({
-    data: yup.string().requiredWithEmpty(),
+    data: yup.string(),
     fd: yup.number().positive().required(),
   }),
   read: yup.object().shape({
@@ -204,7 +204,7 @@ export const syscallSchemas = {
   }),
   close: yup.number().positive(),
   fwrite: yup.object().shape({
-    data: yup.string().requiredWithEmpty(),
+    data: yup.string(),
     path: yup.string().required(),
   }),
   fread: yup.string().required(),

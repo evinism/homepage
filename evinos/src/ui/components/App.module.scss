@@ -1,0 +1,73 @@
+.app {
+  position: relative;
+  background-color: black;
+  line-height: 1.1;
+  :global {
+    .multiplier1 {
+      background: repeating-linear-gradient(
+        45deg,
+        white,
+        white 10px,
+        #eee 10px,
+        #eee 20px
+      );
+    }
+
+    .multiplier2 {
+      mix-blend-mode: multiply;
+      background: repeating-linear-gradient(
+        0deg,
+        white,
+        white 1px,
+        #ccc 1px,
+        #ccc 2px
+      );
+    }
+
+    .screen-wrapper {
+      mix-blend-mode: multiply;
+      background-color: black;
+      padding: 10px;
+      min-height: calc(100vh);
+    }
+
+    a {
+      color: #44ff44;
+    }
+
+    a:hover {
+      color: #aaffaa;
+    }
+
+    .screen {
+      font-size: 1.4em;
+      border: 3px solid #44ff44;
+      padding-left: 10px;
+      color: #44ff44;
+      min-height: calc(100vh - 20px);
+      transition: color 1.5s ease-in 0.5s, border 1.5s ease-in 0.5s;
+    }
+
+    .screen.off {
+      border: 3px solid #242;
+      color: black;
+    }
+
+    .screen.off a {
+      color: inherit;
+    }
+
+    pre {
+      font-family: "VT323", monospace;
+    }
+
+    .cursor {
+      content: " ";
+      animation: cursorBlink 0.7s infinite;
+    }
+
+    .screen.off .cursor {
+      display: none;
+    }
+  }
+}
