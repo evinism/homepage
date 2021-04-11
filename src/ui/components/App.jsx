@@ -1,62 +1,71 @@
-import React from 'react';
-import OsProvider from './OsProvider';
-import Screen from './screen';
+import React from "react";
+import OsProvider from "./OsProvider";
+import Screen from "./Screen";
 
 // lol lenses
-const changeParam = key => fn => (state) => ({
+const changeParam = (key) => (fn) => (state) => ({
   ...state,
-  [key]: fn(state[key])
+  [key]: fn(state[key]),
 });
 
-const changeOutput = changeParam('output');
-const changeOff = changeParam('off');
+const changeOutput = changeParam("output");
+const changeOff = changeParam("off");
 
 class App extends React.Component {
-  state = { output: '', off: false };
+  state = { output: "", off: false };
 
-  constructor(props){
+  constructor(props) {
     super(props);
     props.screenPipe.subscribe((str) => this.writeToScreen(str));
   }
 
-  componentDidMount(){
-    window.addEventListener('click', this.handleWindowClick);
+  componentDidMount() {
+    window.addEventListener("click", this.handleWindowClick);
   }
 
   handleWindowClick = () => {
-    if(window.getSelection().isCollapsed){
+    if (window.getSelection().isCollapsed) {
       this.refocus();
     }
-  }
+  };
 
   refocus = () => {
     this.button && this.button.focus();
-  }
+  };
 
   scrollToBottom = () => {
-    const bodyElem = document.querySelector('body');
-    bodyElem.scrollTop = document.querySelector('.screen').clientHeight; // a little overkill but whatev
-  }
+    const bodyElem = document.querySelector("body");
+    bodyElem.scrollTop = document.querySelector(".screen").clientHeight; // a little overkill but whatev
+  };
 
-  writeToScreen(cmd){
+  writeToScreen(cmd) {
     const cb = () => {
       this.scrollToBottom();
-    }
-    switch(cmd.type){
-      case 'appendCommand': {
+    };
+    switch (cmd.type) {
+      case "appendCommand": {
         const str = cmd.data;
-        this.setState(changeOutput(output => output + str), cb);
+        this.setState(
+          changeOutput((output) => output + str),
+          cb
+        );
         break;
       }
-      case 'clearCommand': {
-        this.setState(changeOutput(() => ''), cb);
+      case "clearCommand": {
+        this.setState(
+          changeOutput(() => ""),
+          cb
+        );
         break;
       }
-      case 'removeCommand': {
-        this.setState(changeOutput(output => output.substr(0, output.length - 1)), cb);
+      case "removeCommand": {
+        this.setState(
+          changeOutput((output) => output.substr(0, output.length - 1)),
+          cb
+        );
         break;
       }
-      case 'offCommand': {
+      case "offCommand": {
         this.setState(changeOff(() => true));
       }
       default:
@@ -75,10 +84,10 @@ class App extends React.Component {
   };
 
   setButtonRef = (button) => {
-    this.button = button
-  }
+    this.button = button;
+  };
 
-  render(){
+  render() {
     const { os } = this.props;
     return (
       <div className="app">
@@ -86,11 +95,11 @@ class App extends React.Component {
         <input
           onKeyPress={this.handleKeypress}
           onKeyDown={this.handleKeydown}
-          ref={this.setButtonRef} 
+          ref={this.setButtonRef}
           type="text"
-          autoFocus 
+          autoFocus
           value=""
-          style={{opacity: '0.0001'}}
+          style={{ opacity: "0.0001" }}
         />
       </div>
     );
