@@ -39,6 +39,7 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidMount() {
     window.addEventListener("click", this.handleWindowClick);
+    this.refocus();
   }
 
   handleWindowClick = () => {
@@ -110,17 +111,23 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     return (
-      <div className="app">
+      <div
+        className="app"
+        onKeyPress={this.handleKeypress}
+        onKeyDown={this.handleKeydown}
+        role="textbox"
+        ref={this.setButtonRef}
+        tabIndex={0}
+      >
         <Screen output={this.state.output} off={this.state.off} />
-        <input
+        {/*<input
           onKeyPress={this.handleKeypress}
           onKeyDown={this.handleKeydown}
-          ref={this.setButtonRef}
           type="text"
           autoFocus
           value=""
           style={{ opacity: "0.0001" }}
-        />
+        />*/}
       </div>
     );
   }
