@@ -1,4 +1,3 @@
-
 /* shape is: 
   file:
   {
@@ -22,7 +21,7 @@
 const sh = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       // For the reader:
@@ -118,7 +117,7 @@ const sh = {
 const ls = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -136,13 +135,13 @@ const ls = {
         }
       });
     });
-`
+`,
 };
 
 const pwd = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     // eww on this null thing
     syscalls.getcwd(null, (err, cwd) => {
@@ -152,13 +151,13 @@ const pwd = {
       });
       syscalls.terminate(0);
     })
-`
-}
+`,
+};
 
 const rm = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -179,13 +178,13 @@ const rm = {
         );
       }
     });
-`
+`,
 };
 
 const cat = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { errStr } = eval(stdlib);
@@ -255,7 +254,7 @@ const cat = {
 const std = {
   _isFile: true,
   owner: 0,
-  permissions: '644',
+  permissions: "644",
   data: `
     const stdout = data => syscalls.write({
       data,
@@ -404,12 +403,12 @@ const std = {
       errStr,
     });
 `,
-}
+};
 
 const su = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   suid: true,
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
@@ -450,13 +449,13 @@ const su = {
         );
       });
     });
-`
-}
+`,
+};
 
 const sudo = {
-  _isFile: true, 
+  _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   suid: true,
   data: `
   syscalls.fread('/lib/std', (err, stdlib) => {
@@ -484,13 +483,13 @@ const sudo = {
       shellExec(args.slice(1).join(' '), () => syscalls.terminate(0))
     });
   });
-`
-}
+`,
+};
 
 const whoami = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.getudata(null, (err, {name}) => {
       syscalls.write({
@@ -500,13 +499,13 @@ const whoami = {
         syscalls.terminate(0);
       })
     });
-`
-}
+`,
+};
 
 const touch = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -523,13 +522,13 @@ const touch = {
         }
       });
     });
-`
-}
+`,
+};
 
 const write = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdin, stdout, stderr, errStr, controlledIO } = eval(stdlib);
@@ -586,13 +585,13 @@ const write = {
         });
       }
     });
-`
+`,
 };
 
 const mkdir = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -617,13 +616,13 @@ const mkdir = {
       }
       makeNext(args.slice(1));
     });
-`
+`,
 };
 
 const rmdir = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.fread('/lib/std', (err, stdlib) => {
       const { stdout, stderr, errStr } = eval(stdlib);
@@ -648,61 +647,83 @@ const rmdir = {
       }
       rmNext(args.slice(1));
     });
-`
+`,
 };
 
 const about_me = {
   _isFile: true,
   owner: 1,
-  permissions: '64',
-  data: 
-`| Hi! My name is Evin Sellin! I spend a lot of time making
-| computers do dumb things. Most of my experience is in webdev,
-| but I'm interested in many aspects of computing, such as
-| machine learning, functional programming, theory of computation,
-| and web performance!
+  permissions: "64",
+  data: `| Hi! My name is Evin Sellin! I spend a lot of time making
+| computers do dumb things.
+|
+| My current specialty is in Machine Learning Infrastructure, but 
+| I'm interested in many aspects of computing, such as JavaScript,
+| functional programming, theory of computation, and web
+| performance!
 |
 | Feel free to email me at evinism@gmail.com or tweet at @evinism
 | to contact me.
+|
+| Github: https://github.com/evinism
+| Medium: https://medium.com/@evinsellin/
+| Twitter: https://twitter.com/evinism
+| LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/
 `,
 };
 
 const about_this_interface = {
   _isFile: true,
   owner: 1,
-  permissions: '64',
-  data:
-`| Source code is hosted at https://github.com/evinism/homepage
+  permissions: "64",
+  data: `| Source code is hosted at https://github.com/evinism/homepage
 | This interface was inspired by my friend Audrey's project,
 | hosted at https://github.com/rhelmot/linjus. To get an idea of
 | what this consists of, try executing cat /bin/sh or looking
 | through the root directory.
 |
-| There's a short puzzle in here! See if you can look through the
-| syscalls for something unusual...
-`
-}
+| As a puzzle, there's some serious security flaws in here! See 
+| if you can look through the syscalls for something unusual...
+`,
+};
 
-const links = {
+const articles = {
   _isFile: true,
   owner: 1,
-  permissions: '64',
-  data: 
-`| Github: https://github.com/evinism
-| Medium: https://medium.com/@evinsellin/
-| Twitter: https://twitter.com/evinism
-| LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/
-`
-}
+  permissions: "64",
+  data: `| --- Articles ---
+| Object Plus Array Is Not Zero
+|  Exploring a common Javascript misconception with Chrome and
+|  ASTExplorer, and exploring the weird parts of Chrome's console
+|  Link: https://evinsellin.medium.com/object-plus-array-is-not-zero-ec4db710e7a5
+|
+| This is my thinly veiled attempt to get you to use a library I wrote.
+|  Why did I write this?? Does this count as satire? 
+|  Link: https://evinsellin.medium.com/this-is-my-thinly-veiled-attempt-to-get-you-to-use-a-library-i-wrote-9755dd0fa917
+|
+| Communicating through UUID Conflicts
+|  Can we open up a really narrow information leak into a
+|  full-blown communication protocol? With some elbow grease, yes!
+|  Link: https://evinsellin.medium.com/communicating-through-uuid-conflicts-fe50134304db
+|
+| What exactly is Turing Completeness?
+|  A quick introduction to theory of computation, giving us the 
+|  tools to answer "Is this programming language Turing Complete?"
+|  Link: https://evinsellin.medium.com/what-exactly-is-turing-completeness-a08cc36b26e2
+|
+| Teaching Monads Slightly Differently
+|  A description of problems I see with teaching monads and an 
+|  explanation using a different style 
+|  Link: https://evinsellin.medium.com/teaching-monads-slightly-differently-2af62c4af8ce
+|
+`,
+};
 
 const projects = {
   _isFile: true,
   owner: 1,
-  permissions: '64',
-  data:
-`| ========================
-| === Projects To Date ===
-| ========================
+  permissions: "64",
+  data: `| === Coding Projects ===
 |
 | --- Webapps ---
 | Lambda Explorer
@@ -715,21 +736,18 @@ const projects = {
 |  Quick-pad is an authless collaborative notepad that makes
 |  creating new notes and sharing them extremely quickly.
 |  Link: https://www.quick-pad.org/
+`,
+};
+
+const talks = {
+  _isFile: true,
+  owner: 1,
+  permissions: "64",
+  data: `| --- Talks ---
+| Aleatoric [ Lightning Talk ]
+|  Can we use sound to help us find subtle bugs in our webapp? 
+|  Maybe! Let's find out together!
 |
-| --- Articles ---
-| What exactly is Turing Completeness?
-|  A quick introduction to computation, giving us the tools to 
-|  tackling the question "Is this programming language Turing 
-|  Complete" beyond simply SPACE(N) completeness.
-|  Link: https://medium.com/@evinsellin/what-exactly-is-turing-completeness-a08cc36b26e2
-|
-| Teaching Monads Slightly Differently
-|  A description of problems I see with teaching monads (outside
-|  of statically typed functional languages) and an explanation
-|  using a different style 
-|  Link: https://medium.com/@evinsellin/teaching-monads-slightly-differently-2af62c4af8ce
-|
-| --- Talk(s) ---
 | The Hows and Whys of Frontend Web Performance
 |  Descriptive Blurb: We focus heavily on the performance of
 |  our apps from a backend perspective, but we often overlook
@@ -738,52 +756,74 @@ const projects = {
 |  "performance" even means from a frontend perspective and how
 |  to use the tools at our disposal to make our webapps feel fast.
 |  Given at the Santa Barbara JS meetup in May 2018
-`
+`,
 };
 
 const passwd = {
   _isFile: true,
   owner: 0,
-  permissions: '64',
-  data:
-`root:0684fd858f99d05b74f80f0b21f4db29:0
+  permissions: "64",
+  data: `root:0684fd858f99d05b74f80f0b21f4db29:0
 web:5f4dcc3b5aa765d61d8327deb882cf99:1
 `,
-}
-
-const fs = { name: 'root', owner: 0, perm: '75',
-  children: {
-    bin: { owner: 0, perm: '75', children: {
-      sh,
-      cat,
-      ls,
-      mkdir,
-      pwd,
-      rm,
-      rmdir,
-      su,
-      sudo,
-      touch,
-      whoami,
-      write,
-    }},
-    dev: { owner: 0, perm: '75', children: {} },
-    etc: { owner: 0, perm: '75', children: {
-      passwd,
-    }},
-    lib: { owner: 0, perm: '75', children: {
-      std,
-    }},
-    users: { owner: 0, perm: '75', children: {
-      web: { owner: 1, perm: '75', children: {
-        about_me,
-        about_this_interface,
-        links,
-        projects,
-      }}
-    }}
-  }
 };
 
+const fs = {
+  name: "root",
+  owner: 0,
+  perm: "75",
+  children: {
+    bin: {
+      owner: 0,
+      perm: "75",
+      children: {
+        sh,
+        cat,
+        ls,
+        mkdir,
+        pwd,
+        rm,
+        rmdir,
+        su,
+        sudo,
+        touch,
+        whoami,
+        write,
+      },
+    },
+    dev: { owner: 0, perm: "75", children: {} },
+    etc: {
+      owner: 0,
+      perm: "75",
+      children: {
+        passwd,
+      },
+    },
+    lib: {
+      owner: 0,
+      perm: "75",
+      children: {
+        std,
+      },
+    },
+    users: {
+      owner: 0,
+      perm: "75",
+      children: {
+        web: {
+          owner: 1,
+          perm: "75",
+          children: {
+            about_me,
+            about_this_interface,
+            articles,
+            talks,
+            projects,
+          },
+        },
+      },
+    },
+  },
+};
 
 export default fs;

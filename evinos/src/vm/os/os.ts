@@ -11,7 +11,7 @@ const motd = `
 Evin Sellin's homepage
 Try poking around the filesystem!
 
-WARNING: This is very much still a work in progress.
+For supported commands, run "ls /bin"
 ---------
 `;
 
