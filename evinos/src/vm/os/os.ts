@@ -73,9 +73,15 @@ class OS {
   };
 
   // Should probs move this to other things here.
-  execProcess(pathStr, args, wd, user, onTerminate) {
-    this.filesystem.readFileMetadata(pathStr, (err, { suid, owner }) => {
-      this.filesystem.readFromFile(pathStr, (err, data) => {
+  execProcess(
+    pathStr: string,
+    args: string[],
+    wd: string,
+    user: User,
+    onTerminate: (exitCode: number) => void
+  ) {
+    this.filesystem.readFileMetadata(pathStr, (_, { suid, owner }) => {
+      this.filesystem.readFromFile(pathStr, (_, data) => {
         let activeUser = user;
         if (suid) {
           activeUser = this.users.find((user) => user.id === owner);

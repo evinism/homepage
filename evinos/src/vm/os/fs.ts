@@ -4,9 +4,9 @@ import { FolderFile, Err, Device } from "./constants";
 
 export const validIdentifier = (name: string) => /^[^*/\\?"<>\|]+$/.test(name);
 
-const noop = (...args: any[]) => {};
+const noop = (..._: any[]) => {};
 
-const makeFS = (entry) => {
+const makeFS = (entry: any) => {
   if (entry._isFile) {
     return new TextFile({
       owner: entry.owner,

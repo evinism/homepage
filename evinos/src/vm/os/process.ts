@@ -43,7 +43,7 @@ class Process {
   os: OS;
   source: string;
   status: ProcStatus;
-  onTerminate: any;
+  onTerminate: (exitCode: number) => void;
   user: User;
   cwd: string;
   env: object;
@@ -54,7 +54,7 @@ class Process {
     user: User,
     os: OS,
     source: string,
-    onTerminate,
+    onTerminate: (exitCode: number) => void,
     env: object,
     cwd: string,
     args: Array<string>

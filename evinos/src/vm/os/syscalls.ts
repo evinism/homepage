@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { ProcStatus, Err } from "./constants";
+import { Err } from "./constants";
 import { getAbsolutePathStr } from "./util";
 import Folder from "./folder";
 import { DeviceFile } from "./file";

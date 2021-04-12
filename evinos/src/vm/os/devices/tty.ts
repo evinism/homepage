@@ -1,5 +1,5 @@
 import { MetaCommand } from "../../../shared/metaTypes";
-import { Device } from "../constants";
+import { Device, ReadCB, WriteCB } from "../constants";
 import { Err } from "../constants";
 import Keyboard from "./keyboard";
 import Screen from "./screen";
@@ -19,8 +19,8 @@ class Tty implements Device {
     this.screen = screen;
   }
 
-  read(cb) {
-    const writeIfEcho = (data) => {
+  read(cb: ReadCB) {
+    const writeIfEcho = (data: string) => {
       if (!this.echoDisabled) {
         this.write(data, NOOP);
       }
@@ -35,13 +35,13 @@ class Tty implements Device {
     // programs, as a general rule.
     if (!this.isPassthrough) {
       const prompt = () =>
-        this.keyboard.read((data, eof) => {
+        this.keyboard.read((err: Err, data: string, eof: boolean) => {
           if (eof) {
-            cb("", true);
+            cb(Err.NONE, "", true);
             this.line = "";
             return;
           } else if (data === "\n") {
-            cb(this.line + data, false);
+            cb(Err.NONE, this.line + data, false);
             writeIfEcho(data);
             this.line = "";
           } else if (data === "\b") {
@@ -65,7 +65,7 @@ class Tty implements Device {
     }
   }
 
-  write(data: string, cb) {
+  write(data: string, cb: WriteCB) {
     return this.screen.write(data, cb);
   }
 

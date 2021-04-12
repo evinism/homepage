@@ -1,9 +1,9 @@
 import Pipe from "../../../shared/pipe";
-import { Device } from "../constants";
+import { Device, ReadCB, WriteCB } from "../constants";
 import { Err } from "../constants";
 
 class Keyboard implements Device {
-  pending: Array<(Err, string, boolean) => void>;
+  pending: Array<(err: Err, data: string, eof: boolean) => void>;
 
   constructor(keypressPipe, keydownPipe) {
     keypressPipe.subscribe((native) => this.preprocessKeypress(native));
@@ -31,7 +31,7 @@ class Keyboard implements Device {
   // Ewww.
   preprocessKeydown(native) {
     const keyCode = native.which || native.keyCode;
-    let toSend;
+    let toSend: string;
     let eof = false;
     switch (keyCode) {
       case 8:
@@ -56,21 +56,21 @@ class Keyboard implements Device {
     }
   }
 
-  callPending(str, finished) {
+  callPending(data: string, eof: boolean) {
     const toCall = this.pending;
     this.pending = [];
-    toCall.forEach((pend) => pend(Err.NONE, str, finished));
+    toCall.forEach((pend) => pend(Err.NONE, data, eof));
   }
 
-  read(cb) {
+  read(cb: ReadCB) {
     this.pending.push(cb);
   }
 
-  write(data, cb) {
+  write(data: string, cb: WriteCB) {
     cb(Err.EUNWRITABLE);
   }
 
-  ioctl(data, cb) {
+  ioctl(_, cb) {
     cb(Err.NONE);
   }
 }

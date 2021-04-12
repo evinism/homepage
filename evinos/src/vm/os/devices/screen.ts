@@ -1,5 +1,5 @@
 import { ScreenCommand } from "../../../shared/screenTypes";
-import { Device } from "../constants";
+import { Device, ReadCB, WriteCB } from "../constants";
 import Pipe from "../../../shared/pipe";
 import { Err } from "../constants";
 
@@ -10,11 +10,11 @@ class Screen implements Device {
     this.outpipe = outpipe;
   }
 
-  read(cb: (err: Err, data: string) => void) {
+  read(cb: ReadCB) {
     cb(Err.NONE, "");
   }
 
-  write(data: string, cb: (err: Err) => void) {
+  write(data: string, cb: WriteCB) {
     if (data === "\b") {
       this.outpipe.fire({
         type: "removeCommand",
@@ -37,7 +37,7 @@ class Screen implements Device {
     this.outpipe.fire(screenCommand);
   }
 
-  ioctl(data: string, cb: (err: Err) => void) {
+  ioctl(_: string, cb: (err: Err) => void) {
     cb(Err.NONE);
   }
 }
