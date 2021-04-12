@@ -1,15 +1,7 @@
-import { Device, FolderFile, ReadWritable } from "./constants";
+import { Device, File, ReadCB, WriteCB } from "./constants";
 import { Err } from "./constants";
 
-/* 
-  interface file extends permissable 
-  read: ((data, eof) => ()) => ()
-  write: (data, bool => ()) => ()
-
-  interface folder extends permissable
-*/
-
-export class TextFile implements FolderFile, ReadWritable {
+export class TextFile implements File {
   owner: number;
   permissions: string;
   suid: boolean;
@@ -24,17 +16,17 @@ export class TextFile implements FolderFile, ReadWritable {
     this.suid = suid;
   }
 
-  read(cb) {
+  read(cb: ReadCB) {
     cb(Err.NONE, this.data, true);
   }
 
-  write(data, cb) {
+  write(data: string, cb: WriteCB) {
     this.data = data;
     cb(Err.NONE);
   }
 }
 
-export class DeviceFile implements FolderFile, ReadWritable {
+export class DeviceFile implements File {
   device: Device;
   owner: number;
   permissions: string; // perms-style string again.
@@ -43,15 +35,17 @@ export class DeviceFile implements FolderFile, ReadWritable {
   constructor(device: Device) {
     this.device = device;
     this.owner = 0;
-    this.permissions = "644";
+    this.permissions = "64";
     this.suid = false;
   }
 
-  read(cb) {
-    this.device.read((data: string, eof: boolean) => cb(Err.NONE, data, eof));
+  read(cb: ReadCB) {
+    this.device.read((err: Err, data: string, eof: boolean) =>
+      cb(err, data, eof)
+    );
   }
 
-  write(data, cb) {
+  write(data, cb: WriteCB) {
     this.device.write(data, cb);
   }
 }

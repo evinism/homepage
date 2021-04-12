@@ -25,24 +25,21 @@ export enum Err {
   EVALIDATION = 11,
 }
 
-export interface Permissable {
+export interface FolderFile {
   permissions: string;
   owner: number;
 }
 
-export interface Device {
-  read: any;
-  write: any; // TODO: Fix this stuff.
-  ioctl: any;
-}
-
-type ReadCB = (data: string, eof: boolean) => void;
-type WriteCB = () => void;
+export type ReadCB = (err: Err, data: string, eof?: boolean) => void;
+export type WriteCB = (err: Err) => void;
 
 export interface ReadWritable {
   read(cb: ReadCB): void;
   write(data: string, cb: WriteCB): void;
 }
 
-export type FolderFile = Permissable;
-export type File = FolderFile & ReadWritable;
+export interface File extends FolderFile, ReadWritable {}
+
+export interface Device<T = any> extends ReadWritable {
+  ioctl(data: T, cb: WriteCB): void;
+}

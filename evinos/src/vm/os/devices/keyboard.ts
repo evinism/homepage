@@ -1,13 +1,13 @@
-import Pipe from '../../../shared/pipe';
-import { Device } from '../constants';
-import { Err } from '../constants';
+import Pipe from "../../../shared/pipe";
+import { Device } from "../constants";
+import { Err } from "../constants";
 
 class Keyboard implements Device {
-  pending : Array<(string, boolean) => void>;
+  pending: Array<(Err, string, boolean) => void>;
 
   constructor(keypressPipe, keydownPipe) {
-    keypressPipe.subscribe(native => this.preprocessKeypress(native));
-    keydownPipe.subscribe(native => this.preprocessKeydown(native));
+    keypressPipe.subscribe((native) => this.preprocessKeypress(native));
+    keydownPipe.subscribe((native) => this.preprocessKeydown(native));
     this.pending = [];
   }
 
@@ -16,24 +16,24 @@ class Keyboard implements Device {
     const keyCode = native.which || native.keyCode;
     let toSend;
     let eof = false;
-    switch(keyCode){
+    switch (keyCode) {
       case 13:
         toSend = "\n";
         break;
-      default: 
+      default:
         toSend = String.fromCharCode(native.which || native.keyCode);
     }
-    if(toSend) {
+    if (toSend) {
       this.callPending(toSend, eof);
     }
-  };
+  }
 
   // Ewww.
   preprocessKeydown(native) {
     const keyCode = native.which || native.keyCode;
     let toSend;
     let eof = false;
-    switch(keyCode){
+    switch (keyCode) {
       case 8:
         toSend = "\b";
         break;
@@ -44,35 +44,35 @@ class Keyboard implements Device {
       case 68:
         if (native.ctrlKey) {
           native.preventDefault();
-          toSend = '\n';
+          toSend = "\n";
           eof = true;
         }
         break;
       default:
         break;
     }
-    if(toSend) {
+    if (toSend) {
       this.callPending(toSend, eof);
     }
   }
 
-  callPending(str, finished){
+  callPending(str, finished) {
     const toCall = this.pending;
     this.pending = [];
-    toCall.forEach(pend => pend(str, finished));
+    toCall.forEach((pend) => pend(Err.NONE, str, finished));
   }
 
-  read (cb) {
+  read(cb) {
     this.pending.push(cb);
   }
 
-  write (data, cb) {
+  write(data, cb) {
     cb(Err.EUNWRITABLE);
   }
 
-  ioctl (data, cb) {
+  ioctl(data, cb) {
     cb(Err.NONE);
   }
-};
+}
 
 export default Keyboard;
