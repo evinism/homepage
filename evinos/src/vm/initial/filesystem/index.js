@@ -723,9 +723,7 @@ const projects = {
   _isFile: true,
   owner: 1,
   permissions: "64",
-  data: `| === Coding Projects ===
-|
-| --- Webapps ---
+  data: `| --- Webapps ---
 | Lambda Explorer
 |  Lambda Explorer is a tutorial/REPL for the lambda calculus
 |  with a pretty clean interface. Like all things, it could
@@ -736,6 +734,23 @@ const projects = {
 |  Quick-pad is an authless collaborative notepad that makes
 |  creating new notes and sharing them extremely quickly.
 |  Link: https://www.quick-pad.org/
+|
+| --- Tools ---
+| Buttery
+|  Minimalistic language for defining HTTP(s) and Websocket APIs
+|  Link: https://github.com/evinism/buttery
+|
+| TinyBaker
+|  Composable, first-order file-to-file transformations in Python!
+|  Link: https://github.com/evinism/TinyBaker
+|
+| Talc
+|  Insta-CLI for your projects!
+|  Link: https://github.com/evinism/talc
+|
+| Timebomb
+|  A library for making sure devs get to solving old important TODOs
+|  Link: https://github.com/evinism/timebomb
 `,
 };
 
