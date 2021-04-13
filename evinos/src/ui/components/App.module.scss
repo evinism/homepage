@@ -28,7 +28,7 @@
       mix-blend-mode: multiply;
       background-color: black;
       padding: 10px;
-      min-height: calc(100vh);
+      min-height: 100vh;
     }
 
     a {
@@ -71,6 +71,7 @@
 
     pre {
       font-family: "VT323", monospace;
+      white-space: pre-wrap;
     }
 
     .cursor {
