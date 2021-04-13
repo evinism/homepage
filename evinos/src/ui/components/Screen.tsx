@@ -23,7 +23,7 @@ const Screen = ({ output, off, onKeyDown }: ScreenProps) => {
                   stripTrailingSlash: false,
                 }}
               />
-              <span className="cursor"></span>
+              <span className="cursor"> </span>
               <input
                 autoFocus
                 type="text"
