@@ -5,10 +5,9 @@ interface ScreenProps {
   output: string;
   off?: boolean;
   onKeyDown?: any;
-  onKeyPress?: any;
 }
 
-const Screen = ({ output, off, onKeyDown, onKeyPress }: ScreenProps) => {
+const Screen = ({ output, off, onKeyDown }: ScreenProps) => {
   return (
     <div className="multiplier1">
       <div className="multiplier2">
@@ -31,7 +30,6 @@ const Screen = ({ output, off, onKeyDown, onKeyPress }: ScreenProps) => {
                 value=""
                 className="screen-input"
                 onKeyDown={onKeyDown}
-                onKeyPress={onKeyPress}
               />
             </pre>
           </div>

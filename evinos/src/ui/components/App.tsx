@@ -24,8 +24,7 @@ const changeOff = changeParam("off");
 
 interface AppProps {
   screenPipe: Pipe<ScreenCommand>;
-  keypressPipe: Pipe<any>; // What are these?
-  keydownPipe: Pipe<any>; // What are these types??
+  keydownPipe: Pipe<any>;
   os: OS;
 }
 
@@ -95,11 +94,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  handleKeypress = (e) => {
-    const native = e.nativeEvent;
-    this.props.keypressPipe.fire(native);
-  };
-
   handleKeydown = (e) => {
     const native = e.nativeEvent;
     this.props.keydownPipe.fire(native);
@@ -112,7 +106,6 @@ class App extends React.Component<AppProps, AppState> {
           output={this.state.output}
           off={this.state.off}
           onKeyDown={this.handleKeydown}
-          onKeyPress={this.handleKeypress}
         />
       </div>
     );

@@ -1,55 +1,39 @@
-import Pipe from "../../../shared/pipe";
 import { Device, ReadCB, WriteCB } from "../constants";
 import { Err } from "../constants";
+
+const isPrintableKey = (key) => key && key.length === 1;
 
 class Keyboard implements Device {
   pending: Array<(err: Err, data: string, eof: boolean) => void>;
 
-  constructor(keypressPipe, keydownPipe) {
-    keypressPipe.subscribe((native) => this.preprocessKeypress(native));
+  constructor(keydownPipe) {
     keydownPipe.subscribe((native) => this.preprocessKeydown(native));
     this.pending = [];
-  }
-
-  // Weird hacky parallel streams here:
-  preprocessKeypress(native) {
-    const keyCode = native.which || native.keyCode;
-    let toSend;
-    let eof = false;
-    switch (keyCode) {
-      case 13:
-        toSend = "\n";
-        break;
-      default:
-        toSend = String.fromCharCode(native.which || native.keyCode);
-    }
-    if (toSend) {
-      this.callPending(toSend, eof);
-    }
   }
 
   // Ewww.
   preprocessKeydown(native) {
     const keyCode = native.which || native.keyCode;
+    const key = native.key;
     let toSend: string;
     let eof = false;
-    switch (keyCode) {
-      case 8:
-        toSend = "\b";
-        break;
-      case 9:
-        native.preventDefault();
-        toSend = "\t";
-        break;
-      case 68:
-        if (native.ctrlKey) {
-          native.preventDefault();
-          toSend = "\n";
-          eof = true;
-        }
-        break;
-      default:
-        break;
+    if (keyCode === 8) {
+      toSend = "\b";
+    } else if (keyCode === 9) {
+      // Tab
+      native.preventDefault();
+      toSend = "\t";
+    } else if (keyCode === 68 && native.ctrlKey) {
+      // Ctrl-D
+      native.preventDefault();
+      toSend = "\n";
+      eof = true;
+    } else if (keyCode === 13) {
+      // Enter
+      toSend = "\n";
+    } else if (isPrintableKey(key)) {
+      // Everything else
+      toSend = key;
     }
     if (toSend) {
       this.callPending(toSend, eof);

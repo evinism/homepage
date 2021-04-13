@@ -9,9 +9,9 @@ import DeviceType from "./vmtypes";
 import OS from "./os";
 
 // really doesn't need to be async, but it makes the cool startup seq super fun.
-const bootstrap = async ({ keydownPipe, keypressPipe, screenPipe }: any) => {
+const bootstrap = async ({ keydownPipe, screenPipe }: any) => {
   const screen = new Screen(screenPipe);
-  const keyboard = new Keyboard(keypressPipe, keydownPipe);
+  const keyboard = new Keyboard(keydownPipe);
   const tty = new Tty(keyboard, screen);
 
   await startupAnim(screen);
