@@ -4,9 +4,11 @@ import cx from "classnames";
 interface ScreenProps {
   output: string;
   off?: boolean;
+  onKeyDown?: any;
+  onKeyPress?: any;
 }
 
-const Screen = ({ output, off }: ScreenProps) => {
+const Screen = ({ output, off, onKeyDown, onKeyPress }: ScreenProps) => {
   return (
     <div className="multiplier1">
       <div className="multiplier2">
@@ -22,7 +24,15 @@ const Screen = ({ output, off }: ScreenProps) => {
                   stripTrailingSlash: false,
                 }}
               />
-              <span className="cursor"> </span>
+              <span className="cursor"></span>
+              <input
+                autoFocus
+                type="text"
+                value=""
+                className="screen-input"
+                onKeyDown={onKeyDown}
+                onKeyPress={onKeyPress}
+              />
             </pre>
           </div>
         </div>

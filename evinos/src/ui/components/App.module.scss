@@ -38,6 +38,18 @@
     a:hover {
       color: #aaffaa;
     }
+    .screen-input {
+      width: 0;
+      &:focus {
+        outline: none;
+      }
+      border: none;
+      background-image: none;
+      background-color: transparent;
+      -webkit-box-shadow: none;
+      -moz-box-shadow: none;
+      box-shadow: none;
+    }
 
     .screen {
       font-size: 1.4em;

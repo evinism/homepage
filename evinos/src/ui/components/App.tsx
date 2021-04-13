@@ -50,7 +50,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   refocus = () => {
-    this.button && this.button.focus();
+    // Annoying weird focusing stuff
+    const input = document.querySelector(".screen-input");
+    (input as any).focus();
   };
 
   scrollToBottom = () => {
@@ -103,21 +105,15 @@ class App extends React.Component<AppProps, AppState> {
     this.props.keydownPipe.fire(native);
   };
 
-  setButtonRef = (button) => {
-    this.button = button;
-  };
-
   render() {
     return (
-      <div
-        className={styles.app}
-        onKeyPress={this.handleKeypress}
-        onKeyDown={this.handleKeydown}
-        role="textbox"
-        ref={this.setButtonRef}
-        tabIndex={0}
-      >
-        <Screen output={this.state.output} off={this.state.off} />
+      <div className={styles.app}>
+        <Screen
+          output={this.state.output}
+          off={this.state.off}
+          onKeyDown={this.handleKeydown}
+          onKeyPress={this.handleKeypress}
+        />
       </div>
     );
   }
