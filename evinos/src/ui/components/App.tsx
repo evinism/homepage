@@ -94,9 +94,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  handleKeydown = (e) => {
-    const native = e.nativeEvent;
-    this.props.keydownPipe.fire(native);
+  handleKeydown = (event) => {
+    this.props.keydownPipe.fire(event);
   };
 
   render() {
