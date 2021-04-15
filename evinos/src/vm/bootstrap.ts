@@ -7,11 +7,18 @@ import DeviceType from "./vmtypes";
 
 // actual os
 import OS from "./os";
+import Pipe from "../shared/pipe";
+import { ScreenCommand } from "../shared/screenTypes";
+
+interface BootstrapOptions {
+  keyPipe: Pipe<[string, boolean]>;
+  screenPipe: Pipe<ScreenCommand>;
+}
 
 // really doesn't need to be async, but it makes the cool startup seq super fun.
-const bootstrap = async ({ keydownPipe, screenPipe }: any) => {
+const bootstrap = async ({ keyPipe, screenPipe }: BootstrapOptions) => {
   const screen = new Screen(screenPipe);
-  const keyboard = new Keyboard(keydownPipe);
+  const keyboard = new Keyboard(keyPipe);
   const tty = new Tty(keyboard, screen);
 
   await startupAnim(screen);

@@ -5,7 +5,7 @@ import OS from "../../vm/os";
 import { ScreenCommand } from "../../shared/screenTypes";
 
 interface OsProvidedProps {
-  keydownPipe: Pipe<any>;
+  keyPipe: Pipe<[string, boolean]>;
   screenPipe: Pipe<ScreenCommand>;
   os?: OS;
 }
@@ -13,20 +13,20 @@ interface OsProvidedProps {
 // TODO: switch to new context api??
 function osProvider<T>(Component: React.ComponentType<T & OsProvidedProps>) {
   class Provided extends React.Component<T> {
-    keydownPipe: Pipe<any>;
+    keyPipe: Pipe<[string, boolean]>;
     screenPipe: Pipe<ScreenCommand>;
     os?: OS;
 
     constructor(props: T) {
       super(props);
-      this.keydownPipe = new Pipe();
+      this.keyPipe = new Pipe();
       this.screenPipe = new Pipe();
     }
 
     componentDidMount() {
       // wait for mount to initialize OS
       bootstrap({
-        keydownPipe: this.keydownPipe,
+        keyPipe: this.keyPipe,
         screenPipe: this.screenPipe,
       }).then((os) => {
         this.os = os;
@@ -38,7 +38,7 @@ function osProvider<T>(Component: React.ComponentType<T & OsProvidedProps>) {
         <Component
           {...this.props}
           os={this.os!}
-          keydownPipe={this.keydownPipe}
+          keyPipe={this.keyPipe}
           screenPipe={this.screenPipe}
         />
       );
