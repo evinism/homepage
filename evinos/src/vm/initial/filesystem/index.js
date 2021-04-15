@@ -311,6 +311,9 @@ const std = {
       },
       logout: (args, cb) => {
         syscalls.terminate(0);
+      },
+      exit: (args, cb) => {
+        syscalls.terminate(0);
       }
     };
 
