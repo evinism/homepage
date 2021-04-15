@@ -48,10 +48,10 @@ class OS {
     this.filesystem = new Filesystem(fs);
   }
 
-  initUsers(cb) {
+  getUsers(cb: (users: User[]) => unknown) {
     this.filesystem.readFromFile("/etc/passwd", (err, passwd) => {
-      this.users = passwd.split("\n").map(makeUserFromEntry).filter(Boolean);
-      cb();
+      const users = passwd.split("\n").map(makeUserFromEntry).filter(Boolean);
+      cb(users);
     });
   }
 
@@ -82,24 +82,26 @@ class OS {
   ) {
     this.filesystem.readFileMetadata(pathStr, (_, { suid, owner }) => {
       this.filesystem.readFromFile(pathStr, (_, data) => {
-        let activeUser = user;
-        if (suid) {
-          activeUser = this.users.find((user) => user.id === owner);
-          if (!activeUser) {
-            console.log("aaaa noa ctive user");
-            activeUser = user;
+        this.getUsers((users) => {
+          let activeUser = user;
+          if (suid) {
+            activeUser = users.find((user) => user.id === owner);
+            if (!activeUser) {
+              console.log("aaaa noa ctive user");
+              activeUser = user;
+            }
           }
-        }
-        const proc = new Process(
-          activeUser,
-          this,
-          data,
-          onTerminate,
-          this.env,
-          wd,
-          args || []
-        );
-        proc.start();
+          const proc = new Process(
+            activeUser,
+            this,
+            data,
+            onTerminate,
+            this.env,
+            wd,
+            args || []
+          );
+          proc.start();
+        });
       });
     });
   }
@@ -119,8 +121,8 @@ class OS {
     // Not the bootstrapper
     this.initFS(initialFilesystem);
     this.mountDevices();
-    this.initUsers(() => {
-      const webUser = this.users.find((user) => user.id === 1);
+    this.getUsers((users) => {
+      const webUser = users.find((user) => user.id === 1);
       this.status = Status.RUNNING;
       this.execProcess("/bin/sh", [], "/users/web/", webUser, () =>
         this.systemShutdown()
