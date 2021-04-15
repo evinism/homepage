@@ -5,6 +5,7 @@ import OS from "../../vm/os";
 import OsProvider from "./OsProvider";
 import Screen from "./Screen";
 import styles from "./App.module.scss";
+import MobileCommands from "./MobileCommands";
 
 interface AppState {
   output: string;
@@ -145,6 +146,7 @@ class App extends React.Component<AppProps, AppState> {
           off={this.state.off}
           onKeyDown={this.handleKeydown}
         />
+        <MobileCommands keyPipe={this.props.keyPipe} />
       </div>
     );
   }
