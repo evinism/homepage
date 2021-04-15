@@ -168,7 +168,9 @@ const syscalls = {
   },
   win: (arg: any, process: Process, cb) => {
     if (process.user.id !== 0) {
-      cb(Err.EPERM);
+      process.fds[1].write("CRITICAL ERROR: Only root can win!\n", () =>
+        cb(Err.EPERM)
+      );
     } else {
       win(process);
       cb(Err.NONE);

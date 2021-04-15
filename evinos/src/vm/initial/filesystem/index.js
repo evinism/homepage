@@ -535,13 +535,16 @@ const write = {
       controlledIO(true);
 
       if(args.length !== 2) {
-        stdout('Usage: write [file]\\nWrites a file, listens until EOF\\n');
+        stdout('Usage: write [file]\\nWrites a file, listens until EOF (ctrl-D)\\n');
         controlledIO(false);
         syscalls.terminate(0);
         return;
       }
       const path = args[1];
       let text = '';
+
+      stdout('---\\n Writing to file ' + args[1] + '\\n Press ctrl-D (EOF) when finished!\\n' + '---\\n');
+
 
       // Copied from 
       const readPrint = () => {
@@ -574,6 +577,7 @@ const write = {
               if (err) {
                 stderr('An error occurred in writing the file' + errStr(err) + '\\n');
               }
+              stdout('\\n---\\nsuccessfully wrote ' + text.length + ' characters to ' + path + '!\\n')
               controlledIO(false);
               syscalls.terminate(err);
             });
