@@ -2,8 +2,14 @@
   position: relative;
   background-color: black;
   line-height: 1.1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   :global {
     .multiplier1 {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
       background: repeating-linear-gradient(
         45deg,
         white,
@@ -14,6 +20,9 @@
     }
 
     .multiplier2 {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
       mix-blend-mode: multiply;
       background: repeating-linear-gradient(
         0deg,
@@ -25,10 +34,12 @@
     }
 
     .screen-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
       mix-blend-mode: multiply;
       background-color: black;
       padding: 10px;
-      min-height: 100vh;
     }
 
     a {
@@ -52,11 +63,11 @@
     }
 
     .screen {
+      flex-grow: 1;
       font-size: 1.4em;
       border: 3px solid #44ff44;
       padding-left: 10px;
       color: #44ff44;
-      min-height: calc(100vh - 20px);
       transition: color 1.5s ease-in 0.5s, border 1.5s ease-in 0.5s;
     }
 
