@@ -16,15 +16,6 @@ class Keyboard implements Device {
     toCall.forEach((pend) => pend(Err.NONE, data, eof));
   }
 
-  handleMobileKeyboard(event) {
-    // This is insane and really gross, but actually kind of works
-    const listener = (event) => {
-      this.send(event.data.toLowerCase(), false);
-      event.target.removeEventListener("input", listener);
-    };
-    event.target.addEventListener("input", listener);
-  }
-
   read(cb: ReadCB) {
     this.pending.push(cb);
   }

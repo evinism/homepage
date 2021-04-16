@@ -1,4 +1,6 @@
 .app {
+  color: #44ff44;
+
   position: relative;
   background-color: black;
   line-height: 1.1;
@@ -67,7 +69,6 @@
       font-size: 1.4em;
       border: 3px solid #44ff44;
       padding-left: 10px;
-      color: #44ff44;
       transition: color 1.5s ease-in 0.5s, border 1.5s ease-in 0.5s;
     }
 
@@ -94,14 +95,30 @@
       display: none;
     }
   }
+  button {
+    background: none;
+    color: inherit;
+    border: 2px dotted #44ff44;
+    padding: 8px;
+    margin: 0 10px 10px 10px;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    flex-grow: 1;
+  }
 }
 
 /* COLOR THEMES */
 .app.orangeTheme {
+  color: #ff9029;
   :global {
     .screen {
-      color: #ff9029;
       border-color: #ff9029;
+    }
+
+    .screen.off {
+      border: 3px solid #2e1a07;
+      color: black;
     }
 
     a {
@@ -114,6 +131,9 @@
 
     a:hover {
       color: #ffc14f;
+    }
+    button {
+      border-color: #ff9029;
     }
   }
 }

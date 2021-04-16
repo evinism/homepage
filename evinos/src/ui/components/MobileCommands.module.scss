@@ -1,3 +1,6 @@
 .container {
   display: none;
+  @media (pointer: none), (pointer: coarse) {
+    display: flex;
+  }
 }

@@ -8,8 +8,8 @@ interface MobileCommandsProps {
 const MobileCommands = ({ keyPipe }: MobileCommandsProps) => {
   return (
     <div className={styles.container}>
-      <button onClick={() => keyPipe.fire(["", true])}>Send EOF</button>
-      <button onClick={() => keyPipe.fire(["\t", false])}>Send Tab</button>
+      <button onClick={() => keyPipe.fire(["", true])}>[ Ctrl-D ]</button>
+      <button onClick={() => keyPipe.fire(["\t", false])}>[ Tab ]</button>
     </div>
   );
 };

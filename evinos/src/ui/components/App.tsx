@@ -26,40 +26,6 @@ const changeOff = changeParam("off");
 
 const isPrintableKey = (key) => key && key.length === 1;
 
-// Ewww.
-function preprocessKeydown(event): [string, boolean] | undefined {
-  const keyCode = event.which || event.keyCode;
-  const key = event.key;
-  let toSend: string;
-  let eof = false;
-  if (keyCode === 229) {
-    this.handleMobileKeyboard(event);
-    return;
-  } else if (keyCode === 8) {
-    toSend = "\b";
-  } else if (keyCode === 9) {
-    // Tab
-    event.preventDefault();
-    toSend = "\t";
-  } else if (keyCode === 68 && event.ctrlKey) {
-    // Ctrl-D
-    event.preventDefault();
-    toSend = "\n";
-    eof = true;
-  } else if (keyCode === 13) {
-    // Enter
-    toSend = "\n";
-  } else if (isPrintableKey(key)) {
-    // Everything else
-    toSend = key;
-  }
-
-  if (toSend) {
-    return [toSend, eof];
-  }
-  return undefined;
-}
-
 interface AppProps {
   screenPipe: Pipe<ScreenCommand>;
   keyPipe: Pipe<[string, boolean]>;
@@ -138,10 +104,44 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  handleMobileKeyboard = (event) => {
+    // This is insane and really gross, but actually kind of works
+    const listener = (event) => {
+      this.props.keyPipe.fire([event.data.toLowerCase(), false]);
+      event.target.removeEventListener("input", listener);
+    };
+    event.target.addEventListener("input", listener);
+  };
+
   handleKeydown = (event) => {
-    const tuple = preprocessKeydown(event);
-    if (tuple) {
-      this.props.keyPipe.fire(tuple);
+    const keyCode = event.which || event.keyCode;
+    const key = event.key;
+    let toSend: string;
+    let eof = false;
+    if (keyCode === 229) {
+      this.handleMobileKeyboard(event);
+      return;
+    } else if (keyCode === 8) {
+      toSend = "\b";
+    } else if (keyCode === 9) {
+      // Tab
+      event.preventDefault();
+      toSend = "\t";
+    } else if (keyCode === 68 && event.ctrlKey) {
+      // Ctrl-D
+      event.preventDefault();
+      toSend = "\n";
+      eof = true;
+    } else if (keyCode === 13) {
+      // Enter
+      toSend = "\n";
+    } else if (isPrintableKey(key)) {
+      // Everything else
+      toSend = key;
+    }
+
+    if (toSend) {
+      this.props.keyPipe.fire([toSend, eof]);
     }
   };
 
