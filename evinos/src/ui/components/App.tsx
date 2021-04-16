@@ -6,6 +6,7 @@ import OsProvider from "./OsProvider";
 import Screen from "./Screen";
 import styles from "./App.module.scss";
 import MobileCommands from "./MobileCommands";
+import cx from "classnames";
 
 interface AppState {
   output: string;
@@ -64,6 +65,12 @@ interface AppProps {
   keyPipe: Pipe<[string, boolean]>;
   os: OS;
 }
+
+function pickRandom<T>(arr: T[]) {
+  return arr[Math.floor(Math.random() * arr.length)]!;
+}
+
+const theme = pickRandom(["", styles.orangeTheme]);
 
 class App extends React.Component<AppProps, AppState> {
   state = { output: "", off: false };
@@ -140,7 +147,7 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     return (
-      <div className={styles.app}>
+      <div className={cx(styles.app, theme)}>
         <Screen
           output={this.state.output}
           off={this.state.off}

@@ -84,3 +84,25 @@
     }
   }
 }
+
+/* COLOR THEMES */
+.app.orangeTheme {
+  :global {
+    .screen {
+      color: #ff9029;
+      border-color: #ff9029;
+    }
+
+    a {
+      color: #ff9029;
+    }
+
+    .cursor {
+      animation: cursorBlinkOrange 0.7s infinite;
+    }
+
+    a:hover {
+      color: #ffc14f;
+    }
+  }
+}

@@ -45,3 +45,18 @@ iframe.process-sandbox {
     background-color: #44ff44;
   }
 }
+
+@keyframes cursorBlinkOrange {
+  0% {
+    background-color: transparent;
+  }
+  40% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: #ffc14f;
+  }
+  90% {
+    background-color: #ffc14f;
+  }
+}
