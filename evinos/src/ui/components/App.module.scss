@@ -8,7 +8,7 @@
   flex-direction: column;
   min-height: 100vh;
   :global {
-    animation: screenOn 0.7s;
+    animation: screenOn 1.5s;
     .multiplier1 {
       display: flex;
       flex-direction: column;
@@ -135,6 +135,35 @@
     }
     button {
       border-color: #ff9029;
+    }
+  }
+}
+
+.app.pinkTheme {
+  color: #f84df0;
+  :global {
+    .screen {
+      border-color: #f84df0;
+    }
+
+    .screen.off {
+      border: 3px solid #421540;
+      color: black;
+    }
+
+    a {
+      color: #f84df0;
+    }
+
+    .cursor {
+      animation: cursorBlinkPink 0.7s infinite;
+    }
+
+    a:hover {
+      color: #fc87f6;
+    }
+    button {
+      border-color: #f84df0;
     }
   }
 }

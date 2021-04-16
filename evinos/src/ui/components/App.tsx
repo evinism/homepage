@@ -36,7 +36,7 @@ function pickRandom<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
-const theme = pickRandom(["", styles.orangeTheme]);
+const theme = pickRandom(["", styles.orangeTheme, styles.pinkTheme]);
 
 class App extends React.Component<AppProps, AppState> {
   state = { output: "", off: false };
