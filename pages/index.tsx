@@ -20,6 +20,7 @@ export default function Home() {
         <meta property="og:image" content="/images/og.png" />
         <meta name="og:title" content="Evin Sellin's Homepage" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="/images/og.png" />
         <title>Evin OS</title>
         <style>{'body: {backgroundColor: "black"}'}</style>
       </Head>
