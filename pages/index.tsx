@@ -22,7 +22,14 @@ export default function Home() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content="/images/og.png" />
         <title>Evin OS</title>
-        <style>{'body {background-color: "black"};'}</style>
+        <style>
+          {`
+          body { 
+            background-color: black;
+            min-height: 100vh;
+          };
+        `}
+        </style>
       </Head>
       <App />
     </>
