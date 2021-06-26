@@ -8,9 +8,12 @@ import styles from "./App.module.scss";
 import MobileCommands from "./MobileCommands";
 import cx from "classnames";
 
+const allThemes = ["", styles.orangeTheme, styles.pinkTheme];
+
 interface AppState {
   output: string;
   off: boolean;
+  theme: string,
 }
 
 // lol lenses
@@ -23,6 +26,7 @@ function changeParam<K extends keyof AppState>(key: K) {
 
 const changeOutput = changeParam("output");
 const changeOff = changeParam("off");
+const changeTheme = changeParam('theme');
 
 const isPrintableKey = (key) => key && key.length === 1;
 
@@ -36,10 +40,12 @@ function pickRandom<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
-const theme = pickRandom(["", styles.orangeTheme, styles.pinkTheme]);
-
 class App extends React.Component<AppProps, AppState> {
-  state = { output: "", off: false };
+  state = {
+    output: "",
+    off: false,
+    theme: pickRandom(allThemes),
+  };
   button: undefined | HTMLButtonElement;
 
   constructor(props: AppProps) {
@@ -99,6 +105,10 @@ class App extends React.Component<AppProps, AppState> {
         this.setState(changeOff(() => true));
         break;
       }
+      case "colorCommand": {
+        this.setState(changeTheme(() => pickRandom(allThemes)))
+        break;
+      }
       default:
         return;
     }
@@ -147,7 +157,7 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     return (
-      <div className={cx(styles.app, theme)}>
+      <div className={cx(styles.app, this.state.theme)}>
         <Screen
           output={this.state.output}
           off={this.state.off}

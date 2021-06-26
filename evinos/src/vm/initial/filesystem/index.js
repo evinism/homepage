@@ -595,6 +595,20 @@ const write = {
 `,
 };
 
+const rainbow = {
+  _isFile: true,
+  owner: 0,
+  permissions: "75",
+  data: `
+  syscalls.open({path: "/dev/screen", perms: 'r' }, (err, fd) => {
+    syscalls.ioctl({fd, cmd: {
+      type: 'colorCommand',
+    }})
+    syscalls.terminate(0);
+  });
+  `
+}
+
 const mkdir = {
   _isFile: true,
   owner: 0,
@@ -853,6 +867,7 @@ const fs = {
         ls,
         mkdir,
         pwd,
+        rainbow,
         rm,
         rmdir,
         su,

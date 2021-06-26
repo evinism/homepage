@@ -16,4 +16,9 @@ export interface OffCommand {
   type: 'offCommand',
 }
 
-export type ScreenCommand = AppendCommand | RemoveCommand | ClearCommand | OffCommand;
+export interface ColorCommand {
+  type: 'colorCommand';
+  color: string;
+}
+
+export type ScreenCommand = AppendCommand | RemoveCommand | ClearCommand | OffCommand | ColorCommand;
