@@ -6,12 +6,12 @@ import FileSystem from "./fs";
 import initialFilesystem from "../initial/filesystem";
 import DeviceType from "../vmtypes";
 
-const motd = `
----------
+const motd = `---------
 Evin Sellin's homepage
 Try poking around the filesystem!
 
-For supported commands, run "ls /bin"
+For help, run "help"
+For all supported commands, run "ls /bin"
 ---------
 `;
 

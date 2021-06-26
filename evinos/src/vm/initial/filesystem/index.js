@@ -657,25 +657,37 @@ const rmdir = {
 `,
 };
 
+const help = {
+  _isFile: true,
+  owner: 0,
+  permissions: '75',
+  data: `
+    syscalls.exec({
+      path: "/bin/cat",
+      args: ["/bin/cat", "/etc/help.txt"],
+    }, () => syscalls.terminate(0));
+`
+}
+
 const about_me = {
   _isFile: true,
   owner: 1,
   permissions: "64",
-  data: `| Hi! My name is Evin Sellin! I spend a lot of time making
-| computers do dumb things.
-|
-| My current specialty is in Machine Learning Infrastructure, but 
-| I'm interested in many aspects of computing, such as JavaScript,
-| functional programming, theory of computation, and web
-| performance!
-|
-| Feel free to email me at evinism@gmail.com or tweet at @evinism
-| to contact me.
-|
-| Github: https://github.com/evinism
-| Medium: https://medium.com/@evinsellin/
-| Twitter: https://twitter.com/evinism
-| LinkedIn: https://www.linkedin.com/in/evin-sellin-80143392/
+  data: `Hi! My name is Evin Sellin! I spend a lot of time making
+computers do dumb things.
+
+My current specialty is in Machine Learning Infrastructure, but 
+I'm interested in many aspects of computing, such as JavaScript,
+functional programming, theory of computation, and web
+performance!
+
+Feel free to email me at evinism@gmail.com or tweet at @evinism
+to contact me.
+
+Github:    https://github.com/evinism
+Medium:    https://medium.com/@evinsellin/
+Twitter:   https://twitter.com/evinism
+LinkedIn:  https://www.linkedin.com/in/evin-sellin-80143392/
 `,
 };
 
@@ -683,14 +695,14 @@ const about_this_interface = {
   _isFile: true,
   owner: 1,
   permissions: "64",
-  data: `| Source code is hosted at https://github.com/evinism/homepage
-| This interface was inspired by my friend Audrey's project,
-| hosted at https://github.com/rhelmot/linjus. To get an idea of
-| what this consists of, try executing cat /bin/sh or looking
-| through the root directory.
-|
-| As a puzzle, there's some serious security flaws in here! See 
-| if you can look through the syscalls for something unusual...
+  data: `Source code is hosted at https://github.com/evinism/homepage
+This interface was inspired by my friend Audrey's project,
+hosted at https://github.com/rhelmot/linjus. To get an idea of
+what this consists of, try executing cat /bin/sh or looking
+through the root directory.
+
+As a puzzle, there's some serious security flaws in here! See 
+if you can look through the syscalls for something unusual...
 `,
 };
 
@@ -698,31 +710,31 @@ const articles = {
   _isFile: true,
   owner: 1,
   permissions: "64",
-  data: `| --- Articles ---
-| Object Plus Array Is Not Zero
-|  Exploring a common Javascript misconception with Chrome and
-|  ASTExplorer, and exploring the weird parts of Chrome's console
-|  Link: https://evinsellin.medium.com/object-plus-array-is-not-zero-ec4db710e7a5
-|
-| This is my thinly veiled attempt to get you to use a library I wrote.
-|  Why did I write this?? Does this count as satire? 
-|  Link: https://evinsellin.medium.com/this-is-my-thinly-veiled-attempt-to-get-you-to-use-a-library-i-wrote-9755dd0fa917
-|
-| Communicating through UUID Conflicts
-|  Can we open up a really narrow information leak into a
-|  full-blown communication protocol? With some elbow grease, yes!
-|  Link: https://evinsellin.medium.com/communicating-through-uuid-conflicts-fe50134304db
-|
-| What exactly is Turing Completeness?
-|  A quick introduction to theory of computation, giving us the 
-|  tools to answer "Is this programming language Turing Complete?"
-|  Link: https://evinsellin.medium.com/what-exactly-is-turing-completeness-a08cc36b26e2
-|
-| Teaching Monads Slightly Differently
-|  A description of problems I see with teaching monads and an 
-|  explanation using a different style 
-|  Link: https://evinsellin.medium.com/teaching-monads-slightly-differently-2af62c4af8ce
-|
+  data: `--- Articles ---
+Object Plus Array Is Not Zero
+ Exploring a common Javascript misconception with Chrome and
+ ASTExplorer, and exploring the weird parts of Chrome's console
+ Link: https://evinsellin.medium.com/object-plus-array-is-not-zero-ec4db710e7a5
+
+This is my thinly veiled attempt to get you to use a library I wrote.
+ Why did I write this?? Does this count as satire? 
+ Link: https://evinsellin.medium.com/this-is-my-thinly-veiled-attempt-to-get-you-to-use-a-library-i-wrote-9755dd0fa917
+
+Communicating through UUID Conflicts
+ Can we open up a really narrow information leak into a
+ full-blown communication protocol? With some elbow grease, yes!
+ Link: https://evinsellin.medium.com/communicating-through-uuid-conflicts-fe50134304db
+
+What exactly is Turing Completeness?
+ A quick introduction to theory of computation, giving us the 
+ tools to answer "Is this programming language Turing Complete?"
+ Link: https://evinsellin.medium.com/what-exactly-is-turing-completeness-a08cc36b26e2
+
+Teaching Monads Slightly Differently
+ A description of problems I see with teaching monads and an 
+ explanation using a different style 
+ Link: https://evinsellin.medium.com/teaching-monads-slightly-differently-2af62c4af8ce
+
 `,
 };
 
@@ -730,34 +742,34 @@ const projects = {
   _isFile: true,
   owner: 1,
   permissions: "64",
-  data: `| --- Webapps ---
-| Lambda Explorer
-|  Lambda Explorer is a tutorial/REPL for the lambda calculus
-|  with a pretty clean interface. Like all things, it could
-|  use a little work, but is otherwise pretty interesting.
-|  Link: https://lambda-explorer.net/
-|
-| quick-pad
-|  Quick-pad is an authless collaborative notepad that makes
-|  creating new notes and sharing them extremely quickly.
-|  Link: https://www.quick-pad.org/
-|
-| --- Tools ---
-| Buttery
-|  Minimalistic language for defining HTTP(s) and Websocket APIs
-|  Link: https://github.com/evinism/buttery
-|
-| TinyBaker
-|  Composable, first-order file-to-file transformations in Python!
-|  Link: https://github.com/evinism/TinyBaker
-|
-| Talc
-|  Insta-CLI for your projects!
-|  Link: https://github.com/evinism/talc
-|
-| Timebomb
-|  A library for making sure devs get to solving old important TODOs
-|  Link: https://github.com/evinism/timebomb
+  data: `--- Webapps ---
+Lambda Explorer
+ Lambda Explorer is a tutorial/REPL for the lambda calculus
+ with a pretty clean interface. Like all things, it could
+ use a little work, but is otherwise pretty interesting.
+ Link: https://lambda-explorer.net/
+
+quick-pad
+ Quick-pad is an authless collaborative notepad that makes
+ creating new notes and sharing them extremely quickly.
+ Link: https://www.quick-pad.org/
+
+--- Tools ---
+Buttery
+ Minimalistic language for defining HTTP(s) and Websocket APIs
+ Link: https://github.com/evinism/buttery
+
+TinyBaker
+ Composable, first-order file-to-file transformations in Python!
+ Link: https://github.com/evinism/TinyBaker
+
+Talc
+ Insta-CLI for your projects!
+ Link: https://github.com/evinism/talc
+
+Timebomb
+ A library for making sure devs get to solving old important TODOs
+ Link: https://github.com/evinism/timebomb
 `,
 };
 
@@ -765,19 +777,19 @@ const talks = {
   _isFile: true,
   owner: 1,
   permissions: "64",
-  data: `| --- Talks ---
-| Aleatoric [ Lightning Talk ]
-|  Can we use sound to help us find subtle bugs in our webapp? 
-|  Maybe! Let's find out together!
-|
-| The Hows and Whys of Frontend Web Performance
-|  Descriptive Blurb: We focus heavily on the performance of
-|  our apps from a backend perspective, but we often overlook
-|  the massive impact that frontend load performance tuning has 
-|  on a user's experience. In this talk, we'll go through what 
-|  "performance" even means from a frontend perspective and how
-|  to use the tools at our disposal to make our webapps feel fast.
-|  Given at the Santa Barbara JS meetup in May 2018
+  data: `--- Talks ---
+Aleatoric [ Lightning Talk ]
+ Can we use sound to help us find subtle bugs in our webapp? 
+ Maybe! Let's find out together!
+
+The Hows and Whys of Frontend Web Performance
+ Descriptive Blurb: We focus heavily on the performance of
+ our apps from a backend perspective, but we often overlook
+ the massive impact that frontend load performance tuning has 
+ on a user's experience. In this talk, we'll go through what 
+ "performance" even means from a frontend perspective and how
+ to use the tools at our disposal to make our webapps feel fast.
+ Given at the Santa Barbara JS meetup in May 2018
 `,
 };
 
@@ -790,6 +802,42 @@ web:5f4dcc3b5aa765d61d8327deb882cf99:1
 `,
 };
 
+const help_txt = {
+  _isFile: true,
+  owner: 0,
+  permissions: "64",
+  data: `This interface implements a few unix-like commands! You can look up tutorials
+for navigating in a unix shell online, but provided below is a small summary
+of a few basic commands.
+
+cwd     cwd stands for current working directory. This command prints out which
+        directory you're currently in. By default, you start in the
+        /users/web directory. This means if you ran cwd right at the start, you would
+        see /users/web
+
+cd      cd stands for Change Directory. Showing an example probably makes this easiest.
+        Let's say you're in directory /users/, and you know there's a folder called blah
+        in that directory. You can type cd blah to navigate to /users/blah.
+        To navigate up a directory, you can use the command cd ../
+        For more information, look at https://linuxize.com/post/linux-cd-command/
+
+ls      List contents of the current directory. For example, running ls in the
+        starting directory lists out all the text files that describe this interface,
+        e.g. about_me.txt, about_this_interface.txt, and all those other goodies
+
+cat     The main usage of cat is printing out the contents of a file. For example,
+        running cat about_me.txt will print out the contents of about_me.txt
+
+touch   Create an empty file. For example, touch hi.txt creates an empty file called 
+        hi.txt in the current working directory.
+
+write   This isn't a standard unix command, but I needed an easy way to write files.
+        Type write blah.txt to start creating a file called blah.txt. From there, type
+        in the contents of the file. To finish, type Ctrl+D to send the "End of File" 
+        command.
+`
+}
+
 const fs = {
   name: "root",
   owner: 0,
@@ -801,6 +849,7 @@ const fs = {
       children: {
         sh,
         cat,
+        help,
         ls,
         mkdir,
         pwd,
@@ -819,6 +868,7 @@ const fs = {
       perm: "75",
       children: {
         passwd,
+        "help.txt": help_txt
       },
     },
     lib: {
