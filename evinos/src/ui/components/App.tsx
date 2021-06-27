@@ -18,6 +18,7 @@ const knownColors = {
   green: 0, 
   orange: 0.82,
   purple: 0.5,
+  spin: -1,
 }
 
 // lol lenses
@@ -114,8 +115,6 @@ class App extends React.Component<AppProps, AppState> {
         let newRotation = undefined;
         if (color === 'random'){
           newRotation = Math.random();
-        } else if(color === "spin") {
-          newRotation = -1;
         } else {
           newRotation = knownColors[color];
         }
