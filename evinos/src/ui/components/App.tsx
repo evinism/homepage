@@ -6,14 +6,12 @@ import OsProvider from "./OsProvider";
 import Screen from "./Screen";
 import styles from "./App.module.scss";
 import MobileCommands from "./MobileCommands";
-import cx from "classnames";
 
-const allThemes = ["", styles.orangeTheme, styles.pinkTheme];
 
 interface AppState {
   output: string;
   off: boolean;
-  theme: string,
+  hueRotation: number, /* 0 to 1 */
 }
 
 // lol lenses
@@ -26,7 +24,7 @@ function changeParam<K extends keyof AppState>(key: K) {
 
 const changeOutput = changeParam("output");
 const changeOff = changeParam("off");
-const changeTheme = changeParam('theme');
+const changeHueRotation = changeParam('hueRotation');
 
 const isPrintableKey = (key) => key && key.length === 1;
 
@@ -37,14 +35,14 @@ interface AppProps {
 }
 
 function pickRandom<T>(arr: T[]) {
-  return arr[Math.floor(Math.random() * arr.length)]!;
+    return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
 class App extends React.Component<AppProps, AppState> {
   state = {
     output: "",
     off: false,
-    theme: pickRandom(allThemes),
+    hueRotation: pickRandom([0, 0.5, 0.82]),
   };
   button: undefined | HTMLButtonElement;
 
@@ -106,7 +104,7 @@ class App extends React.Component<AppProps, AppState> {
         break;
       }
       case "colorCommand": {
-        this.setState(changeTheme(() => pickRandom(allThemes)))
+        this.setState(changeHueRotation(() => Math.random()))
         break;
       }
       default:
@@ -156,8 +154,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   render() {
+    const filter = `hue-rotate(${this.state.hueRotation * 360}deg)`;
     return (
-      <div className={cx(styles.app, this.state.theme)}>
+      <div className={styles.app} style={{filter}} >
         <Screen
           output={this.state.output}
           off={this.state.off}

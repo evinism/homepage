@@ -1,4 +1,5 @@
 .app {
+  filter: hue-rotate(0deg);
   color: #44ff44;
 
   position: relative;
@@ -106,64 +107,5 @@
     cursor: pointer;
     outline: inherit;
     flex-grow: 1;
-  }
-}
-
-/* COLOR THEMES */
-.app.orangeTheme {
-  color: #ff9029;
-  :global {
-    .screen {
-      border-color: #ff9029;
-    }
-
-    .screen.off {
-      border: 3px solid #2e1a07;
-      color: black;
-    }
-
-    a {
-      color: #ff9029;
-    }
-
-    .cursor {
-      animation: cursorBlinkOrange 0.7s infinite;
-    }
-
-    a:hover {
-      color: #ffc14f;
-    }
-    button {
-      border-color: #ff9029;
-    }
-  }
-}
-
-.app.pinkTheme {
-  color: #f84df0;
-  :global {
-    .screen {
-      border-color: #f84df0;
-    }
-
-    .screen.off {
-      border: 3px solid #421540;
-      color: black;
-    }
-
-    a {
-      color: #f84df0;
-    }
-
-    .cursor {
-      animation: cursorBlinkPink 0.7s infinite;
-    }
-
-    a:hover {
-      color: #fc87f6;
-    }
-    button {
-      border-color: #f84df0;
-    }
   }
 }

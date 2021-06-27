@@ -46,40 +46,9 @@ iframe.process-sandbox {
   }
 }
 
-@keyframes cursorBlinkOrange {
-  0% {
-    background-color: transparent;
-  }
-  40% {
-    background-color: transparent;
-  }
-  50% {
-    background-color: #ffc14f;
-  }
-  90% {
-    background-color: #ffc14f;
-  }
-}
-
-@keyframes cursorBlinkPink {
-  0% {
-    background-color: transparent;
-  }
-  40% {
-    background-color: transparent;
-  }
-  50% {
-    background-color: #f84df0;
-  }
-  90% {
-    background-color: #f84df0;
-  }
-}
-
 @keyframes screenOn {
   0% {
     opacity: 0.7;
-    filter: blur(7px) hue-rotate(-60deg);
     transform: scaleY(0);
   }
   5% {
@@ -87,12 +56,10 @@ iframe.process-sandbox {
   }
   25% {
     transform: scaleY(0.995) scaleX(1.005) skew(0deg, 0deg);
-    filter: blur(0px) hue-rotate(-10deg);
   }
 
   100% {
     opacity: 1;
     transform: scale(1);
-    filter: blur(0px);
   }
 }
