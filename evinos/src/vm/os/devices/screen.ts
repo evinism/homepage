@@ -39,10 +39,7 @@ class Screen implements Device {
 
   ioctl(command: ScreenCommand, cb: (err: Err) => void) {
     if (command.type === "colorCommand"){
-      this.outpipe.fire({
-        type: "colorCommand",
-        color: "placeholder",
-      });
+      this.outpipe.fire(command);
     }
     cb(Err.NONE);
   }

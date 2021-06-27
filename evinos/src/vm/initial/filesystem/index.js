@@ -600,11 +600,26 @@ const rainbow = {
   owner: 0,
   permissions: "75",
   data: `
-  syscalls.open({path: "/dev/screen", perms: 'r' }, (err, fd) => {
-    syscalls.ioctl({fd, cmd: {
-      type: 'colorCommand',
-    }})
-    syscalls.terminate(0);
+  syscalls.fread('/lib/std', (err, stdlib) => {
+    const { stdout, stderr } = eval(stdlib);
+    const availableColors = ['orange', 'purple', 'green', 'random'];
+    if (args[1] && !availableColors.includes(args[1])){
+      const errStr = "Unexpected value "
+        + args[1]
+        + ". Available values: "
+        + availableColors.join(", ")
+        + "\\n";
+      stderr(errStr);
+      syscalls.terminate(1);
+    } else {
+      syscalls.open({path: "/dev/screen", perms: 'r' }, (err, fd) => {
+        syscalls.ioctl({fd, cmd: {
+          type: 'colorCommand',
+          color: args[1] || 'random'
+        }});
+        syscalls.terminate(0);
+      });
+    }
   });
   `
 }

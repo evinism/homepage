@@ -14,6 +14,12 @@ interface AppState {
   hueRotation: number, /* 0 to 1 */
 }
 
+const knownColors = {
+  green: 0, 
+  orange: 0.82,
+  purple: 0.5,
+}
+
 // lol lenses
 function changeParam<K extends keyof AppState>(key: K) {
   return (fn: (value: AppState[typeof key]) => void) => (state: AppState) => ({
@@ -42,7 +48,7 @@ class App extends React.Component<AppProps, AppState> {
   state = {
     output: "",
     off: false,
-    hueRotation: pickRandom([0, 0.5, 0.82]),
+    hueRotation: pickRandom(Object.values(knownColors)),
   };
   button: undefined | HTMLButtonElement;
 
@@ -104,7 +110,16 @@ class App extends React.Component<AppProps, AppState> {
         break;
       }
       case "colorCommand": {
-        this.setState(changeHueRotation(() => Math.random()))
+        const color = cmd.color;
+        let newRotation = undefined;
+        if (color === 'random'){
+          newRotation = Math.random();
+        } else {
+          newRotation = knownColors[color];
+        }
+        if (newRotation !== undefined){
+          this.setState(changeHueRotation(() => newRotation))
+        }
         break;
       }
       default:
