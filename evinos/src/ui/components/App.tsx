@@ -114,6 +114,8 @@ class App extends React.Component<AppProps, AppState> {
         let newRotation = undefined;
         if (color === 'random'){
           newRotation = Math.random();
+        } else if(color === "spin") {
+          newRotation = -1;
         } else {
           newRotation = knownColors[color];
         }
@@ -169,9 +171,20 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   render() {
-    const filter = `hue-rotate(${this.state.hueRotation * 360}deg)`;
+    const {hueRotation} = this.state;
+    let inlineStyle: any;
+    if (hueRotation >= 0){
+      inlineStyle = {
+        filter: `hue-rotate(${this.state.hueRotation * 360}deg)`,
+      }
+    } else {
+      inlineStyle = {
+        animation: `hueSpin 7s 0s infinite linear`,
+      }
+    }
+
     return (
-      <div className={styles.app} style={{filter}} >
+      <div className={styles.app} style={inlineStyle} >
         <Screen
           output={this.state.output}
           off={this.state.off}

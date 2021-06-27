@@ -602,7 +602,7 @@ const rainbow = {
   data: `
   syscalls.fread('/lib/std', (err, stdlib) => {
     const { stdout, stderr } = eval(stdlib);
-    const availableColors = ['orange', 'purple', 'green', 'random'];
+    const availableColors = ['orange', 'purple', 'green', 'random', 'spin'];
     if (args[1] && !availableColors.includes(args[1])){
       const errStr = "Unexpected value "
         + args[1]
