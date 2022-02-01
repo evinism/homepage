@@ -740,6 +740,10 @@ const articles = {
   owner: 1,
   permissions: "64",
   data: `--- Articles ---
+Chaotic JavaScript Patterns
+ An etude in cursed programming.
+ Link: https://evinsellin.medium.com/chaotic-javascript-patterns-1025a8f077e6
+
 Object Plus Array Is Not Zero
  Exploring a common Javascript misconception with Chrome and
  ASTExplorer, and exploring the weird parts of Chrome's console
@@ -784,6 +788,10 @@ quick-pad
  Link: https://www.quick-pad.org/
 
 --- Tools ---
+MistQL
+ Miniature embeddable language for performing computations on JSON-like structures
+ Link: https://www.mistql.com/
+
 Buttery
  Minimalistic language for defining HTTP(s) and Websocket APIs
  Link: https://github.com/evinism/buttery
@@ -839,9 +847,9 @@ const help_txt = {
 for navigating in a unix shell online, but provided below is a small summary
 of a few basic commands.
 
-cwd     cwd stands for current working directory. This command prints out which
+pwd     pwd stands for current working directory. This command prints out which
         directory you're currently in. By default, you start in the
-        /users/web directory. This means if you ran cwd right at the start, you would
+        /users/web directory. This means if you ran pwd right at the start, you would
         see /users/web
 
 cd      cd stands for Change Directory. Showing an example probably makes this easiest.
