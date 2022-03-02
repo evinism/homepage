@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import remark from 'remark'
+import {remark} from 'remark'
 import html from 'remark-html'
 
 const postsDirectory = path.join(process.cwd(), 'posts')
@@ -9,7 +9,7 @@ const postsDirectory = path.join(process.cwd(), 'posts')
 export function getSortedPostsData() {
   // Get file names under /posts
   const fileNames = fs.readdirSync(postsDirectory)
-  const allPostsData = fileNames.map(fileName => {
+  const allPostsData: any[] = fileNames.map(fileName => {
     // Remove ".md" from file name to get id
     const id = fileName.replace(/\.md$/, '')
 
@@ -24,7 +24,7 @@ export function getSortedPostsData() {
     return {
       id,
       ...matterResult.data
-    }
+    };
   })
   // Sort posts by date
   return allPostsData.sort((a, b) => {

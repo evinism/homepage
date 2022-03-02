@@ -951,9 +951,9 @@ toposort@^2.0.2:
   integrity sha1-riF2gXXRVZ1IvvNUILL0li8JwzA=
 
 trough@^2.0.0:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/trough/-/trough-2.0.2.tgz#94a3aa9d5ce379fc561f6244905b3f36b7458d96"
-  integrity sha512-FnHq5sTMxC0sk957wHDzRnemFnNBvt/gSY99HzK8F7UP5WAbvP70yX5bd7CjEQkN+TjdxwI7g7lJ6podqrG2/w==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/trough/-/trough-2.1.0.tgz#0f7b511a4fde65a46f18477ab38849b22c554876"
+  integrity sha512-AqTiAOLcj85xS7vQ8QkAV41hPDIJ71XJB4RCUrzo/1GM2CQwhkJGaf9Hgr7BOugMRpgGUrqRg/DrBDl4H40+8g==
 
 tslib@^1.9.3:
   version "1.14.1"
