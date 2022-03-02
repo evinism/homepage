@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Chaotic JavaScript Patterns</title>
+    <style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field="subtitle"],
+      section[data-field="description"] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="h-entry">
+      <header>
+        <h1 class="p-name">Chaotic JavaScript Patterns</h1>
+      </header>
+      <section data-field="subtitle" class="p-summary">
+        Dubious solutions to dubious problems
+      </section>
+      <section data-field="body" class="e-content">
+        <section name="a3f2" class="section section--body section--first">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <h3
+                name="bbbc"
+                id="bbbc"
+                class="graf graf--h3 graf--leading graf--title"
+              >
+                Chaotic JavaScript Patterns
+              </h3>
+              <h4
+                name="a811"
+                id="a811"
+                class="graf graf--h4 graf-after--h3 graf--subtitle"
+              >
+                Dubious solutions to dubious problems
+              </h4>
+              <figure
+                name="deab"
+                id="deab"
+                class="graf graf--figure graf-after--h4"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*3r1RUsiRzMY-BYK50vJ_yA.jpeg"
+                  data-width="2048"
+                  data-height="977"
+                  data-is-featured="true"
+                  src="https://cdn-images-1.medium.com/max/800/1*3r1RUsiRzMY-BYK50vJ_yA.jpeg"
+                />
+                <figcaption class="imageCaption">
+                  Thanks
+                  <a
+                    href="https://www.flickr.com/photos/pagedooley/"
+                    data-href="https://www.flickr.com/photos/pagedooley/"
+                    class="markup--anchor markup--figure-anchor"
+                    title="Go to Kevin Dooley&#39;s photostream"
+                    rel="noopener"
+                    target="_blank"
+                    >Kevin Dooley</a
+                  >!
+                </figcaption>
+              </figure>
+              <p name="3a70" id="3a70" class="graf graf--p graf-after--figure">
+                Depending on who you ask, JavaScript is one of the following:
+              </p>
+              <ol class="postList">
+                <li name="7fc4" id="7fc4" class="graf graf--li graf-after--p">
+                  A charming, expressive language with a few quirks.
+                </li>
+                <li name="c0d8" id="c0d8" class="graf graf--li graf-after--li">
+                  A nasty pile of terrible behavior, each instance worse than
+                  the last.
+                </li>
+              </ol>
+              <p name="2a96" id="2a96" class="graf graf--p graf-after--li">
+                Today, we will be steelmanning the second argument by providing
+                a few code snippets purpose-built to sow confusion. While you
+                can certainly write chaotic JavaScript without these techniques,
+                I hope to provide you with an extended toolset that can help
+                you, the programmer, curry favor with the
+                <em class="markup--em markup--p-em"
+                  >Ghaunadar the Ancient One, Chaos Deified</em
+                >.
+              </p>
+              <p name="15c4" id="15c4" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em"
+                    >Edit: I realize I have to be 100% clear. Never, ever, do
+                    any of these.</em
+                  ></strong
+                >
+              </p>
+              <h3 name="1ccd" id="1ccd" class="graf graf--h3 graf-after--p">
+                Problem 1: Object keys are too restrictive!
+              </h3>
+              <p name="8429" id="8429" class="graf graf--p graf-after--h3">
+                Isn’t it annoying how only strings and symbols can be keys to
+                objects in JavaScript? For goodness sake, even Python allows us
+                to at least index based on tuples! Is JavaScript really going to
+                be outdone by Python?
+              </p>
+              <p name="6676" id="6676" class="graf graf--p graf-after--p">
+                An example of the glaring issue can be seen below:
+              </p>
+              <figure
+                name="e699"
+                id="e699"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/0e1a44d1564742a98c4056932c461bb7.js"></script>
+                <figcaption class="imageCaption">the literal worst</figcaption>
+              </figure>
+              <p name="4dd9" id="4dd9" class="graf graf--p graf-after--figure">
+                Whatever can we do? Isn’t there any way we can improve this
+                situation?
+              </p>
+              <h4 name="d9b2" id="d9b2" class="graf graf--h4 graf-after--p">
+                Solution: Symbols + toPrimitive + Object.prototype
+              </h4>
+              <p name="72dc" id="72dc" class="graf graf--p graf-after--h4">
+                We can get around this limitation by just rewriting
+                <strong class="markup--strong markup--p-strong">Object</strong
+                >’s
+                <strong class="markup--strong markup--p-strong"
+                  >toPrimitive </strong
+                >call so it creates a new symbol for every object! Any object,
+                when converted to a primitive, will resolve to a new, distinct
+                symbol that you can index off of!
+              </p>
+              <figure
+                name="0328"
+                id="0328"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/e7996c4f218f12183809e0ce1e20d487.js"></script>
+                <figcaption class="imageCaption">
+                  nothing bad can come of this
+                </figcaption>
+              </figure>
+              <p name="8f30" id="8f30" class="graf graf--p graf-after--figure">
+                This works for objects, arrays, class instances, even classes
+                themselves, you name it! We’ve fixed JavaScript by using the
+                power of JavaScript! Isn’t JavaScript wonderful?
+              </p>
+              <p name="d7d6" id="d7d6" class="graf graf--p graf-after--p">
+                (As an aside, JavaScript’s Map data structure natively allows
+                this! If you were hoping to solve this problem in a reasonable
+                fashion, that’s almost certainly the way to go about it!)
+              </p>
+              <h3 name="a65a" id="a65a" class="graf graf--h3 graf-after--p">
+                Problem 2: I end up relying too much on my closure!
+              </h3>
+              <p name="7e82" id="7e82" class="graf graf--p graf-after--h3">
+                Let’s say we’ve got a section within a function that you could
+                imagine splitting out into it’s own function, but frankly it’s
+                only used in one place, and splitting it out might be more
+                confusing than helpful.
+              </p>
+              <figure
+                name="d39d"
+                id="d39d"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/0f03ff949a6a07c8a55e53a84271ba72.js"></script>
+              </figure>
+              <p name="6fc1" id="6fc1" class="graf graf--p graf-after--figure">
+                The only problem is that there’s nothing preventing us from
+                accidentally relying on
+                <strong class="markup--strong markup--p-strong">a </strong>or
+                <strong class="markup--strong markup--p-strong">b </strong>in
+                that section, which would make it harder to split out in the
+                future. Dang, I wish I could ensure a block only had access to
+                <strong class="markup--strong markup--p-strong">z</strong>, but
+                was still part of the function!
+              </p>
+              <h4 name="7661" id="7661" class="graf graf--h4 graf-after--p">
+                Solution: Nuke the Closure
+              </h4>
+              <p name="74a8" id="74a8" class="graf graf--p graf-after--h4">
+                Using proxies + with() allows us to do some programatic
+                shenanigans to the stack. We can restrict the closure to only
+                have access to the things the block cares about!
+              </p>
+              <p name="a1b6" id="a1b6" class="graf graf--p graf-after--p">
+                An example of how this strategy works is listed below:
+              </p>
+              <figure
+                name="add8"
+                id="add8"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/eff97c05e7835f04e27dcf3006b1b848.js"></script>
+              </figure>
+              <p name="9c26" id="9c26" class="graf graf--p graf-after--figure">
+                If we have some subsection of a function which semantically only
+                operates on variable
+                <strong class="markup--strong markup--p-strong">z</strong>, we
+                can restrict access to those variables and those variables
+                alone, ensuring that we can abstract it out later if we want to
+                reuse it. The above code snippet then becomes:
+              </p>
+              <figure
+                name="bbe1"
+                id="bbe1"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/cdc274920e75e43c62fad3cc14ad7e25.js"></script>
+                <figcaption class="imageCaption">
+                  just make sure to disable strict mode ok
+                </figcaption>
+              </figure>
+              <p name="5193" id="5193" class="graf graf--p graf-after--figure">
+                A kind of interesting property via a terrible, terrible
+                technique!
+              </p>
+              <h3 name="ab70" id="ab70" class="graf graf--h3 graf-after--p">
+                Problem 3: I hate quote marks!
+              </h3>
+              <p name="e592" id="e592" class="graf graf--p graf-after--h3">
+                This is a continuation on the above technique, where proxies +
+                with() gives you programatic access to the closure in exchange
+                for your soul.
+              </p>
+              <p name="460b" id="460b" class="graf graf--p graf-after--p">
+                Let’s say you typed
+                <strong class="markup--strong markup--p-strong"
+                  >foo[bar]</strong
+                >
+                when you meant to type
+                <strong class="markup--strong markup--p-strong"
+                  >foo[‘bar’]</strong
+                >. Now JavaScript’s telling you that
+                <strong class="markup--strong markup--p-strong">bar </strong>is
+                undefined even though it’s really obvious what you meant to
+                type? Why is it being so pedantic? God, computers are stupid
+                sometimes.
+              </p>
+              <h4 name="7afb" id="7afb" class="graf graf--h4 graf-after--p">
+                Solution: Bare Strings
+              </h4>
+              <p name="5362" id="5362" class="graf graf--p graf-after--h4">
+                Wrap every file in a big ol’ with() clause using a specialized
+                proxy, like above! Now any valid identifier that’s not otherwise
+                defined is now a valid string as well!
+              </p>
+              <figure
+                name="da3a"
+                id="da3a"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/ac446cf10b1814061a3e35d6c285b060.js"></script>
+                <figcaption class="imageCaption">
+                  with + proxies = instant joy, tell ur friends
+                </figcaption>
+              </figure>
+              <p name="3160" id="3160" class="graf graf--p graf-after--figure">
+                Now forgetting those quote marks will be a thing of the past! We
+                did what we set out to do!
+              </p>
+              <h3 name="416d" id="416d" class="graf graf--h3 graf-after--p">
+                Problem 4: People keep commenting out my code!
+              </h3>
+              <p name="276f" id="276f" class="graf graf--p graf-after--h3">
+                Picture this: You’ve written a core function. Then somebody else
+                comes along to your very nice implementation and comments out a
+                line as part of their testing or whatever. That change gets
+                accidentally added, submitted, then pushed. Your whole site goes
+                down, and your shareholders’ portfolios decrease by 0.03%.
+                Complete catastrophe.
+              </p>
+              <p name="1e55" id="1e55" class="graf graf--p graf-after--p">
+                Sure, tests SHOULD catch this, and sure, stuff SHOULD have gone
+                through more stringent code review, and sure, maybe a linter
+                would have helped or whatever. But this is the real world we’re
+                talking about, and infrastructure is a pipe-dream. Code problems
+                should be solved with CODE.
+              </p>
+              <h4 name="6d40" id="6d40" class="graf graf--h4 graf-after--p">
+                Solution: uncomment()
+              </h4>
+              <p name="1fe2" id="1fe2" class="graf graf--p graf-after--h4">
+                We can make use of JavaScript’s wonderful behavior once again!
+                Calling toString() on a function returns the source of the
+                function, which means we can define higher-order functions that
+                operate on the source code itself! Wonderful!
+              </p>
+              <figure
+                name="38dd"
+                id="38dd"
+                class="graf graf--figure graf--iframe graf-after--p"
+              >
+                <script src="https://gist.github.com/evinism/2ad57ce2690387950085f3e9430f6de3.js"></script>
+                <figcaption class="imageCaption">
+                  just make sure to disable ur minifier
+                </figcaption>
+              </figure>
+              <p name="d4af" id="d4af" class="graf graf--p graf-after--figure">
+                Well, this has been fun! See ya next ti…
+              </p>
+              <h3 name="646c" id="646c" class="graf graf--h3 graf-after--p">
+                Plea: Show me your chaotic JavaScript
+              </h3>
+              <p name="887a" id="887a" class="graf graf--p graf-after--h3">
+                I need to see the JavaScript you keep under the rug. The
+                JavaScript buried deep underground, never to be unearthed by
+                human hands. The JavaScript your dad warned you about.
+              </p>
+              <p name="30c4" id="30c4" class="graf graf--p graf-after--p">
+                Unearth them.
+              </p>
+              <p
+                name="9c80"
+                id="9c80"
+                class="graf graf--p graf-after--p graf--trailing"
+              >
+                I must have them.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section name="ef67" class="section section--body section--last">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <p
+                name="d101"
+                id="d101"
+                class="graf graf--p graf--leading graf--trailing"
+              >
+                <em class="markup--em markup--p-em"
+                  >Evin Sellin is a software engineer and purveyor of bad
+                  programming takes. He sits on ugly snippets like a dragon on a
+                  hoard of treasure, constantly seeking more to add to his
+                  collection of horrors.</em
+                >
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+      <footer>
+        <p>
+          By
+          <a href="https://medium.com/@evinsellin" class="p-author h-card"
+            >Evin Sellin</a
+          >
+          on
+          <a href="https://medium.com/p/1025a8f077e6"
+            ><time class="dt-published" datetime="2021-10-18T20:21:19.357Z"
+              >October 18, 2021</time
+            ></a
+          >.
+        </p>
+        <p>
+          <a
+            href="https://medium.com/@evinsellin/chaotic-javascript-patterns-1025a8f077e6"
+            class="p-canonical"
+            >Canonical link</a
+          >
+        </p>
+        <p>
+          Exported from <a href="https://medium.com">Medium</a> on March 2,
+          2022.
+        </p>
+      </footer>
+    </article>
+  </body>
+</html>

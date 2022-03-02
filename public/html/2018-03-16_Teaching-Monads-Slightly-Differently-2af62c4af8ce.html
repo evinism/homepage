@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Teaching Monads Slightly Differently</title>
+    <style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field="subtitle"],
+      section[data-field="description"] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="h-entry">
+      <header>
+        <h1 class="p-name">Teaching Monads Slightly Differently</h1>
+      </header>
+      <section data-field="subtitle" class="p-summary">
+        Chipping away at Lady Monadgreen’s curse
+      </section>
+      <section data-field="body" class="e-content">
+        <section
+          name="0c72"
+          class="section section--body section--first section--last"
+        >
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <h3
+                name="516c"
+                id="516c"
+                class="graf graf--h3 graf--leading graf--title"
+              >
+                Teaching Monads Slightly Differently
+              </h3>
+              <h4
+                name="2e89"
+                id="2e89"
+                class="graf graf--h4 graf-after--h3 graf--subtitle"
+              >
+                Chipping away at Lady Monadgreen’s curse
+              </h4>
+              <blockquote
+                name="defb"
+                id="defb"
+                class="graf graf--blockquote graf--startsWithDoubleQuote graf-after--h4"
+              >
+                “Once you understand monads, you immediately become incapable of
+                explaining them to anyone else”
+              </blockquote>
+              <blockquote
+                name="a4f0"
+                id="a4f0"
+                class="graf graf--blockquote graf-after--blockquote"
+              >
+                — Lady Monadgreen’s curse, Gilad Bracha
+              </blockquote>
+              <p
+                name="345c"
+                id="345c"
+                class="graf graf--p graf-after--blockquote"
+              >
+                It’s my monad article! Everyone does one at some point! In this
+                article, I propose a slightly different strategy to teaching
+                monads, and attempt an explanation in that style. Will I break
+                <em class="markup--em markup--p-em">Lady Monadgreen’s curse</em
+                >? Spoiler Alert: probably not.
+              </p>
+              <h4 name="efa1" id="efa1" class="graf graf--h4 graf-after--p">
+                The two camps of Functional Terminology
+              </h4>
+              <p name="cab6" id="cab6" class="graf graf--p graf-after--h4">
+                In the functional programming community, there is a divide on
+                the correct terminology to use when teaching functional concepts
+                such as <em class="markup--em markup--p-em">Functor </em>and
+                <em class="markup--em markup--p-em">Monad</em> to beginners.
+                There are two main camps:
+              </p>
+              <p name="f118" id="f118" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong">Side 1:</strong>
+                Terms like <em class="markup--em markup--p-em">Functor </em>and
+                <em class="markup--em markup--p-em">Monad</em> are unnecessarily
+                dense and mathematical. Having to handle the twofold burden of
+                both introducing a term and identifying the semantic meaning
+                behind it is too much for a reasonable beginner to bear. We
+                should be using terminology that guides the beginner to
+                understanding, such as
+                <em class="markup--em markup--p-em">Mappable</em> and
+                <em class="markup--em markup--p-em">Chainable</em>.
+              </p>
+              <p name="ccba" id="ccba" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong">Side 2:</strong>
+                Terms like <em class="markup--em markup--p-em">Functor </em>and
+                <em class="markup--em markup--p-em">Monad</em> are exactly as
+                dense as they need to be. They’re inherently confusing concepts,
+                enough so that even well established programmers get it wrong a
+                lot of the time. Furthermore, why shouldn’t we be using the
+                technical term? There’s no push in Electrical Engineering to
+                call transistors “gateways”, nor should there be. As engineers,
+                we learn the terms of the trade, despite the difficulty. We
+                should be using terminology that is technically correct and does
+                not guide the beginner into a false sense of understanding.
+              </p>
+              <h4 name="5deb" id="5deb" class="graf graf--h4 graf-after--p">
+                Both strategies are unhelpful to beginners
+              </h4>
+              <p name="bc42" id="bc42" class="graf graf--p graf-after--h4">
+                Both these strategies often introduce a term, then define it (a
+                <em class="markup--em markup--p-em">Functor</em> is
+                <em class="markup--em markup--p-em">f </em>where
+                <em class="markup--em markup--p-em">f …</em>). This is extremely
+                useful for being mathematically precise and correct — it’s the
+                kind of language you’d invoke in a mathematical paper to be as
+                unambiguous and free of error as possible. But I’d argue it’s
+                the wrong way to teach beginners about these concepts. Our goal
+                isn’t to create a mathematically rigorous definition here, our
+                goal is to guide a beginner to build intuition.
+              </p>
+              <p name="9358" id="9358" class="graf graf--p graf-after--p">
+                Does introducing the term
+                <em class="markup--em markup--p-em">Monad</em> and defining it
+                build intuition? Of course not — this is the problem faced by
+                many, many, beginners, including myself. A quick search on
+                google for “what is a monad” shows what any person struggling to
+                learn statically typed functional languages already know: monads
+                are confusing.
+              </p>
+              <p name="a07a" id="a07a" class="graf graf--p graf-after--p">
+                Furthermore, you have to parse through a myriad of different
+                definitions to come to a unified understanding of monads. “<em
+                  class="markup--em markup--p-em"
+                  >Monad</em
+                >
+                is a term from category theory. Does that mean it’ll be easier
+                to be more correct by learning the category theoretic definition
+                of a monad? If so, what’s the correspondence?” There is
+                inherently a choice to be made when learning monads on your own:
+                what level will be the easiest to understand? Expecting
+                beginners to effectively navigate this is unrealistic.
+              </p>
+              <p name="a9fd" id="a9fd" class="graf graf--p graf-after--p">
+                Does lying a little to the beginner by saying
+                <em class="markup--em markup--p-em">Mappable </em>and
+                <em class="markup--em markup--p-em">Chainable</em> work? In the
+                context of functional programming, definitely no. People still
+                believe that
+                <em class="markup--em markup--p-em">pointfree</em> refers to
+                literal ‘.’ characters in their code. There’s an
+                <em class="markup--em markup--p-em">eternal september</em> with
+                functional programming languages, guaranteeing that there will
+                always be people confused by misleading terminology.
+              </p>
+              <p name="9a89" id="9a89" class="graf graf--p graf-after--p">
+                Is <em class="markup--em markup--p-em">Chainable</em> any more
+                useful to a beginner to guiding correctness than
+                <em class="markup--em markup--p-em">Monad</em>? Of course not.
+                You have to explicitly know “oh, chain refers to a
+                <em class="markup--em markup--p-em">flatmap</em> which has
+                properties <em class="markup--em markup--p-em">x, y, </em>and
+                <em class="markup--em markup--p-em">z.</em>” You have to know
+                that a chainable even wraps a type, that chainable is inherently
+                mappable, and a whole host of other constraints. Sure, it tells
+                you where you might use a monad, but it doesn’t guide the
+                intuition of what a monad actually is — and that’s a bad thing.
+                Using bad terminology leads to pitfalls on pitfalls.
+                <em class="markup--em markup--p-em">Chainable</em> doesn’t work
+                here.
+              </p>
+              <p name="bfc7" id="bfc7" class="graf graf--p graf-after--p">
+                Neither of these options sound good. I instead propose a third
+                option.
+              </p>
+              <h4 name="4298" id="4298" class="graf graf--h4 graf-after--p">
+                Deduction to Induction
+              </h4>
+              <p name="7a45" id="7a45" class="graf graf--p graf-after--h4">
+                The strategy wherein we first introduce a term like
+                <em class="markup--em markup--p-em">Monad</em>, then figure out
+                the consequences, is inherently deductive in nature. It
+                presupposes the usefulness of the term, then tries to convince
+                you of its utility.
+              </p>
+              <p name="88f3" id="88f3" class="graf graf--p graf-after--p">
+                We should instead be teaching monads inductively: We should
+                encapsulate the breadth of monads by showing motivating examples
+                and connecting them together. We should not teach them by
+                defining a weirdly mechanical and arbitrary ruleset, then
+                showing how a bunch of different things might happen to follow
+                that arbitrary ruleset. The connections between monads should be
+                obvious to start. The exact ruleset doesn’t need to be.
+              </p>
+              <p name="81c8" id="81c8" class="graf graf--p graf-after--p">
+                We do this all the time when teaching mathematics: We use “what
+                was the mathematical history for this concept?” to essentially
+                proxy for “what’s the motivation behind this?”, to relatively
+                good effect. The people who did best at math in school were
+                those who were comfortable with the motivation, and could if
+                they needed to, re-derive formulae or techniques. In the same
+                vein, I want to provide a path to “What led to this weird
+                structure being named and isolated as a useful concept?”
+              </p>
+              <p
+                name="b31e"
+                id="b31e"
+                class="graf graf--p graf--startsWithDoubleQuote graf-after--p"
+              >
+                “So how would you teach monads, Evin?”
+              </p>
+              <h4 name="2071" id="2071" class="graf graf--h4 graf-after--p">
+                Monads, taught inductively
+              </h4>
+              <p name="b1b4" id="b1b4" class="graf graf--p graf-after--h4">
+                This strategy is largely taken from Jafar Husain’s<em
+                  class="markup--em markup--p-em"
+                >
+                  Intro to Reactive Programming with RxJS.</em
+                >
+                In this series, he NEVER uses the word monad, but manages to
+                teach the essence of working with monads extremely effectively.
+                His method revolves around forming intuitive connections between
+                datatypes, and showing how solving two related problems are
+                roughly the same. So I’m going to go through several toy
+                problems using Javascript, each driving at monads from a
+                slightly different angle.
+              </p>
+              <p name="4747" id="4747" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >Round 1: Arrays</strong
+                >
+              </p>
+              <p name="1538" id="1538" class="graf graf--p graf-after--p">
+                Let’s say Javascript has an
+                <strong class="markup--strong markup--p-strong"
+                  >Array.flatten</strong
+                >
+                method, wherein you can take an array of arrays, and flatten it
+                into one array. So, for example:
+              </p>
+              <pre name="a386" id="a386" class="graf graf--pre graf-after--p">
+[[1, 2, 3], [4, 5]].flatten() // evaluates to [1, 2, 3, 4, 5]</pre
+              >
+              <p name="daa6" id="daa6" class="graf graf--p graf-after--pre">
+                Let’s say also that we’ve got a JSON blob which represents users
+                and their tweets:
+              </p>
+              <pre
+                name="790a"
+                id="790a"
+                class="graf graf--pre graf-after--p"
+              >const users = [<br>  {<br>    name: &#39;Chad Brogrammer&#39;,<br>    tweets: [&#39;lol generics&#39;, &#39;hn is my bestie&#39;],<br>  },<br>  {<br>    name: &#39;Freddie Hubbard&#39;,<br>    tweets: [&#39;i make trumpet sounds&#39;, &#39;haha good memes there&#39;]<br>  }<br>  // ...<br>];</pre>
+              <p name="19f5" id="19f5" class="graf graf--p graf-after--pre">
+                And we want to reduce this down to a log of their tweets, in the
+                following format:
+              </p>
+              <pre
+                name="f3a0"
+                id="f3a0"
+                class="graf graf--pre graf-after--p"
+              >[<br>  &#39;&lt;Chad Brogrammer&gt; lol generics&#39;,<br>  &#39;&lt;Chad Brogrammer&gt; hn is my bestie&#39;,<br>  &#39;&lt;Freddie Hubbard&gt; i make trumpet sounds&#39;,<br>  ...<br>]</pre>
+              <p name="5747" id="5747" class="graf graf--p graf-after--pre">
+                With
+                <strong class="markup--strong markup--p-strong"
+                  >Array.flatten</strong
+                >
+                in our pocket, we can do a slick little map inside of a map to a
+                flatten to get to our target:
+              </p>
+              <pre
+                name="0d8b"
+                id="0d8b"
+                class="graf graf--pre graf-after--p"
+              >const log = users.map(<br>  user =&gt; user.tweets.map(<br>    tweet =&gt; `&lt;${user.name}&gt; ${tweet}`<br>  )<br>).flatten();</pre>
+              <p name="25de" id="25de" class="graf graf--p graf-after--pre">
+                First we map over the users, then we map over the tweets. Then
+                we join the username with the tweet, then we flatten the array
+                together. Easy solution to an easy problem! Our goal is
+                achieved!
+              </p>
+              <p name="956e" id="956e" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >Round 2: Optionals</strong
+                >
+              </p>
+              <p name="759b" id="759b" class="graf graf--p graf-after--p">
+                To the next toy problem!
+              </p>
+              <p name="ba42" id="ba42" class="graf graf--p graf-after--p">
+                First, let’s introduce the concept of an
+                <em class="markup--em markup--p-em">Optional.</em> An
+                <em class="markup--em markup--p-em">Optional </em>is a data type
+                which either does or does not contain a value. In JS class
+                notation, we can write the bare bones of an optional datatype as
+                follows:
+              </p>
+              <pre
+                name="a8eb"
+                id="a8eb"
+                class="graf graf--pre graf-after--p"
+              >class Optional {<br>  constructor (hasValue, value) {<br>    this.hasValue = hasValue;<br>    this.value = value;<br>  }<br>}</pre>
+              <p name="14bd" id="14bd" class="graf graf--p graf-after--pre">
+                Which seems just a little bit silly in javascript when you’re
+                first introduced to it, but being able to differentiate between
+                a value that
+                <em class="markup--em markup--p-em">shouldn’t</em> be undefined
+                and one that <em class="markup--em markup--p-em">can</em> be
+                undefined is pretty useful. And because we’ve got a separate
+                class for it, we can introduce two additional methods:
+              </p>
+              <p name="80d6" id="80d6" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em">map()</em></strong
+                >: If you’ve got an
+                <em class="markup--em markup--p-em">Optional</em> that contains
+                1, you should be able to do
+                <strong class="markup--strong markup--p-strong"
+                  >optional.map(a =&gt; a+1) </strong
+                >to get an optional that contains two. If the optional doesn’t
+                contain a value, it just ignores the operation.
+              </p>
+              <p name="9b07" id="9b07" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em">join()</em>: </strong
+                >If you’ve got an
+                <em class="markup--em markup--p-em">Optional</em> that contains
+                another <em class="markup--em markup--p-em">Optional</em>, you
+                should be able to collapse those into one
+                <em class="markup--em markup--p-em">Optional</em>. Is
+                <strong class="markup--strong markup--p-strong"
+                  >Optional(Nothing)</strong
+                >
+                really different than
+                <strong class="markup--strong markup--p-strong">Nothing</strong>
+                itself?
+              </p>
+              <p name="81ab" id="81ab" class="graf graf--p graf-after--p">
+                With this in mind, let’s set up the problem: I’ve got a path on
+                a website, and I want to find the filename extension off that
+                path. So, for
+                <strong class="markup--strong markup--p-strong"
+                  >/homepage/index.html</strong
+                >, the thing I’m looking for is
+                <strong class="markup--strong markup--p-strong">html</strong>.
+                But:
+              </p>
+              <p name="90c1" id="90c1" class="graf graf--p graf-after--p">
+                1: a path doesn’t necessarily have a file, e.g.
+                <strong class="markup--strong markup--p-strong"
+                  >/homepage/</strong
+                >
+              </p>
+              <p name="b9db" id="b9db" class="graf graf--p graf-after--p">
+                2: a file doesn’t necessarily have an an extension, e.g.
+                <strong class="markup--strong markup--p-strong"
+                  >/homepage/index</strong
+                >
+              </p>
+              <p name="98de" id="98de" class="graf graf--p graf-after--p">
+                Now I’ve got the functions
+                <strong class="markup--strong markup--p-strong"
+                  >getFile() </strong
+                >and
+                <strong class="markup--strong markup--p-strong"
+                  >getExtension()</strong
+                >, which each may or may not produce a value. In fact, they
+                return an <em class="markup--em markup--p-em">Optional</em>.
+                With a little slickness, we should be able to get an optional
+                that contains only the extension, if the extension is there!
+              </p>
+              <pre name="07f0" id="07f0" class="graf graf--pre graf-after--p">
+const optionalExtension = getFile(path).map(getExtension).join()</pre
+              >
+              <p name="3955" id="3955" class="graf graf--p graf-after--pre">
+                Nice!
+                <strong class="markup--strong markup--p-strong">getFile</strong>
+                returns an optional, and mapping over
+                <strong class="markup--strong markup--p-strong"
+                  >getExtension</strong
+                >
+                gets you an optional of an optional, so now you just reduce
+                those into one optional that (possibly) contains the file
+                extension. Another easy problem, easy solution.
+              </p>
+              <p name="d1dd" id="d1dd" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >Round 3: Observables</strong
+                >
+              </p>
+              <p name="b2a9" id="b2a9" class="graf graf--p graf-after--p">
+                Next toy problem, Cookie Clicker edition:
+              </p>
+              <p name="b4c0" id="b4c0" class="graf graf--p graf-after--p">
+                Let’s imagine another datatype, namely an Observable. This one
+                is more difficult to construct than the other two, so if you’re
+                familiar with observables this will go easily. Otherwise, this
+                brief explanation might make sense:
+              </p>
+              <p name="b755" id="b755" class="graf graf--p graf-after--p">
+                An Observable represents a stream of events. Events can be
+                anything: numbers, strings, mouseclick events, websocket
+                messages, tweets by Donald Trump (or Freddie Hubbard
+                apparently). I’ll represent them like this:
+              </p>
+              <pre
+                name="3465"
+                id="3465"
+                class="graf graf--pre graf-after--p"
+              >// pretend this represents an observable where time goes -&gt; that way<br>[.........E1....E2....E4...]</pre>
+              <p name="aa93" id="aa93" class="graf graf--p graf-after--pre">
+                You can map over these. So if I have an observable that fires
+                off values 1, 2, 3, I can make a new one that fires 2, 3, 4, by
+                doing the following:
+              </p>
+              <pre
+                name="7790"
+                id="7790"
+                class="graf graf--pre graf-after--p"
+              >[.........1.......2....3].map(value =&gt; value + 1)<br>// gives:<br>[.........2.......3....4]</pre>
+              <p name="6d6c" id="6d6c" class="graf graf--p graf-after--pre">
+                It turns out this is an extremely useful way of representing
+                events, for reasons I won’t get into here… There are tons of
+                tutorials on observables that go into detail on how and why they
+                work so well.
+              </p>
+              <p name="9446" id="9446" class="graf graf--p graf-after--p">
+                The truly mind-bending part is when you consider that the events
+                that observables fire can THEMSELVES be observables:
+              </p>
+              <pre
+                name="6724"
+                id="6724"
+                class="graf graf--pre graf-after--p"
+              >[......O1.....O2.....O3..] // contains the following observables:<br>       [...a.....b.......] // O1<br>              [c....d....] // O2<br>                     [..e] // O3</pre>
+              <p name="1275" id="1275" class="graf graf--p graf-after--pre">
+                So, to reiterate, we’ve got an observable. Observables consist
+                of a bunch of events, which themselves are just values. An
+                observable can fire other observables, to get this
+                two-dimensional structure. It’s incredibly neat.
+              </p>
+              <p name="5f46" id="5f46" class="graf graf--p graf-after--p">
+                You might already see where this is going: We can also flatten
+                an observable of observables into one single observable. There
+                are a number of ways to do this, but let’s just consider merging
+                all these observables together by just taking all events: Any
+                time one of the inner observables fire an event, we take it.
+              </p>
+              <pre
+                name="ee3f"
+                id="ee3f"
+                class="graf graf--pre graf-after--p"
+              >[......O1.....O2.....O3..].mergeAll() // from above<br>// gets us:<br>[..........a...c.b..d...e]</pre>
+              <p name="e987" id="e987" class="graf graf--p graf-after--pre">
+                Okay, I know this is a lot, but let’s try a problem here: Let’s
+                say you’re building Cookie Clicker v2, and you want to keep a
+                total of all cookie clicks. To do this, each client that visits
+                your site starts a websocket connection with your server,
+                modeled like an observable:
+              </p>
+              <pre name="ad7f" id="ad7f" class="graf graf--pre graf-after--p">
+const clientConnections = [.....Client1...Client2.....Client3..]</pre
+              >
+              <p name="d6e6" id="d6e6" class="graf graf--p graf-after--pre">
+                And we’ve got
+                <strong class="markup--strong markup--p-strong"
+                  >getCookieClicks</strong
+                >, which given a client, gives us an observable containing
+                cookie click events (notified via websocket):
+              </p>
+              <pre
+                name="bdcf"
+                id="bdcf"
+                class="graf graf--pre graf-after--p"
+              >getCookieClicks(client)<br>// gives:<br>[.....click.........click.....click.......]</pre>
+              <p name="5c0c" id="5c0c" class="graf graf--p graf-after--pre">
+                Can we make an observable that contains all clicks from all
+                clients? You probably can already guess the answer:
+              </p>
+              <pre name="b95a" id="b95a" class="graf graf--pre graf-after--p">
+const allClicks = clientConnections.map(getCookieClicks).mergeAll();</pre
+              >
+              <p name="4819" id="4819" class="graf graf--p graf-after--pre">
+                Neato. We can then increment a counter each time that Observable
+                fires to get a total of the number of cookie clicks.
+              </p>
+              <h4 name="1395" id="1395" class="graf graf--h4 graf-after--p">
+                Pulling the 3 examples together
+              </h4>
+              <p name="3950" id="3950" class="graf graf--p graf-after--h4">
+                Those look pretty related, right? In all of these examples, we
+                got this twice wrapped value, then flattened them to be a once
+                wrapped value. So let’s pull out the essential pieces of this
+                common pattern:
+              </p>
+              <p name="c6d7" id="c6d7" class="graf graf--p graf-after--p">
+                <em class="markup--em markup--p-em"
+                  >1: All of these data structures are essentially wrappers for
+                  values.<br />2: Given a wrapped value, you can transform the
+                  value (via </em
+                ><strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em">map</em></strong
+                ><em class="markup--em markup--p-em"
+                  >).<br />3: Given a wrapper of a wrapper, you can collapse it
+                  into one wrapper.</em
+                >
+              </p>
+              <p name="7979" id="7979" class="graf graf--p graf-after--p">
+                Okay, so if something looks roughly like that, let’s call it a
+                <strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em">Monad</em></strong
+                >. Let’s see if we can more solidly define what we mean by each
+                one of these! Before we do, however, there’s one final property
+                that we’re going to need to make explicit, later, namely that we
+                have a constructor. Or in other words:
+              </p>
+              <p name="0d03" id="0d03" class="graf graf--p graf-after--p">
+                <em class="markup--em markup--p-em"
+                  >4: That you can always take a value and wrap it in one of
+                  these data structures</em
+                >
+              </p>
+              <p name="93ec" id="93ec" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >Formalizing Map</strong
+                >
+              </p>
+              <p name="398b" id="398b" class="graf graf--p graf-after--p">
+                Let’s try to pin down exactly what properties we want on these
+                rules.
+              </p>
+              <p name="d6bc" id="d6bc" class="graf graf--p graf-after--p">
+                Well, we kind of expect
+                <strong class="markup--strong markup--p-strong">map</strong> to
+                do the same thing as just applying a function to a value in
+                general. If I did
+                <strong class="markup--strong markup--p-strong"
+                  >optional.map(a=&gt;a+1)</strong
+                >
+                and that did ANYTHING other than adding 1 to the contained
+                value(s), that would be super confusing.
+              </p>
+              <p name="073d" id="073d" class="graf graf--p graf-after--p">
+                One way we can formalize this is by preserving how functions
+                compose together. Mapping over
+                <strong class="markup--strong markup--p-strong"
+                  >a=&gt;a+1 </strong
+                >twice should just give us the same result as mapping over their
+                composition,
+                <strong class="markup--strong markup--p-strong"
+                  >a=&gt;a+2</strong
+                >. Or, more precisely:
+              </p>
+              <pre
+                name="6be6"
+                id="6be6"
+                class="graf graf--pre graf-after--p"
+              >// these should be the same<br>Monad(value).map(f).map(g);<br>Monad(value).map(x =&gt; g(f(x)));</pre>
+              <p name="7a74" id="7a74" class="graf graf--p graf-after--pre">
+                There’s also another rule we might expect a map to follow:
+                mapping over the identity function should not affect the value.
+                If we consider the instances of monad we were looking at before,
+                this is a common-sense constraint.
+              </p>
+              <pre
+                name="82cb"
+                id="82cb"
+                class="graf graf--pre graf-after--p"
+              >// these should be the same<br>Monad(value);<br>Monad(value).map(id);</pre>
+              <p name="4af2" id="4af2" class="graf graf--p graf-after--pre">
+                <strong class="markup--strong markup--p-strong"
+                  >Formalizing Flatten</strong
+                >
+              </p>
+              <p name="f75e" id="f75e" class="graf graf--p graf-after--p">
+                There’s another rule that might be difficult to come up with,
+                without having a general understanding of what makes monads
+                useful: If you’ve got a many-times wrapped value, flattening
+                should be <em class="markup--em markup--p-em">associative</em>.
+                That is, if you’ve got a 3 layer deep monad, and you want to
+                flatten to a single layer deep monad, the order in which you
+                flatten the monad shouldn’t matter.
+              </p>
+              <pre
+                name="350b"
+                id="350b"
+                class="graf graf--pre graf-after--p"
+              >// these should be the same<br>Monad(Monad(Monad(value)).flatten()).flatten();<br>Monad(Monad(Monad(value))).flatten().flatten();</pre>
+              <p name="5bf9" id="5bf9" class="graf graf--p graf-after--pre">
+                <strong class="markup--strong markup--p-strong"
+                  >Formalizing Constructor</strong
+                >
+              </p>
+              <p name="a935" id="a935" class="graf graf--p graf-after--p">
+                What we want is roughly for the constructor to be the opposite
+                of flatten, for when flatten is defined. Since we can’t
+                <em class="markup--em markup--p-em">necessarily</em> flatten a
+                single-dimensional monad, we’ll have to work within the context
+                of the monad itself. There are two ways to get to a 2
+                dimensional monad from a single-dimensional monad: One is to map
+                over the constructor, the other is to call the constructor on
+                the monad itself.
+              </p>
+              <pre
+                name="f79c"
+                id="f79c"
+                class="graf graf--pre graf-after--p"
+              >Monad(value).map(construct);<br>construct(Monad(value));</pre>
+              <p name="b18c" id="b18c" class="graf graf--p graf-after--pre">
+                What this means is that if we map over the constructor, then
+                flatten, we should get the exact thing back in both these cases,
+                and we do:
+              </p>
+              <pre
+                name="080a"
+                id="080a"
+                class="graf graf--pre graf-after--p"
+              >// these 3 should be the same<br>construct(Monad(value)).flatten();<br>Monad(value).map(construct).flatten();<br>Monad(value);</pre>
+              <p name="03a8" id="03a8" class="graf graf--p graf-after--pre">
+                All these together are the<strong
+                  class="markup--strong markup--p-strong"
+                >
+                  <em class="markup--em markup--p-em">MONAD LAWS</em></strong
+                >, the rules all monads have to satisfy! Was learning them like
+                this easier than starting with monads themselves? Maybe! You
+                tell me!
+              </p>
+              <h4 name="a277" id="a277" class="graf graf--h4 graf-after--p">
+                Defining Monad
+              </h4>
+              <p name="19fd" id="19fd" class="graf graf--p graf-after--h4">
+                We’re well equipped enough to finally define the term monad,
+                correctly! <em class="markup--em markup--p-em">Monad</em> is a
+                generic datatype for which 3 methods are defined:
+              </p>
+              <p name="026d" id="026d" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong">Map: </strong
+                >Map is a function on the monad that takes a function as an
+                argument, satisfying the above
+                <em class="markup--em markup--p-em">monad laws</em>
+              </p>
+              <p name="bdef" id="bdef" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >Constructor: </strong
+                >Constructor is a function that takes a value and returns a
+                monad that wraps that type, satisfying the above
+                <em class="markup--em markup--p-em">monad laws</em>.
+              </p>
+              <p name="858a" id="858a" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >Flatten:</strong
+                >
+                Flatten is a function on the monad, defined for when the wrapped
+                type is another instance of the monad, that flattens the monad
+                of a monad into a single-layer monad, satisfying the above
+                <em class="markup--em markup--p-em">monad laws</em>.
+              </p>
+              <h4 name="4c29" id="4c29" class="graf graf--h4 graf-after--p">
+                Matching categorical monads and monadic datatypes
+              </h4>
+              <p name="bc25" id="bc25" class="graf graf--p graf-after--h4">
+                It turns out that these specific rules map extremely nicely to
+                the category theoretic definitions of monads. That is, authors
+                of programming languages can start using definitions and
+                techniques used in category theory as a way to help guide them
+                to a clean and consistent codebase.
+              </p>
+              <p name="e076" id="e076" class="graf graf--p graf-after--p">
+                For an exercise, let’s take the formal definition of a monad in
+                category theory<em class="markup--em markup--p-em"> </em>as
+                found in Wikipedia. Reminder, this is the extremely dense,
+                extremely technical, jargony version that grad students like
+                rattling off:
+              </p>
+              <figure
+                name="17fa"
+                id="17fa"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*1u_eXvVzqiWet5AwI72GCQ.png"
+                  data-width="1158"
+                  data-height="170"
+                  src="https://cdn-images-1.medium.com/max/800/1*1u_eXvVzqiWet5AwI72GCQ.png"
+                />
+                <figcaption class="imageCaption">Source: Wikipedia</figcaption>
+              </figure>
+              <p name="a709" id="a709" class="graf graf--p graf-after--figure">
+                Now let’s anger some math nerds by scribbling all over it:
+              </p>
+              <figure
+                name="7a37"
+                id="7a37"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*4ZAHNkwFgXEO7E5ZAkvMKQ.png"
+                  data-width="1158"
+                  data-height="300"
+                  src="https://cdn-images-1.medium.com/max/800/1*4ZAHNkwFgXEO7E5ZAkvMKQ.png"
+                />
+                <figcaption class="imageCaption">
+                  Source: Wikipedia, GIMP
+                </figcaption>
+              </figure>
+              <p name="bb07" id="bb07" class="graf graf--p graf-after--figure">
+                My goal here isn’t to show you the exact correspondence between
+                category theory and functional programming — that would require
+                a working knowledge of category theory, and I’m not qualified to
+                teach that. Instead, I’m showing that:
+              </p>
+              <p name="28a0" id="28a0" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong">1:</strong>
+                Using <em class="markup--em markup--p-em">map</em>,
+                <em class="markup--em markup--p-em">constructor</em>, and
+                <em class="markup--em markup--p-em">flatten</em> as your basis
+                for monads is the easiest way to connect the programming
+                definition to the category theoretic definition of monads.
+              </p>
+              <p name="03e5" id="03e5" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong">2:</strong> When
+                you choose this basis for understanding, the high level pieces
+                as presented here map
+                <em class="markup--em markup--p-em">directly</em> between the
+                two.
+              </p>
+              <h4 name="36af" id="36af" class="graf graf--h4 graf-after--p">
+                To <em class="markup--em markup--h4-em">flatmap</em>, chain,
+                and bind
+              </h4>
+              <p name="6ccf" id="6ccf" class="graf graf--p graf-after--h4">
+                Spoiler alert: these all refer to the exact same thing! I’ll use
+                the term <em class="markup--em markup--p-em">flatmap </em>from
+                this point onwards, because I think it keys nicely with the
+                things we’ve already defined.
+              </p>
+              <p name="3903" id="3903" class="graf graf--p graf-after--p">
+                Lots of people describe monads based around flatmap. So where
+                does <em class="markup--em markup--p-em">flatmap</em> come into
+                play? Well, you can compose together a map and a flatten to
+                define flatmap. Or more succinctly:
+              </p>
+              <pre
+                name="3ca8"
+                id="3ca8"
+                class="graf graf--pre graf-after--p"
+              >// These are exactly the same<br>monad.map(someFunction).flatten();<br>monad.flatmap(someFunction);</pre>
+              <p name="5264" id="5264" class="graf graf--p graf-after--pre">
+                If we go back to our previous problems and rewrite our examples
+                with flatmap, then our solutions get pretty concise!
+              </p>
+              <pre
+                name="394c"
+                id="394c"
+                class="graf graf--pre graf-after--p"
+              >// Problem 1<br>users.flatmap(<br>   user =&gt; tweets.map(tweet =&gt; `&lt;${user.name}&gt; ${tweet}`)<br>);</pre>
+              <pre
+                name="f7f8"
+                id="f7f8"
+                class="graf graf--pre graf-after--pre"
+              >// Problem 2<br>getFile(path).flatmap(getExtension);</pre>
+              <pre
+                name="5be6"
+                id="5be6"
+                class="graf graf--pre graf-after--pre"
+              >// Problem 3<br>clientConnects.flatmap(getCookieClicks);</pre>
+              <p name="5132" id="5132" class="graf graf--p graf-after--pre">
+                It’s worth reiterating that defining monads with
+                <em class="markup--em markup--p-em">flatmap</em> in place of
+                <em class="markup--em markup--p-em">flatten</em> is entirely
+                equivalent — flatmap’s just a map composed with a flatten, and
+                flatten’s just a flatmap over the identity function.
+              </p>
+              <p name="2ebe" id="2ebe" class="graf graf--p graf-after--p">
+                This seems a little silly with our previous examples. Wouldn’t
+                we want the flatten step to be explicit? Well, if we turn our
+                gaze towards modeling computations and asynchronous actions with
+                monads, we start seeing just why it’s useful it is to define
+                monads this way…
+              </p>
+              <h4 name="36f2" id="36f2" class="graf graf--h4 graf-after--p">
+                Chaining asynchronous operations with the Future monad
+              </h4>
+              <p name="69c9" id="69c9" class="graf graf--p graf-after--h4">
+                Hopping back into deduction here: Let’s consider a new datatype:
+                the <em class="markup--em markup--p-em">Future.</em>
+              </p>
+              <p name="9fb1" id="9fb1" class="graf graf--p graf-after--p">
+                What I’m going to show is that Future, a very generic datatype,
+                can describe composition of arbitrary computations with only a
+                <strong class="markup--strong markup--p-strong"
+                  >constructor</strong
+                >,
+                <strong class="markup--strong markup--p-strong">flatmap </strong
+                >(here called
+                <strong class="markup--strong markup--p-strong">chain</strong>),
+                and
+                <strong class="markup--strong markup--p-strong">map </strong
+                >function.
+              </p>
+              <p name="d489" id="d489" class="graf graf--p graf-after--p">
+                As a note, this is going to be very similar to promises, but not
+                quite. If Promises had a monadic interface, I’d be using them,
+                but
+                <a
+                  href="https://github.com/promises-aplus/promises-spec/issues/94"
+                  data-href="https://github.com/promises-aplus/promises-spec/issues/94"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >unfortunately, they don’t</a
+                >. Instead, I’ll borrow the interface from
+                <a
+                  href="https://github.com/fluture-js/Fluture"
+                  data-href="https://github.com/fluture-js/Fluture"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Fluture</a
+                >.
+              </p>
+              <p name="aac8" id="aac8" class="graf graf--p graf-after--p">
+                Consider a future, with a constructor:
+              </p>
+              <pre
+                name="2a7f"
+                id="2a7f"
+                class="graf graf--pre graf-after--p"
+              >const future = Future(<br>  (reject, resolve) =&gt; somethingThatEventuallyCalls(resolve)<br>);</pre>
+              <pre
+                name="ff6f"
+                id="ff6f"
+                class="graf graf--pre graf-after--pre"
+              >// calling fork calls the passed in computation,<br>// and eventually outputs the result:</pre>
+              <pre name="6b9e" id="6b9e" class="graf graf--pre graf-after--pre">
+future.fork(console.log);</pre
+              >
+              <p name="d14f" id="d14f" class="graf graf--p graf-after--pre">
+                The function passed into the constructor is called a
+                computation. When
+                <strong class="markup--strong markup--p-strong">fork</strong> on
+                the appropriate future is called, the computation function
+                fires, and eventually (or not), either rejects or resolves the
+                computation, resulting in the function being passed to
+                <strong class="markup--strong markup--p-strong">fork</strong>
+                firing.
+              </p>
+              <p name="baf3" id="baf3" class="graf graf--p graf-after--p">
+                We’ve got a constructor over values:
+              </p>
+              <pre name="1c13" id="1c13" class="graf graf--pre graf-after--p">
+Future.of(5).fork(console.log) // outputs 5</pre
+              >
+              <p name="ab50" id="ab50" class="graf graf--p graf-after--pre">
+                We can <em class="markup--em markup--p-em">map</em> over
+                futures:
+              </p>
+              <pre
+                name="9c8e"
+                id="9c8e"
+                class="graf graf--pre graf-after--p"
+              >Future<br>  .of(5)<br>  .map(a =&gt; a + 1)<br>  .fork(console.log); // outputs 6</pre>
+              <p name="6fc6" id="6fc6" class="graf graf--p graf-after--pre">
+                We can also
+                <em class="markup--em markup--p-em">flatmap</em> (here called
+                <em class="markup--em markup--p-em">chain</em>) over futures.
+                Let’s imagine that a well-named function
+                <strong class="markup--strong markup--p-strong"
+                  >fireNetworkRequest</strong
+                >
+                returns a future:
+              </p>
+              <pre
+                name="c402"
+                id="c402"
+                class="graf graf--pre graf-after--p"
+              >const future1 = Future<br>  .of(&#39;/some/path.json&#39;)<br>  .chain(path =&gt; fireNetworkRequest(path)) // remember: flatmap</pre>
+              <pre name="6f3c" id="6f3c" class="graf graf--pre graf-after--pre">
+future1.fork(console.log)</pre
+              >
+              <p name="80ae" id="80ae" class="graf graf--p graf-after--pre">
+                We’ve now got a future, which for all intents and purposes,
+                wraps the result of the network request. It’s a future, just
+                like one we’d construct with the
+                <strong class="markup--strong markup--p-strong">of</strong>
+                constructor, with the only difference that it might take a while
+                to actually fire the fork callback.
+              </p>
+              <p name="8627" id="8627" class="graf graf--p graf-after--p">
+                But remember: this just resolves to another future, this time
+                containing the result of the network request! That means we can
+                flatmap it again:
+              </p>
+              <pre
+                name="c168"
+                id="c168"
+                class="graf graf--pre graf-after--p"
+              >const future2 = Future<br>  .of(&#39;/some/path.json&#39;)<br>  .chain(path =&gt; fireNetworkRequest(path))<br>  .chain(response =&gt; fireSecondNetworkRequest(response))</pre>
+              <pre name="87f8" id="87f8" class="graf graf--pre graf-after--pre">
+future2.fork(console.log)</pre
+              >
+              <p name="de82" id="de82" class="graf graf--p graf-after--pre">
+                We have a future that will eventually resolve to another future,
+                which will eventually resolve to another value. But importantly,
+                the second future can depend on the first one. Similarly,
+                because we’re chaining, we get a single layer future back.
+              </p>
+              <p name="5b9a" id="5b9a" class="graf graf--p graf-after--p">
+                This is pretty neat: in theory, you can sort of make that kinda
+                anything you want, can’t you? It could be a network request as
+                we’ve done here, it could be a prompt to the user, it could be
+                the result of a random process, it could be something that may
+                never even execute! In essence, we’re starting to notice that
+                monads using
+                <em class="markup--em markup--p-em">flatmap</em> are nicely
+                suited to describe chains of computations.
+              </p>
+              <h4 name="5e83" id="5e83" class="graf graf--h4 graf-after--p">
+                Why monads represent the “computational context” metaphor
+              </h4>
+              <p name="db48" id="db48" class="graf graf--p graf-after--h4">
+                Ultimately, that this strategy should work in general isn’t
+                inherently obvious. We had one example above where monads
+                encapsulated the composition of network requests, but that our
+                map / flatten interface is strong enough to capture programs in
+                all cases is a pretty neat result.
+              </p>
+              <p name="cb4b" id="cb4b" class="graf graf--p graf-after--p">
+                In other words, monads don’t represent computations, but rather
+                that computations can be represented by monads.
+              </p>
+              <p name="b857" id="b857" class="graf graf--p graf-after--p">
+                Eugenio Moggi’s 1991 paper
+                <a
+                  href="http://fsl.cs.illinois.edu/pubs/moggi-1991-ic.pdf"
+                  data-href="http://fsl.cs.illinois.edu/pubs/moggi-1991-ic.pdf"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Notions of Computations and Monads</a
+                >
+                solidifies the connection between categorical monads and
+                programs, going into crazy categorical math that I still
+                struggle to understand. His primary argument boils down to “we
+                have these 5 or so distinct notions of what a program is or can
+                do, beyond computing computable numbers. Monads can describe all
+                of them. Choosing monads as a way to formalize computation is
+                therefore a pretty good choice.”
+              </p>
+              <h4 name="a532" id="a532" class="graf graf--h4 graf-after--p">
+                Caveats
+              </h4>
+              <p name="612f" id="612f" class="graf graf--p graf-after--h4">
+                First caveat: There’s nothing in our definition of monads that
+                says you should be able to pull values out of monads. Sure, for
+                lots of monads, you
+                <em class="markup--em markup--p-em">can</em> pull values out of
+                monads, but this isn’t true in general. What’s the value of an
+                empty optional? A Future that never returns?
+              </p>
+              <p name="22a1" id="22a1" class="graf graf--p graf-after--p">
+                Second caveat: You can only flatten two monads of the same type.
+                So if I’ve got an array of optionals, the monad rules don’t
+                guarantee that a function exists that flattens the two. Once
+                again, for lots of monads, there are instances where you
+                <em class="markup--em markup--p-em">can</em> define a join, but
+                we have to break outside of the monad interface to flatten them
+                together.
+              </p>
+              <p name="dbcb" id="dbcb" class="graf graf--p graf-after--p">
+                Lastly, I want to re-stress that the use of Javascript to
+                describe monads is a little odd: these patterns come from
+                strongly typed languages, and often Javascript serves more as a
+                metaphor rather than as an accurate representation. However, I
+                wanted to provide an alternate path towards understanding here,
+                rather than going through Haskell syntax.
+              </p>
+              <h4 name="e198" id="e198" class="graf graf--h4 graf-after--p">
+                Finishing thoughts
+              </h4>
+              <p name="27fa" id="27fa" class="graf graf--p graf-after--h4">
+                Do I think this this is the best tutorial on monads? Heck no,
+                for 4 reasons:
+              </p>
+              <p name="5276" id="5276" class="graf graf--p graf-after--p">
+                1: Tutorials for monads have been done time and time again, and
+                I’m not particularly good at writing tutorials. The person who
+                teaches monads, day in, day out, is going to be far better at
+                teaching them than me.
+              </p>
+              <p name="374c" id="374c" class="graf graf--p graf-after--p">
+                2: The ‘best way to learn monads’ is different for everybody,
+                because everybody has a different background. I have no doubt
+                that the way I learned was particularly nonstandard, and I bet
+                many others can say the same.
+              </p>
+              <p name="134b" id="134b" class="graf graf--p graf-after--p">
+                3: I kind of think a smattering of different tutorials, so that
+                you can understand the different ways to approach monads, is an
+                incredibly effective method. It sort of takes the inductive
+                approach I took here and broadens it even farther.
+              </p>
+              <p name="b2b5" id="b2b5" class="graf graf--p graf-after--p">
+                4: In this specific tutorial, I brush over exactly what
+                “wrapper” means in a way that may end up being confusing to
+                people.
+              </p>
+              <p name="aa47" id="aa47" class="graf graf--p graf-after--p">
+                Do I think this is at least an effective way to teach monads?
+                Yeah, I do! I really believe in the efficacy of examples over
+                definitions, and especially, metaphors. I’d love to see more of
+                a focus on this style of learning in the tech community, and
+                selfishly, I want to practice it myself.
+              </p>
+              <p
+                name="7007"
+                id="7007"
+                class="graf graf--p graf-after--p graf--trailing"
+              >
+                As always, if I got anything wrong, please let me know. Cheers!
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+      <footer>
+        <p>
+          By
+          <a href="https://medium.com/@evinsellin" class="p-author h-card"
+            >Evin Sellin</a
+          >
+          on
+          <a href="https://medium.com/p/2af62c4af8ce"
+            ><time class="dt-published" datetime="2018-03-16T23:15:14.221Z"
+              >March 16, 2018</time
+            ></a
+          >.
+        </p>
+        <p>
+          <a
+            href="https://medium.com/@evinsellin/teaching-monads-slightly-differently-2af62c4af8ce"
+            class="p-canonical"
+            >Canonical link</a
+          >
+        </p>
+        <p>
+          Exported from <a href="https://medium.com">Medium</a> on March 2,
+          2022.
+        </p>
+      </footer>
+    </article>
+  </body>
+</html>

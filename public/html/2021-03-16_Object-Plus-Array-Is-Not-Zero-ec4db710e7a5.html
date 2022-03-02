@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Object Plus Array Is Not Zero</title>
+    <style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field="subtitle"],
+      section[data-field="description"] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="h-entry">
+      <header>
+        <h1 class="p-name">Object Plus Array Is Not Zero</h1>
+      </header>
+      <section data-field="subtitle" class="p-summary">
+        Exploring a common Javascript misconception with Chrome and ASTExplorer
+      </section>
+      <section data-field="body" class="e-content">
+        <section name="e551" class="section section--body section--first">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <h3
+                name="aa68"
+                id="aa68"
+                class="graf graf--h3 graf--leading graf--title"
+              >
+                Object Plus Array Is Not Zero
+              </h3>
+              <h4
+                name="6e61"
+                id="6e61"
+                class="graf graf--h4 graf-after--h3 graf--subtitle"
+              >
+                Exploring a common Javascript misconception with Chrome and
+                ASTExplorer
+              </h4>
+              <p name="bb79" id="bb79" class="graf graf--p graf-after--h4">
+                You may have seen Gary Bernhardt’s
+                <a
+                  href="https://www.destroyallsoftware.com/talks/wat"
+                  data-href="https://www.destroyallsoftware.com/talks/wat"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >WAT</a
+                >
+                talk in which he pulls out these confusing lines of JavaScript:
+              </p>
+              <pre
+                name="05ff"
+                id="05ff"
+                class="graf graf--pre graf-after--p"
+              >{} + []<br>0<br>[] + {}<br>&quot;[object Object]&quot;</pre>
+              <p name="be85" id="be85" class="graf graf--p graf-after--pre">
+                He shows the audience that an object plus an array is 0, but an
+                array plus an object is
+                <em class="markup--em markup--p-em">“</em
+                ><strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em"
+                    >[object Object]”</em
+                  ></strong
+                >. Lo and behold, if you try this in the chrome console, that’s
+                what you’ll get:
+              </p>
+              <figure
+                name="643c"
+                id="643c"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*LRBz-0I6-Bu8DibEqqJ1Zw.png"
+                  data-width="314"
+                  data-height="168"
+                  src="https://cdn-images-1.medium.com/max/800/1*LRBz-0I6-Bu8DibEqqJ1Zw.png"
+                />
+              </figure>
+              <p name="ee41" id="ee41" class="graf graf--p graf-after--figure">
+                But something’s a little fishy about that claim. If you wrap
+                these lines in parentheses, you can see that both of these lines
+                evaluate identically:
+              </p>
+              <figure
+                name="b6a9"
+                id="b6a9"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*JoodINGrduz144kJ7JB5sQ.png"
+                  data-width="334"
+                  data-height="168"
+                  src="https://cdn-images-1.medium.com/max/800/1*JoodINGrduz144kJ7JB5sQ.png"
+                />
+                <figcaption class="imageCaption">
+                  The same, just like the spec said!
+                </figcaption>
+              </figure>
+              <p name="2929" id="2929" class="graf graf--p graf-after--figure">
+                So what’s going on? Let’s take a look at the
+                <a
+                  href="https://www.twilio.com/blog/abstract-syntax-trees"
+                  data-href="https://www.twilio.com/blog/abstract-syntax-trees"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >abstract syntax tree</a
+                >
+                to see if there’s anything weird going on syntactically.
+              </p>
+              <p name="7434" id="7434" class="graf graf--p graf-after--p">
+                If we plug <em class="markup--em markup--p-em">{} + []</em> into
+                ASTExplorer, we get
+                <a
+                  href="https://astexplorer.net/#/gist/080d212e936876e5b2ed591a06e8b66c/latest"
+                  data-href="https://astexplorer.net/#/gist/080d212e936876e5b2ed591a06e8b66c/latest"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >this</a
+                >:
+              </p>
+              <figure
+                name="1dab"
+                id="1dab"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*qMFBz7tuloKRQtXa5Pt-Ww.png"
+                  data-width="1356"
+                  data-height="764"
+                  src="https://cdn-images-1.medium.com/max/800/1*qMFBz7tuloKRQtXa5Pt-Ww.png"
+                />
+                <figcaption class="imageCaption">
+                  Source:
+                  <a
+                    href="https://astexplorer.net/#/gist/080d212e936876e5b2ed591a06e8b66c/latest"
+                    data-href="https://astexplorer.net/#/gist/080d212e936876e5b2ed591a06e8b66c/latest"
+                    class="markup--anchor markup--figure-anchor"
+                    rel="noopener"
+                    target="_blank"
+                    >ASTExplorer.net</a
+                  >
+                </figcaption>
+              </figure>
+              <p name="6f0d" id="6f0d" class="graf graf--p graf-after--figure">
+                An empty block, followed by a
+                <a
+                  href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Unary_plus"
+                  data-href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Unary_plus"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >unary<em class="markup--em markup--p-em"> </em>(+)</a
+                ><em class="markup--em markup--p-em"> </em>operator? That’s not
+                Object plus Array! That’s… something else entirely.
+              </p>
+              <p name="496d" id="496d" class="graf graf--p graf-after--p">
+                To confirm our suspicions, we see that Javascript’s unary +
+                operator acting on an array evaluates to 0, showing us that our
+                interpretation is indeed correct. The empty code block is
+                evaluated as a noop, and all we’re left with is the unary
+                expression:
+              </p>
+              <figure
+                name="b0be"
+                id="b0be"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*pbCnEgmKIRbfNgIAMXCGpQ.png"
+                  data-width="220"
+                  data-height="168"
+                  src="https://cdn-images-1.medium.com/max/800/1*pbCnEgmKIRbfNgIAMXCGpQ.png"
+                />
+              </figure>
+              <p name="eb49" id="eb49" class="graf graf--p graf-after--figure">
+                To double-check, we go to ASTExplorer again to make sure
+                that<strong class="markup--strong markup--p-strong">
+                  [] + {}</strong
+                >
+                is actually adding an array to an object like we expect:
+              </p>
+              <figure
+                name="54ff"
+                id="54ff"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*OE6v-HpDvqm2_4y-Kzatlw.png"
+                  data-width="974"
+                  data-height="608"
+                  data-is-featured="true"
+                  src="https://cdn-images-1.medium.com/max/800/1*OE6v-HpDvqm2_4y-Kzatlw.png"
+                />
+              </figure>
+              <p name="15f2" id="15f2" class="graf graf--p graf-after--figure">
+                Yep! Our understanding looks good here! So, if we’re confused by
+                syntax, plug it into ASTExplorer, and everything will be
+                revealed, right? Right?
+              </p>
+              <h3 name="7f75" id="7f75" class="graf graf--h3 graf-after--p">
+                And back into weirdness
+              </h3>
+              <p name="e985" id="e985" class="graf graf--p graf-after--h3">
+                The story, however, is incomplete. Remember how we pasted
+                something into ASTExplorer to see how it parsed, and then pasted
+                it into the Chrome console to see how it behaved? Let’s try this
+                same process out with regular JavaScript objects.
+              </p>
+              <p name="e96d" id="e96d" class="graf graf--p graf-after--p">
+                Chrome does what we expect and creates an object:
+              </p>
+              <figure
+                name="c142"
+                id="c142"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*uhe9puggn4Dv5YdNmK5Cag.png"
+                  data-width="286"
+                  data-height="88"
+                  src="https://cdn-images-1.medium.com/max/800/1*uhe9puggn4Dv5YdNmK5Cag.png"
+                />
+              </figure>
+              <p name="b4cf" id="b4cf" class="graf graf--p graf-after--figure">
+                When we paste it into ASTExplorer, however, we get the
+                following:
+              </p>
+              <figure
+                name="3dd6"
+                id="3dd6"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*3FmS7mOSdV2wzuOIG9ONgw.png"
+                  data-width="974"
+                  data-height="272"
+                  src="https://cdn-images-1.medium.com/max/800/1*3FmS7mOSdV2wzuOIG9ONgw.png"
+                />
+                <figcaption class="imageCaption">
+                  Token (1:8) refers to the colon
+                </figcaption>
+              </figure>
+              <p name="493b" id="493b" class="graf graf--p graf-after--figure">
+                What? Why does ASTExplorer think that it’s a syntax error? We’re
+                declaring an object! This is like 1st day of JavaScript stuff!
+                How can ASTExplorer not catch that?
+              </p>
+              <p name="6606" id="6606" class="graf graf--p graf-after--p">
+                So it turns out ASTExplorer is actually right here, and Chrome
+                is the one behaving weirdly. A bare object, outside of any other
+                statement, will not be parsed as a bare object, but instead a
+                code block, exactly like before! Since the inner contents of the
+                code block do not parse as a statement, parsing fails, leading
+                to a syntax error on the colon.
+              </p>
+              <p name="93cd" id="93cd" class="graf graf--p graf-after--p">
+                We can convince ourselves that that’s true with a quick
+                <strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em">eval</em></strong
+                >:
+              </p>
+              <figure
+                name="f953"
+                id="f953"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*VM90z0-0WWkfnXRI2wimYA.png"
+                  data-width="802"
+                  data-height="124"
+                  src="https://cdn-images-1.medium.com/max/800/1*VM90z0-0WWkfnXRI2wimYA.png"
+                />
+              </figure>
+              <p name="4c26" id="4c26" class="graf graf--p graf-after--figure">
+                Why does Chrome console end up creating an object when provided
+                with a clear syntax error?
+              </p>
+              <p name="1f3d" id="1f3d" class="graf graf--p graf-after--p">
+                Chrome does this because when you paste something into the
+                Chrome console, you instinctively have 2 different behavioral
+                expectations:
+              </p>
+              <ol class="postList">
+                <li name="8bf1" id="8bf1" class="graf graf--li graf-after--p">
+                  The Chrome console evaluates statements.
+                </li>
+                <li name="d6d6" id="d6d6" class="graf graf--li graf-after--li">
+                  Pasting an expression into the Chrome console should evaluate
+                  that expression
+                </li>
+              </ol>
+              <p name="b5ab" id="b5ab" class="graf graf--p graf-after--li">
+                These two expectations are fundamentally in conflict with one
+                another, and can’t be reconciled. They lead to a fundamental
+                contradiction in how a bare object should be parsed.
+              </p>
+              <p name="6b26" id="6b26" class="graf graf--p graf-after--p">
+                To try to bridge this gap, Chrome dynamically figures out
+                whether to parse a line as a
+                <em class="markup--em markup--p-em">Statement</em> or an
+                <em class="markup--em markup--p-em">Expression</em>. As an
+                <em class="markup--em markup--p-em">Expression</em>, the line
+                ends up evaluating to an object, but as a
+                <em class="markup--em markup--p-em">Statement,</em> the line
+                ends up in a syntax error. Chrome has changed the exact rules
+                they use here over time, but the one they’ve landed on seems to
+                be this behavior:
+              </p>
+              <ol class="postList">
+                <li name="cc15" id="cc15" class="graf graf--li graf-after--p">
+                  See if the input starts with a { and ends with a }
+                </li>
+                <li name="564a" id="564a" class="graf graf--li graf-after--li">
+                  If not, parse the input as a series of statements.
+                </li>
+                <li name="280c" id="280c" class="graf graf--li graf-after--li">
+                  If so, try to parse the input as an expression.
+                </li>
+                <li name="57b3" id="57b3" class="graf graf--li graf-after--li">
+                  If that fails, fall back to parsing the input as a series of
+                  statements.
+                </li>
+              </ol>
+              <p name="2e0b" id="2e0b" class="graf graf--p graf-after--li">
+                I’m about 90% sure that’s where it stands today, but I also
+                haven’t checked in like a year, and I’m not about to dig into
+                the Chrome source to figure it out again.
+              </p>
+              <h4 name="ed5a" id="ed5a" class="graf graf--h4 graf-after--p">
+                In summary:
+              </h4>
+              <ul class="postList">
+                <li name="bd46" id="bd46" class="graf graf--li graf-after--h4">
+                  Object plus Array is not 0, even though it sure looks like it
+                  is in the Chrome console
+                </li>
+                <li name="6698" id="6698" class="graf graf--li graf-after--li">
+                  You should use ASTExplorer if you’re confused about syntax
+                </li>
+                <li name="579d" id="579d" class="graf graf--li graf-after--li">
+                  The Chrome console is a great way to evaluate statements and
+                  expressions, but…
+                </li>
+                <li name="7a96" id="7a96" class="graf graf--li graf-after--li">
+                  The Chrome console has a few narrow gotchas.
+                </li>
+                <li
+                  name="9727"
+                  id="9727"
+                  class="graf graf--li graf-after--li graf--trailing"
+                >
+                  If you’re confused, a quick
+                  <em class="markup--em markup--li-em">eval</em> will tell you
+                  the source of truth.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section name="1e8d" class="section section--body section--last">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <p
+                name="da05"
+                id="da05"
+                class="graf graf--p graf--leading graf--trailing"
+              >
+                <em class="markup--em markup--p-em"
+                  >Evin Sellin is an enthusiastic programmer that might not
+                  exist. He possibly enjoys programming language trivia, topics
+                  in machine learning, and writing semi-useless articles about
+                  technology.</em
+                >
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+      <footer>
+        <p>
+          By
+          <a href="https://medium.com/@evinsellin" class="p-author h-card"
+            >Evin Sellin</a
+          >
+          on
+          <a href="https://medium.com/p/ec4db710e7a5"
+            ><time class="dt-published" datetime="2021-03-16T01:53:52.255Z"
+              >March 16, 2021</time
+            ></a
+          >.
+        </p>
+        <p>
+          <a
+            href="https://medium.com/@evinsellin/object-plus-array-is-not-zero-ec4db710e7a5"
+            class="p-canonical"
+            >Canonical link</a
+          >
+        </p>
+        <p>
+          Exported from <a href="https://medium.com">Medium</a> on March 2,
+          2022.
+        </p>
+      </footer>
+    </article>
+  </body>
+</html>

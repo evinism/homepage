@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Communicating through UUID conflicts</title>
+    <style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field="subtitle"],
+      section[data-field="description"] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="h-entry">
+      <header>
+        <h1 class="p-name">Communicating through UUID conflicts</h1>
+      </header>
+      <section data-field="subtitle" class="p-summary">
+        “This is definitely stupid, yet slightly applicable”
+      </section>
+      <section data-field="body" class="e-content">
+        <section
+          name="ae6f"
+          class="section section--body section--first section--last"
+        >
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <h3
+                name="48d7"
+                id="48d7"
+                class="graf graf--h3 graf--leading graf--title"
+              >
+                Communicating through UUID conflicts
+              </h3>
+              <h4
+                name="67c7"
+                id="67c7"
+                class="graf graf--h4 graf--startsWithDoubleQuote graf-after--h3 graf--subtitle"
+              >
+                “This is definitely stupid, yet slightly applicable”
+              </h4>
+              <h3 name="3c3d" id="3c3d" class="graf graf--h3 graf-after--h4">
+                Part 1: Posing the problem
+              </h3>
+              <p name="88b5" id="88b5" class="graf graf--p graf-after--h3">
+                For one issue at work, we tossed around the idea of generating
+                UUIDs client-side in order to ensure that we had a unique
+                immutable id without having to go to the server to get a
+                permanent id back. Obviously, if somebody’s maliciously creating
+                ids, they can choose arbitrary values and create collisions.
+                Additionally, one client could tell if another client had
+                already chosen a certain value for an id by trying to commit a
+                certain UUID to the DB. For example:
+              </p>
+              <pre
+                name="33f9"
+                id="33f9"
+                class="graf graf--pre graf-after--p"
+              >&gt; Client 1 creates a &quot;todo&quot; with a certain UUID.<br>&gt; Client 2 tries to create a “todo” with the same UUID.<br>&gt; Client 2 now has some information about client 1’s actions.</pre>
+              <p name="d519" id="d519" class="graf graf--p graf-after--pre">
+                I ended up posing the purely academic question of how we might
+                be able to send arbitrary messages over that channel. As an
+                example of the mechanism of communication:
+              </p>
+              <pre
+                name="2865"
+                id="2865"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client 1 creates a &quot;todo&quot; with the following UUIDS<br></strong>  - 000...-000000001<br>  - 000...-000000003<br>  - 000...-000000005<br><strong class="markup--strong markup--pre-strong">&gt; Client 2 creates todos of the following UUIDs with responses:</strong><br>  - 000...-000000001 -&gt; 409 Conflict<br>  - 000...-000000002 -&gt; 201 Created<br>  - 000...-000000003 -&gt; 409 Conflict<br>  - 000...-000000004 -&gt; 201 Created<br>  - 000...-000000005 -&gt; 409 Conflict</pre>
+              <p name="9f8e" id="9f8e" class="graf graf--p graf-after--pre">
+                If we interpret the 409s as 1s, and the 201s as 0, we get the
+                string <em class="markup--em markup--p-em">10101</em>, or 21 in
+                binary. One client has now communicated some information to the
+                other, merely through conflicts in IDs!
+              </p>
+              <h4 name="80c9" id="80c9" class="graf graf--h4 graf-after--p">
+                Design Goals and Optimization Criteria
+              </h4>
+              <p name="24d1" id="24d1" class="graf graf--p graf-after--h4">
+                We’ve established that basic communication can occur between
+                different clients, but designing a protocol requires having
+                solid design guidelines. Here are a few possible goals for a
+                system like this, where an asterisk denotes whether I’ll be
+                addressing those goals in this design:
+              </p>
+              <ol class="postList">
+                <li name="13d7" id="13d7" class="graf graf--li graf-after--p">
+                  The protocol should be relatively robust to existing records
+                  in the database*
+                </li>
+                <li name="9f89" id="9f89" class="graf graf--li graf-after--li">
+                  Two communicators must not know when the other is sending a
+                  message*
+                </li>
+                <li name="4617" id="4617" class="graf graf--li graf-after--li">
+                  Each client should be able to send multiple messages over a
+                  period of time*
+                </li>
+                <li name="b7ac" id="b7ac" class="graf graf--li graf-after--li">
+                  The protocol should mitigate concurrency issues*
+                </li>
+                <li name="67db" id="67db" class="graf graf--li graf-after--li">
+                  The protocol should mitigate the impact of malicious actors
+                </li>
+                <li name="ea39" id="ea39" class="graf graf--li graf-after--li">
+                  The protocol should support more than two clients over the
+                  shared medium*
+                </li>
+                <li name="92e9" id="92e9" class="graf graf--li graf-after--li">
+                  The protocol should reduce of number of requests to the server
+                </li>
+                <li name="d48e" id="d48e" class="graf graf--li graf-after--li">
+                  The protocol should support client discovery
+                </li>
+              </ol>
+              <p name="8404" id="8404" class="graf graf--p graf-after--li">
+                With these constraints and criteria, we can begin to start
+                crafting a communication protocol and have a general notion of
+                why we might prefer one protocol over another. To be perfectly
+                clear: This is a toy problem with interesting constraints.
+              </p>
+              <h4 name="575f" id="575f" class="graf graf--h4 graf-after--p">
+                Modeling the Problem Domain
+              </h4>
+              <p name="f45e" id="f45e" class="graf graf--p graf-after--h4">
+                Each client can create a record (like a todo) with a certain
+                UUID in this space:
+              </p>
+              <pre
+                name="b0b4"
+                id="b0b4"
+                class="graf graf--pre graf-after--p"
+              >----<br>  0: 00000000-0000-0000-0000-0000000000<br>  1: 00000000-0000-0000-0000-0000000001<br>     ...<br>  n: ffffffff-ffff-ffff-ffff-ffffffffff<br>----</pre>
+              <p name="9445" id="9445" class="graf graf--p graf-after--pre">
+                Assume that if an ID hasn’t been used already, you get a
+                <strong class="markup--strong markup--p-strong"
+                  >201 Created</strong
+                >
+                back from the server. If an ID has been used, you get a
+                <strong class="markup--strong markup--p-strong"
+                  >409 Conflict</strong
+                >
+                back. All <em class="markup--em markup--p-em">GET</em>s will
+                <strong class="markup--strong markup--p-strong"
+                  >404 Not Found</strong
+                >, so in order to tell whether an ID has been used, you have to
+                try to create a “todo” with that ID.
+              </p>
+              <p name="86c4" id="86c4" class="graf graf--p graf-after--p">
+                The interesting bit is that by reading whether or not another
+                client has created a record with a UUID, you inevitably end up
+                creating one if it doesn’t already exist.<em
+                  class="markup--em markup--p-em"
+                >
+                </em
+                >In other words,<em class="markup--em markup--p-em">
+                  by reading whether a bit is set, you inherently overwrite it
+                  to be set. </em
+                >That is, the “create a record” operation can be viewed as a
+                joint “read and write true” operation:
+              </p>
+              <pre
+                name="c57c"
+                id="c57c"
+                class="graf graf--pre graf-after--p"
+              ><em class="markup--em markup--pre-em">[...]<br></em><strong class="markup--strong markup--pre-strong">&gt; Client 2 creates todos of the following UUIDs with responses:</strong><br>  - ...001 -&gt; 409 Conflict<br>  - ...002 -&gt; 201 Created<br>  - ...003 -&gt; 409 Conflict</pre>
+              <pre
+                name="f042"
+                id="f042"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client 2 tries to read the same UUIDs again:</strong><br>  - ...001 -&gt; 409 Conflict<br>  - ...002 -&gt; 409 Conflict <em class="markup--em markup--pre-em">// Overwritten!</em><br>  - ...003 -&gt; 409 Conflict</pre>
+              <h4 name="575e" id="575e" class="graf graf--h4 graf-after--pre">
+                To Shared Memory
+              </h4>
+              <p name="5c41" id="5c41" class="graf graf--p graf-after--h4">
+                We can imagine a table of sequential UUIDs and whether
+                they&#39;re taken:
+              </p>
+              <pre
+                name="6a9f"
+                id="6a9f"
+                class="graf graf--pre graf-after--p"
+              >----<br>  uuid:   | ...0-0000001 | ...0-0000002 | ...0-0000003 | ...<br>  taken?: |      no      |      yes     |     yes      |<br>----</pre>
+              <p name="d2a2" id="d2a2" class="graf graf--p graf-after--pre">
+                We can model the space of taken vs. untaken UUIDs as shared
+                memory, where the address is the sequential index of the UUID,
+                and data is whether the record exists or not.
+              </p>
+              <pre
+                name="98a7"
+                id="98a7"
+                class="graf graf--pre graf-after--p"
+              >----<br>  addr: | 0 | 1 | 2 | 3 | 4 | 5 | 6 | ...<br>  data: | 0 | 1 | 1 | 0 | 1 | 1 | 0 | ...<br>----</pre>
+              <p name="18c1" id="18c1" class="graf graf--p graf-after--pre">
+                This address space will be the basis of the rest of the
+                discussion.
+              </p>
+              <h3 name="3c62" id="3c62" class="graf graf--h3 graf-after--p">
+                Part 2: Tackling the Problem
+              </h3>
+              <p name="f53a" id="f53a" class="graf graf--p graf-after--h3">
+                From here on out, I’ll be trying to design a message protocol
+                that conforms to the constraints above.
+              </p>
+              <p name="4e65" id="4e65" class="graf graf--p graf-after--p">
+                The first attempt I’ll construct consists of a sled of 1s at the
+                bottom of the memory space, a data structure I’m calling a
+                “shared message store” that’s just beyond the sled of 1s, and a
+                data heap that starts at the top of the address space and grows
+                downwards in address space.
+              </p>
+              <p name="a6a6" id="a6a6" class="graf graf--p graf-after--p">
+                The rough overview is that when a client polls for messages, it
+                sequentially reads the sled of 1s to try to find the shared
+                message store, reads the whole shared message store, performs
+                manipulations to the shared message store, and rewrites the
+                shared message store just beyond where the previous one ended
+                (which is now filled with 1s due to the read.)
+              </p>
+              <h4 name="27ca" id="27ca" class="graf graf--h4 graf-after--p">
+                Prerequisite: The sled of ones
+              </h4>
+              <p name="ed92" id="ed92" class="graf graf--p graf-after--h4">
+                The purpose of the sled of ones is to enable a client to read
+                and write values from the memory, even though all values are
+                overwritten on read. I’ll use this mechanism extensively in the
+                protocol. Following is a quick example to illustrate the
+                mechanism:
+              </p>
+              <pre
+                name="62df"
+                id="62df"
+                class="graf graf--pre graf-after--p"
+              ><em class="markup--em markup--pre-em">Basic read of data from the sled of 1s<br></em>---<br><strong class="markup--strong markup--pre-strong">&gt; Client reads the first byte, observes it&#39;s a 1, then continues</strong><br> | 1111111101011000000000 |<br>   ^</pre>
+              <pre
+                name="9179"
+                id="9179"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads the second byte, observes it&#39;s a 1, then continues</strong><br> | 1111111101011000000000 |<br>    ^</pre>
+              <pre
+                name="1aba"
+                id="1aba"
+                class="graf graf--pre graf-after--pre"
+              ><em class="markup--em markup--pre-em">[ until... ]</em></pre>
+              <pre
+                name="d74f"
+                id="d74f"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads a zero, and interprets it as the start bit to a value</strong><br> | 1111111101011000000000 | <br>           ^               <em class="markup--em markup--pre-em">// overwrites the start bit</em></pre>
+              <pre
+                name="30ef"
+                id="30ef"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads the rest of the k-sized message and interprets it.<br> </strong>| 1111111111011000000000 |<br>            ^^^^^^         <em class="markup--em markup--pre-em">// reads k=6 bytes, 101100, overwrites it</em></pre>
+              <pre
+                name="0d90"
+                id="0d90"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong"><em class="markup--em markup--pre-em">&gt; </em>Client rewrites the value just beyond the newly written 1s<br> </strong>| 1111111111111110000000 |<br>                   ^ ^^    <em class="markup--em markup--pre-em">// Writing &quot;101100&quot; to right after 0</em></pre>
+              <pre
+                name="3e7a"
+                id="3e7a"
+                class="graf graf--pre graf-after--pre"
+              ><em class="markup--em markup--pre-em">The state looks the same, except for having more 1s in the sled:<br></em><strong class="markup--strong markup--pre-strong"> </strong>| 1111111111111110101100 |</pre>
+              <h4 name="3aa0" id="3aa0" class="graf graf--h4 graf-after--pre">
+                Initial Memory Layout for the Protocol
+              </h4>
+              <p name="0e26" id="0e26" class="graf graf--p graf-after--h4">
+                To make it easier on ourselves to start, we’re going to start
+                with the assumption that each client can perform an entire
+                routine atomically. This is, of course, a horrible assumption,
+                but I’ll try to address it later. Here is the memory layout I’m
+                starting with:
+              </p>
+              <figure
+                name="d85d"
+                id="d85d"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*gDfsuRFOT8_kKxaXjQpPAA.png"
+                  data-width="1256"
+                  data-height="334"
+                  data-is-featured="true"
+                  src="https://cdn-images-1.medium.com/max/800/1*gDfsuRFOT8_kKxaXjQpPAA.png"
+                />
+                <figcaption class="imageCaption">
+                  Screenshot because the screen was too wide
+                </figcaption>
+              </figure>
+              <h4
+                name="fe26"
+                id="fe26"
+                class="graf graf--h4 graf-after--figure"
+              >
+                Glossary of fields
+              </h4>
+              <ul class="postList">
+                <li name="499b" id="499b" class="graf graf--li graf-after--h4">
+                  <strong class="markup--strong markup--li-strong">start</strong
+                  >: The start bit, indicating the beginning of the message
+                  store
+                </li>
+                <li name="01be" id="01be" class="graf graf--li graf-after--li">
+                  <strong class="markup--strong markup--li-strong"
+                    >msg_count</strong
+                  >: The number of messages in the message store
+                </li>
+                <li name="ebf5" id="ebf5" class="graf graf--li graf-after--li">
+                  <strong class="markup--strong markup--li-strong"
+                    >head_ptr</strong
+                  >: The pointer for the top of the message data heap. Gets
+                  updated when a new message is added to the data heap.
+                </li>
+                <li name="ecc4" id="ecc4" class="graf graf--li graf-after--li">
+                  <strong class="markup--strong markup--li-strong"
+                    >dest_addr</strong
+                  >: The client id of the destination for that message.
+                </li>
+                <li name="a101" id="a101" class="graf graf--li graf-after--li">
+                  <strong class="markup--strong markup--li-strong"
+                    >msg_ptr</strong
+                  >: The pointer to the to the message data for that message
+                  record
+                </li>
+                <li name="9df9" id="9df9" class="graf graf--li graf-after--li">
+                  <strong class="markup--strong markup--li-strong"
+                    >msg_size</strong
+                  >: The length of the message data for that message record
+                </li>
+              </ul>
+              <p name="bcd1" id="bcd1" class="graf graf--p graf-after--li">
+                To read from the message, read down the field of 1s until you
+                find a zero,<br />then read the subsequent 2 bytes to get the
+                message count. Since messages are of a fixed size, we can now
+                read the whole set of message records. Once we’ve read the
+                message queue, we can read the data in the message queue.
+              </p>
+              <p name="3eae" id="3eae" class="graf graf--p graf-after--p">
+                Since after reading, the field of 1s now extends through where
+                the shared message store was written, we rewrite the message
+                store at the end of the new field (removing any messages
+                addressed to that client.) As an example:
+              </p>
+              <pre
+                name="6baa"
+                id="6baa"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads the first 0</strong><br>| 111111 0 00000010 11110110 00001111 10111010 00001010 000... |<br>         ^ (msg_cnt head_ptr dst_addr msg_ptr  msg_size)</pre>
+              <pre
+                name="4a8e"
+                id="4a8e"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads subsequent 2 bytes to get message count and head ptr<br></strong>| 111111 1 00000010 11110110 00001111 10111010 00001010 000... |<br>           ^^^^^^^^ ^^^^^^^^ // <em class="markup--em markup--pre-em">In this case 1 message in the store</em></pre>
+              <pre
+                name="9895"
+                id="9895"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads message off in struct<br></strong>| 111111 1 11111111 11111111 00001111 10111010 00001010 000... |<br>                             ^^^^^^^^ ^^^^^^^^ ^^^^^^^^</pre>
+              <pre
+                name="8a9f"
+                id="8a9f"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client rewrites message store right of overwritten values:<br></strong>| 111111 1 11111111 11111111 11111111 11111111 11111111 0 00.. |<br>                                      <em class="markup--em markup--pre-em">write starts here</em> ^</pre>
+              <p name="5886" id="5886" class="graf graf--p graf-after--pre">
+                After reading, re-copy the message store just past the end of
+                the newly invalidated block, exactly as described above.
+              </p>
+              <h4 name="2046" id="2046" class="graf graf--h4 graf-after--p">
+                Inserting a message into the Message Store
+              </h4>
+              <p name="aba0" id="aba0" class="graf graf--p graf-after--h4">
+                Inserting a message is equivalent to reading a message, but
+                right before rewriting the message, perform these steps:
+              </p>
+              <ol class="postList">
+                <li name="82c9" id="82c9" class="graf graf--li graf-after--p">
+                  Write the message data to just before the
+                  <strong class="markup--strong markup--li-strong"
+                    >head_ptr</strong
+                  >
+                  address.
+                </li>
+                <li name="f15e" id="f15e" class="graf graf--li graf-after--li">
+                  Update
+                  <strong class="markup--strong markup--li-strong"
+                    >head_ptr</strong
+                  >
+                  to the start of the newly written data blob.
+                </li>
+                <li name="9f7f" id="9f7f" class="graf graf--li graf-after--li">
+                  Add a new message record to the client’s representation of the
+                  message store.
+                </li>
+                <li name="3fb8" id="3fb8" class="graf graf--li graf-after--li">
+                  Update
+                  <strong class="markup--strong markup--li-strong"
+                    >msg_count</strong
+                  >
+                </li>
+              </ol>
+              <h4 name="3390" id="3390" class="graf graf--h4 graf-after--li">
+                Concurrency
+              </h4>
+              <p name="35eb" id="35eb" class="graf graf--p graf-after--h4">
+                I’m going to attempt to tackle this one whittling down from
+                strong guarantees <br />to weak ones. The concurrency models
+                from strongest to weakest are:
+              </p>
+              <ol class="postList">
+                <li name="32ea" id="32ea" class="graf graf--li graf-after--p">
+                  Clients can execute an entire routine atomically
+                </li>
+                <li name="0306" id="0306" class="graf graf--li graf-after--li">
+                  Clients can execute a readwrite of k addresses atomically
+                  (with some limit).
+                </li>
+                <li name="b514" id="b514" class="graf graf--li graf-after--li">
+                  Clients can execute a readwrite of 1 address atomically.
+                </li>
+              </ol>
+              <p name="a0f0" id="a0f0" class="graf graf--p graf-after--li">
+                The above protocol is robust to
+                <strong class="markup--strong markup--p-strong">(1)</strong> but
+                to no others, and thus will have to be amended.
+              </p>
+              <h4 name="219d" id="219d" class="graf graf--h4 graf-after--p">
+                Tackling k = O(log n)
+              </h4>
+              <p name="8ec2" id="8ec2" class="graf graf--p graf-after--h4">
+                Can we get atomic locks if we assume for an address size of n, k
+                = O(log n)? The answer seems to be yes, via the following
+                mechanism. First, we split up the shared message store into a
+                static part and a dynamic part:
+              </p>
+              <pre
+                name="a394"
+                id="a394"
+                class="graf graf--pre graf-after--p"
+              ><em class="markup--em markup--pre-em">head_ptr_record</em><br> |  01  | 00100101 |<br>  start   head_ptr</pre>
+              <p name="3604" id="3604" class="graf graf--p graf-after--pre">
+                We move the residual part of the message store to just beyond
+                the head_ptr:
+              </p>
+              <pre
+                name="870a"
+                id="870a"
+                class="graf graf--pre graf-after--p"
+              ><em class="markup--em markup--pre-em">shared_message_store:</em><br> | message 1 | ... | message m-1 | message m | msg_count |</pre>
+              <pre
+                name="c5c9"
+                id="c5c9"
+                class="graf graf--pre graf-after--pre"
+              ><em class="markup--em markup--pre-em">message layout is unchanged:</em><br> | dest_addr | msg_ptr | msg_size |</pre>
+              <p name="de60" id="de60" class="graf graf--p graf-after--pre">
+                Our whole memory space now looks like this:
+              </p>
+              <pre name="9642" id="9642" class="graf graf--pre graf-after--p">
+ [ ones | head_ptr_rec | zeros | message_store | message_data ]</pre
+              >
+              <p name="4d54" id="4d54" class="graf graf--p graf-after--pre">
+                With this memory layout, we can now lean heavily on k = O(log n)
+                to construct a locking mechanism, as detailed below:
+              </p>
+              <h4 name="73ed" id="73ed" class="graf graf--h4 graf-after--p">
+                Detail of the Locking Mechanism
+              </h4>
+              <p name="39b6" id="39b6" class="graf graf--p graf-after--h4">
+                Let’s modify our original behavior, such that we read in chunks
+                of k. In other words, we set our word size to be k.
+              </p>
+              <pre
+                name="4558"
+                id="4558"
+                class="graf graf--pre graf-after--p"
+              ><em class="markup--em markup--pre-em">Let’s say k = 8, for this exercise<br></em>| 11111111 11111111 00101011 00000000 |<br>|  Word 1   Word 2   Word 3   Word 4  |</pre>
+              <p name="c734" id="c734" class="graf graf--p graf-after--pre">
+                We then issue a read for word 3, reading that byte sequence in a
+                single atomic operation (as per our assumed atomicity
+                constraint). The client reads 00101011 from Word 3, leaving the
+                memory space as follows:
+              </p>
+              <pre name="697d" id="697d" class="graf graf--pre graf-after--p">
+| 11111111 11111111 11111111 00000000 |</pre
+              >
+              <p name="de14" id="de14" class="graf graf--p graf-after--pre">
+                The interesting thing is that if we choose the sled of ones
+                to <br />be written in chunks like this, we can define a locking
+                mechanism<br />on top of it. We state for a client trying to
+                acquire a read/write lock:
+              </p>
+              <ol class="postList">
+                <li name="ce24" id="ce24" class="graf graf--li graf-after--p">
+                  A word of all ones is part of the ones sled and the client<br /> should
+                  read the next word.
+                </li>
+                <li name="092d" id="092d" class="graf graf--li graf-after--li">
+                  A word of all zeros means that someone else has a lock
+                </li>
+                <li name="8536" id="8536" class="graf graf--li graf-after--li">
+                  A word that starts with 01 means that the word is a valid
+                  head<br /> ptr, and the client has gotten the lock.
+                </li>
+              </ol>
+              <p name="7acb" id="7acb" class="graf graf--p graf-after--li">
+                Choosing a start sequence of 01 allows us to disambiguate
+                between<br />these 3 possibilities because a valid message will
+                never be all 1s or all<br />0s. The convenient thing about this
+                series of choices is that a lock is guaranteed to belong to at
+                most one client at a time:
+              </p>
+              <p name="3301" id="3301" class="graf graf--p graf-after--p">
+                Hitting a series of all 1s does not change the state, nor affect
+                the lock condition.
+              </p>
+              <pre
+                name="4557"
+                id="4557"
+                class="graf graf--pre graf-after--p"
+              >State:<br> | 11111111 00000000 |<br> |  word 1   word 2  |</pre>
+              <pre
+                name="1268"
+                id="1268"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; Client reads word 1 atomically</strong></pre>
+              <pre
+                name="9245"
+                id="9245"
+                class="graf graf--pre graf-after--pre"
+              >State:<br> | 11111111 00000000 | <em class="markup--em markup--pre-em">unaffected</em><br> |  word 1   word 2  |</pre>
+              <p name="c4bf" id="c4bf" class="graf graf--p graf-after--pre">
+                Hitting a series of all 0s does not affect the lock condition,
+                per the following:
+              </p>
+              <pre
+                name="ea4a"
+                id="ea4a"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">&gt; State before client reads word 2</strong><br> | 11111111 00000000 00000000 | <em class="markup--em markup--pre-em">locked because word 2 is blank</em><br> |  word 1   word 2   word 3  |</pre>
+              <pre
+                name="aea8"
+                id="aea8"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; State after client reads word 2</strong><br> | 11111111 11111111 00000000 | <em class="markup--em markup--pre-em">locked because word 3 is blank</em><br> |  word 1   word 2   word 3  |</pre>
+              <p name="f5fc" id="f5fc" class="graf graf--p graf-after--pre">
+                Hitting a valid head ptr atomically grabs a lock for the client
+                reading:
+              </p>
+              <pre
+                name="8aaa"
+                id="8aaa"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">&gt; State before client reads word 2<br> </strong>| 11111111 01100100 00000000 | <em class="markup--em markup--pre-em">lock available<br> |  </em>word 1   word 2   word 3  |</pre>
+              <pre
+                name="8825"
+                id="8825"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">&gt; State after client reads word 2</strong><br> | 11111111 11111111 00000000 | <em class="markup--em markup--pre-em">locked acquired, word 3 is all 0s</em><br> |  word 1   word 2   word 3  |</pre>
+              <p name="876e" id="876e" class="graf graf--p graf-after--pre">
+                This requires atomic manipulation of 2 + log2(n) bits where n is
+                the size of the space of available UUIDs.
+              </p>
+              <h4 name="38fb" id="38fb" class="graf graf--h4 graf-after--p">
+                Initializing the Memory Space
+              </h4>
+              <p name="fd9e" id="fd9e" class="graf graf--p graf-after--h4">
+                This protocol does not (yet) handle the initial coordination of
+                the clients. If the memory space were blank at the onset of
+                clients joining, then all clients will loop consistency, each
+                thinking that some other client must have pulled the lock.
+              </p>
+              <p name="efb5" id="efb5" class="graf graf--p graf-after--p">
+                To solve this, I’ll add in a quick asymmetry to the
+                specification: a client that writes to the first word
+                automatically gains the read/write lock and assumes the default
+                head pointer state of the form [ 01 | top_of_address_space ].
+                Since a field of zeros is a valid
+                <em class="markup--em markup--p-em">shared message store</em>,
+                the client performs no additional setup beyond simply assuming
+                the lock.
+              </p>
+              <p name="1448" id="1448" class="graf graf--p graf-after--p">
+                An extremely rough implementation of the protocol up to this
+                point can be found in my
+                <a
+                  href="https://github.com/evinism/graveyard/blob/master/uuid_protocol.js"
+                  data-href="https://github.com/evinism/graveyard/blob/master/uuid_protocol.js"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >scratchpad repo</a
+                >.
+              </p>
+              <h4 name="4b00" id="4b00" class="graf graf--h4 graf-after--p">
+                Tackling k=2
+              </h4>
+              <p name="6277" id="6277" class="graf graf--p graf-after--h4">
+                Really, the essence of the locking mechanism we need is the
+                start sequence. We can replace the whole lock operation with
+                just the sled of 1s, followed by the two-bit sequence 01. From a
+                practical perspective, this makes it far less likely that two
+                clients will conflict horrifically if atomicity can only be
+                guaranteed to k=1, but that’s little consolation when the jitter
+                between requests is by no means negligible.
+              </p>
+              <p name="9f99" id="9f99" class="graf graf--p graf-after--p">
+                To tackle k=2, I partition the memory into 3 sections and treat
+                each section as a contiguous shared memory space. I arbitrarily
+                assign:
+              </p>
+              <p name="a243" id="a243" class="graf graf--p graf-after--p">
+                <strong class="markup--strong markup--p-strong"
+                  >First 1/3rd (M1):</strong
+                >
+                Locking mechanism (just the 01 sequence from the head_ptr data
+                structure)<br /><strong class="markup--strong markup--p-strong"
+                  >Second 1/3rd (M2):</strong
+                >
+                Shared Message Store (identical the original construction)<br /><strong
+                  class="markup--strong markup--p-strong"
+                  >Final 1/3rd (M3):</strong
+                >
+                Message Data
+              </p>
+              <pre
+                name="d2f1"
+                id="d2f1"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">State Snapshot</strong><br>M1: | 11 11 11 11 01 00 00 00 | <em class="markup--em markup--pre-em">no client lock on data<br>    | </em>ones sled <em class="markup--em markup--pre-em">| </em>lk | zeros  |</pre>
+              <pre
+                name="bbaa"
+                id="bbaa"
+                class="graf graf--pre graf-after--pre"
+              >M2: | 1111111111 011010010000 | <em class="markup--em markup--pre-em">Shared data store after sled.<br>    | </em>ones sled | msg store...| <em class="markup--em markup--pre-em">Sledded because lk has no ptr.</em></pre>
+              <pre
+                name="2ed1"
+                id="2ed1"
+                class="graf graf--pre graf-after--pre"
+              >M3: | 110101111001001 0000000 | <em class="markup--em markup--pre-em">No sled, because msg store has</em><br>    |  message data  | zeros  | <em class="markup--em markup--pre-em">pointers into this space.</em></pre>
+              <p name="28dd" id="28dd" class="graf graf--p graf-after--pre">
+                Since the locking mechanism can no longer store a pointer, we
+                must still<br />put in a sled of 1s on both M1 and M2. This is
+                the primary modification to<br />get us to k=2, and is the best
+                construction I’ve come up with so far.
+              </p>
+              <h4 name="2a1b" id="2a1b" class="graf graf--h4 graf-after--p">
+                Tackling k = 1?
+              </h4>
+              <p name="310c" id="310c" class="graf graf--p graf-after--h4">
+                I have no idea how to do this, and strongly suspect it’s
+                impossible. I don’t know how to prove it impossible either, so
+                if anybody has suggestions, I’m all ears.
+              </p>
+              <h4 name="7360" id="7360" class="graf graf--h4 graf-after--p">
+                Error correction
+              </h4>
+              <p name="8247" id="8247" class="graf graf--p graf-after--h4">
+                Obviously, we’re not the only one using this system; there will
+                be existing entries in the UUID space. We’ll have to work around
+                them and mitigate the (extremely rare) errors incurred. I’m
+                going to state for
+              </p>
+              <p name="6192" id="6192" class="graf graf--p graf-after--p">
+                We have 2 possible system behaviors to watch out for:
+              </p>
+              <ol class="postList">
+                <li name="d046" id="d046" class="graf graf--li graf-after--p">
+                  The system allows records can be deleted and their IDs reused.
+                </li>
+                <li name="de2f" id="de2f" class="graf graf--li graf-after--li">
+                  The system does not allow for the reuse of IDs.
+                </li>
+              </ol>
+              <p name="e4fd" id="e4fd" class="graf graf--p graf-after--li">
+                For generality, we’ll assume the former model. For messages,
+                pointers, counts, and other pieces of data, a simple
+                garden-variety Hamming code should be sufficient to detect and
+                correct single errors.
+              </p>
+              <p name="b5da" id="b5da" class="graf graf--p graf-after--p">
+                For forward-correction in the start sequence and locking
+                mechanisms, the 3 word states we need to distinguish are all 1s
+                (for the ones sled), all 0s (for resource locked), and a valid
+                start sequence of our choosing. To ensure a Hamming distance of
+                3 between any two of these cases, we need 6 bits. We’ll
+                therefore expand the start sequence from 2 bits to 6 bits, and
+                choose [ 000111 | head_ptr ] as the memory layout. On observing
+                a value, we’ll correct to whichever valid 6 byte sequence has
+                the minimum Hamming distance to the observed value.
+              </p>
+              <p name="fb65" id="fb65" class="graf graf--p graf-after--p">
+                And I think that solves just about all the problems I’m willing
+                to tackle within this thought experiment.
+              </p>
+              <h3 name="216a" id="216a" class="graf graf--h3 graf-after--p">
+                Part 3: Further Explorations and Contextualization
+              </h3>
+              <p name="fbd8" id="fbd8" class="graf graf--p graf-after--h3">
+                Given that the constraints in this problem set are relatively
+                new, there’s ample space for creative exploration. My proposed
+                protocol is far from the only possible style of solution, and
+                after a few conversations, I started seeing how different
+                strategies might emerge.
+              </p>
+              <p name="cd19" id="cd19" class="graf graf--p graf-after--p">
+                For example, my solution does not utilize time domain — I
+                implicitly assume that we can never assume time as a total
+                ordering. However, on seeing this problem, my coworker proposed
+                a concept we started calling a
+                <em class="markup--em markup--p-em">synchronization block</em
+                >:<strong class="markup--strong markup--p-strong"> </strong>a
+                region of memory shared asymmetrically by two clients, by which
+                client 2 can notify client 1 of an arbitrary event. Client 1
+                sequentially reads position 1, position 2, position 3, until it
+                reads a 1 (unless it reaches the end of the buffer).
+              </p>
+              <pre
+                name="83a0"
+                id="83a0"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">Normal operation</strong><br>|1111110000000| Client 1 reads 0 from each position sequentially<br>      ^<br>|1111111111111| Client 2 writes to each position in the block<br> ^^^^^^^^^^^^^<br>|1111111111111| Client 1 reads a 1, representing some event<br>       ^</pre>
+              <pre
+                name="2ed0"
+                id="2ed0"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">Out of buffer operation<br></strong>|1111111111111| Client 1 reads the last 0 address in the buffer,<br>             ^  noticing that no 1 was written. </pre>
+              <pre
+                name="6f64"
+                id="6f64"
+                class="graf graf--pre graf-after--pre"
+              >|1111111111111| Client 2 reads all positions, noticing that all<br> ^^^^^^^^^^^^^  positions all return 1.</pre>
+              <pre name="07a9" id="07a9" class="graf graf--pre graf-after--pre">
+Both clients now know that client 1 did not receive the event.</pre
+              >
+              <p name="32fd" id="32fd" class="graf graf--p graf-after--pre">
+                Under the assumption that time does not pass uniformly, this
+                does not work. But under the constraints of real-world systems,
+                we can often reasonably make these assumptions and get away with
+                such a data block. The primary point of this illustration is how
+                small variants yield interesting and novel constructs in the
+                problem space.
+              </p>
+              <h4 name="544f" id="544f" class="graf graf--h4 graf-after--p">
+                Why on earth did you spend time on this?
+              </h4>
+              <p name="f1f6" id="f1f6" class="graf graf--p graf-after--h4">
+                In my mind, the interesting part of this article is the problem
+                more than the protocol. The protocol’s purpose is to show that
+                the problem itself is worth investigating. Even though this is a
+                toy problem, it has interesting consequences that yield nicely
+                under some, but not a lot, of mental energy. I love those sorts
+                of tasks.
+              </p>
+              <p
+                name="4f49"
+                id="4f49"
+                class="graf graf--p graf-after--p graf--trailing"
+              >
+                As always, if you find anything wrong with this article, please
+                reach out and tell me. Happy hacking, all.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+      <footer>
+        <p>
+          By
+          <a href="https://medium.com/@evinsellin" class="p-author h-card"
+            >Evin Sellin</a
+          >
+          on
+          <a href="https://medium.com/p/fe50134304db"
+            ><time class="dt-published" datetime="2018-11-19T01:32:48.651Z"
+              >November 19, 2018</time
+            ></a
+          >.
+        </p>
+        <p>
+          <a
+            href="https://medium.com/@evinsellin/communicating-through-uuid-conflicts-fe50134304db"
+            class="p-canonical"
+            >Canonical link</a
+          >
+        </p>
+        <p>
+          Exported from <a href="https://medium.com">Medium</a> on March 2,
+          2022.
+        </p>
+      </footer>
+    </article>
+  </body>
+</html>

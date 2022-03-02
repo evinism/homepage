@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>What exactly is Turing Completeness?</title>
+    <style>
+      * {
+        font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 50px;
+        margin-bottom: 17px;
+        color: #333;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.6;
+        margin: 30px 0 0 0;
+        margin-bottom: 18px;
+        margin-top: 33px;
+        color: #333;
+      }
+      h3 {
+        font-size: 30px;
+        margin: 10px 0 20px 0;
+        color: #333;
+      }
+      header {
+        width: 640px;
+        margin: auto;
+      }
+      section {
+        width: 640px;
+        margin: auto;
+      }
+      section p {
+        margin-bottom: 27px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: #333;
+      }
+      section img {
+        max-width: 640px;
+      }
+      footer {
+        padding: 0 20px;
+        margin: 50px 0;
+        text-align: center;
+        font-size: 12px;
+      }
+      .aspectRatioPlaceholder {
+        max-width: auto !important;
+        max-height: auto !important;
+      }
+      .aspectRatioPlaceholder-fill {
+        padding-bottom: 0 !important;
+      }
+      header,
+      section[data-field="subtitle"],
+      section[data-field="description"] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="h-entry">
+      <header>
+        <h1 class="p-name">What exactly is Turing Completeness?</h1>
+      </header>
+      <section data-field="subtitle" class="p-summary">
+        An armory for the insatiable pedant
+      </section>
+      <section data-field="body" class="e-content">
+        <section name="647f" class="section section--body section--first">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <h3
+                name="b849"
+                id="b849"
+                class="graf graf--h3 graf--leading graf--title"
+              >
+                What exactly is Turing Completeness?
+              </h3>
+              <h4
+                name="5c39"
+                id="5c39"
+                class="graf graf--h4 graf-after--h3 graf--subtitle"
+              >
+                An armory for the insatiable pedant
+              </h4>
+              <p name="4fd1" id="4fd1" class="graf graf--p graf-after--h4">
+                I hear the term Turing Completeness thrown around a lot more in
+                software engineering than I would expect. I think there’s a
+                little confusion about what Turing Complete means, especially
+                within a software engineering context.
+              </p>
+              <p name="16e9" id="16e9" class="graf graf--p graf-after--p">
+                We say that Turing Completeness is a property of a computational
+                system that states that the system is as computationally
+                powerful as a Turing machine. But what EXACTLY does that mean?
+                Put your scuba gear and wetsuit on because we’re diving deep
+                into formalism:
+              </p>
+              <h3 name="7d6b" id="7d6b" class="graf graf--h3 graf-after--p">
+                Turing Machines
+              </h3>
+              <p name="605e" id="605e" class="graf graf--p graf-after--h3">
+                Turing machines are theoretical computers defined by Alan Turing
+                in his highly influential paper titled
+                <a
+                  href="https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf"
+                  data-href="https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  ><em class="markup--em markup--p-em"
+                    >On Computable Numbers, with an application to the
+                    Entscheidungsproblem</em
+                  ></a
+                ><em class="markup--em markup--p-em">, </em>published 1936.
+                Turing machines are abstract mathematical constructs that help
+                us describe in a rigorous fashion what we mean by
+                <em class="markup--em markup--p-em">computation</em>.
+              </p>
+              <p name="b80d" id="b80d" class="graf graf--p graf-after--p">
+                There are countless in-depth tutorials on how a Turing machine
+                works, and you can watch any of them! I can pretty much
+                guarantee that they’re going to be better at explaining how a
+                Turing machine works than me, but in case you don’t want to
+                watch any of those, I’ll throw my description in as well.
+              </p>
+              <p name="76b5" id="76b5" class="graf graf--p graf-after--p">
+                A Turing machine consists of 2 elements: The computational
+                <em class="markup--em markup--p-em">head</em> and an infinitely
+                long tape. The head operates roughly as a ‘read-write’ head on a
+                disk drive, and the tape is divided up into an infinitely long
+                set of squares, for which on each square a symbol can be written
+                or erased. The Turing machine recognizes and can write down a
+                finite set of symbols, called the Turing machine’s
+                <em class="markup--em markup--p-em">alphabet</em>.
+              </p>
+              <p name="f30a" id="f30a" class="graf graf--p graf-after--p">
+                The Turing machine is only ‘aware’ of one square on the tape at
+                a time — namely the square the head of the Turing machine is
+                currently on.
+              </p>
+              <p name="8400" id="8400" class="graf graf--p graf-after--p">
+                On that tape, a Turing Machine can do any of these 4 actions:
+              </p>
+              <ul class="postList">
+                <li name="7f7a" id="7f7a" class="graf graf--li graf-after--p">
+                  Move the head left by 1 space
+                </li>
+                <li name="8261" id="8261" class="graf graf--li graf-after--li">
+                  Move the head right by 1 space
+                </li>
+                <li name="087e" id="087e" class="graf graf--li graf-after--li">
+                  Write a symbol at the head
+                </li>
+                <li name="9531" id="9531" class="graf graf--li graf-after--li">
+                  Erase a symbol at the head
+                </li>
+              </ul>
+              <p name="6609" id="6609" class="graf graf--p graf-after--li">
+                The machine decides which of these operations to do on any given
+                step through a
+                <em class="markup--em markup--p-em">finite state machine</em>.
+                Different Turing machines have different state machines that
+                define their operation.
+              </p>
+              <p name="07b8" id="07b8" class="graf graf--p graf-after--p">
+                A finite state machine consists of a finite number of
+                <em class="markup--em markup--p-em">states </em>(which Turing
+                calls <em class="markup--em markup--p-em">m-</em>configurations)
+                which it switches between on every iteration. The machine can
+                only be in one state at a time, but transitions between them
+                based on the current state and the symbol that the machine is
+                currently scanning. The Turing machine takes the current state
+                and the symbol and looks up what to do in a big table.
+              </p>
+              <p name="8583" id="8583" class="graf graf--p graf-after--p">
+                A Turing Machine also has a set of
+                <em class="markup--em markup--p-em">accept states</em> that tell
+                the Turing machine to stop executing. If the Turing machine
+                enters any of these
+                <em class="markup--em markup--p-em">accept states</em>, the
+                machine is said to
+                <em class="markup--em markup--p-em">halt </em>and suspends
+                execution forever. That’s all there is to Turing Machines!
+              </p>
+              <p name="1741" id="1741" class="graf graf--p graf-after--p">
+                …well maybe it’s not inherently obvious what exactly that means
+                and how that can be expressive enough to capture
+                <em class="markup--em markup--p-em">all </em>computation. I
+                almost always see Turing Machines described with a
+                <a
+                  href="https://en.wikipedia.org/wiki/State_diagram"
+                  data-href="https://en.wikipedia.org/wiki/State_diagram"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  ><em class="markup--em markup--p-em">state diagram</em></a
+                ><em class="markup--em markup--p-em">, </em>which I’ll provide a
+                description for in later versions of this article.
+              </p>
+              <p name="3e63" id="3e63" class="graf graf--p graf-after--p">
+                Let’s construct a Turing machine that never halts with a state
+                diagram!
+              </p>
+              <figure
+                name="6047"
+                id="6047"
+                class="graf graf--figure graf-after--p"
+              >
+                <img
+                  class="graf-image"
+                  data-image-id="1*JcE7EO1SZ-40g8a2XQFhYg.jpeg"
+                  data-width="320"
+                  data-height="233"
+                  src="https://cdn-images-1.medium.com/max/800/1*JcE7EO1SZ-40g8a2XQFhYg.jpeg"
+                />
+              </figure>
+              <p name="dac3" id="dac3" class="graf graf--p graf-after--figure">
+                We’ll start out with creating a very simple Turing machine with
+                an alphabet of
+                <strong class="markup--strong markup--p-strong">{0, 1}</strong>.
+                We start in state S1, and decide what to do. For any symbol
+                (denoted <em class="markup--em markup--p-em">*</em>) on the
+                tape, the Turing machine writes the symbol
+                <strong class="markup--strong markup--p-strong">1</strong
+                >,<strong class="markup--strong markup--p-strong"> </strong
+                >moves one space to the right, and switches to S2. Now in state
+                S2, for any symbol on the tape, the machine writes
+                <strong class="markup--strong markup--p-strong">0 </strong>and
+                moves one space to the right, switching to S1. Back in S1, the
+                loop repeats itself, continuing forever. As you might guess,
+                this writes out
+                <strong class="markup--strong markup--p-strong"
+                  >1010101[…]</strong
+                >
+                in a never ending loop. The machine has no
+                <em class="markup--em markup--p-em">accept states</em> so it
+                will never halt.
+              </p>
+              <p name="e64e" id="e64e" class="graf graf--p graf-after--p">
+                Well, that was exciting.
+              </p>
+              <h4 name="922a" id="922a" class="graf graf--h4 graf-after--p">
+                Description Numbers
+              </h4>
+              <p name="fc70" id="fc70" class="graf graf--p graf-after--h4">
+                It turns out we can number all Turing machines uniquely. A
+                Turing machine which doubles a number might be numbered:
+              </p>
+              <pre name="66e5" id="66e5" class="graf graf--pre graf-after--p">
+31332531173113353111731113322531111731111335317</pre
+              >
+              <p name="e84c" id="e84c" class="graf graf--p graf-after--pre">
+                whereas one that triples numbers might be numbered something
+                else:
+              </p>
+              <pre name="7f9d" id="7f9d" class="graf graf--pre graf-after--p">
+3133253117311335311173111332253111173111133531731323253117</pre
+              >
+              <p name="910b" id="910b" class="graf graf--p graf-after--pre">
+                As you can tell, they’re huge and weirdly repetitive numbers,
+                but they are still nonetheless numbers.
+              </p>
+              <p name="8d99" id="8d99" class="graf graf--p graf-after--p">
+                We call these the
+                <em class="markup--em markup--p-em">description number </em>for
+                a given Turing machine. We don’t need to specify exactly how to
+                number the Turing machines, it’s sufficient for our purposes to
+                simply note that you can fully encode a Turing machine within an
+                integer.
+              </p>
+              <p name="25e6" id="25e6" class="graf graf--p graf-after--p">
+                Spoilers: we’ll pass a Turing machine’s description number as
+                the input to another Turing machine later on, but forget you
+                heard anything…
+              </p>
+              <h3 name="0dad" id="0dad" class="graf graf--h3 graf-after--p">
+                …as a way of computing functions
+              </h3>
+              <p name="0518" id="0518" class="graf graf--p graf-after--h3">
+                Turing machines are fine and all as little toy computers, but
+                what we <em class="markup--em markup--p-em">really</em> want to
+                do is use them to define functions. Turing was a mathematician,
+                and he cared about defining a set of numbers called the
+                <em class="markup--em markup--p-em">computable numbers</em>, and
+                to do so he proposed Turing machines.
+              </p>
+              <p name="23c4" id="23c4" class="graf graf--p graf-after--p">
+                In particular, we want to turn Turing machines into
+                <em class="markup--em markup--p-em">partial functions, </em
+                >functions for which there can be undefined outputs. We’ll want
+                these functions to be ℕ⁽ⁿ⁾→ℕ, meaning they take any number
+                <strong class="markup--strong markup--p-strong">n</strong>
+                natural numbers as input, and output one natural number (or are
+                undefined for that input, since they are partial).
+              </p>
+              <p name="05e8" id="05e8" class="graf graf--p graf-after--p">
+                All we have to do to turn a Turing machine into a partial
+                function<em class="markup--em markup--p-em"> </em>is to equip it
+                with an input and output schema. Turing himself doesn’t provide
+                an unambiguous ‘input’ format, but as we get into programming
+                languages, it’ll be useful to make this step of defining input
+                vs. output explicit. I’m choosing a
+                <em class="markup--em markup--p-em">monadic notation </em>as
+                given in<em class="markup--em markup--p-em"> </em
+                ><strong class="markup--strong markup--p-strong"
+                  >Computability and Logic</strong
+                >.¹
+              </p>
+              <pre
+                name="54b0"
+                id="54b0"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong"><em class="markup--em markup--pre-em">Precise Formulation</em><br>(a)</strong> The arguments <em class="markup--em markup--pre-em">m1...mk </em>of the function will be represented in monadic notation by blocks of those numbers of strokes, each separated from the next by a single blank, on an otherwise blank tape. Thus at the beginning of the computation of, say, 3 + 2, the tape will look like this: 111B11</pre>
+              <pre
+                name="7bf5"
+                id="7bf5"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">(b) </strong>Initially, the machine will be scanning the leftmost 1 on the tape, and will be in its initial state, state 1. Thus in the computation of 3 + 2, the initial configuration will be 1₁11B11. A configuration as described by (a) and (b) is called a <em class="markup--em markup--pre-em">standard initial configuration</em>.</pre>
+              <pre
+                name="ab53"
+                id="ab53"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">(c) </strong>If the function that is to be computed assigns a value <em class="markup--em markup--pre-em">n</em> to the arguments that are represented initially on the tape, then the machine will eventually halt on a tape containing a block of that number of strokes, and otherwise blank. Thus in the computation of 3+2, the tape will look like this: 11111.</pre>
+              <pre
+                name="0a5a"
+                id="0a5a"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">(d) </strong>In this case, the machine will halt scanning the leftmost 1 on the tape. Thus in the computation of 3 + 2, the final configuration will be 1ₐ1111, where the <em class="markup--em markup--pre-em">a</em>th state is one for which there is no instruction what to do if scanning a stroke, so that in this configuration the machine will be halted. A configuration as described by <strong class="markup--strong markup--pre-strong">(c) </strong>and <strong class="markup--strong markup--pre-strong">(d) </strong>is called a <em class="markup--em markup--pre-em">standard final configuration </em>(or <em class="markup--em markup--pre-em">position</em>)</pre>
+              <pre
+                name="c89c"
+                id="c89c"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">(e) </strong>If the function that is to be computed assigns no value to the arguments that are represented initially on the tape, then the machine will either never halt, or halt in some nonstandard configuration such as Bₐ11111 or B111ₐ11 or B11111ₐ.</pre>
+              <p name="d76e" id="d76e" class="graf graf--p graf-after--pre">
+                The set of functions that you can express with Turing machines
+                in this manner are called the
+                <em class="markup--em markup--p-em">computable functions.</em>
+              </p>
+              <p name="9a62" id="9a62" class="graf graf--p graf-after--p">
+                The exact definition we choose for input and output isn’t that
+                important: As long as translation between different input and
+                output formats is computable (which it almost certainly is for
+                any sane definition), we will get an equivalent set of
+                computable functions.
+              </p>
+              <p name="da17" id="da17" class="graf graf--p graf-after--p">
+                This is why the oft-heard description “<em
+                  class="markup--em markup--p-em"
+                  >A Turing-complete language is one that can simulate a Turing
+                  machine</em
+                >” is absolutely correct, but just a tad misleading. If you can
+                simulate a Turing machine, then you can compute every function
+                that any Turing machine can compute, but the thing that
+                <em class="markup--em markup--p-em">actually </em>makes the
+                system Turing complete is that it can compute the whole set of
+                Turing computable functions.
+              </p>
+              <h4 name="9a68" id="9a68" class="graf graf--h4 graf-after--p">
+                Computable Numbers
+              </h4>
+              <p name="e1a8" id="e1a8" class="graf graf--p graf-after--h4">
+                Now, given that we have a solid definition for computable
+                functions, we can sort of ‘bootstrap’ off of that to define the
+                <em class="markup--em markup--p-em">computable numbers</em>. But
+                given that a number can have an infinite number of nonrepeating
+                digits (e.g. something like pi), we have to be just a tad clever
+                in how we define them. Some smart people came up with this:
+              </p>
+              <blockquote
+                name="3bea"
+                id="3bea"
+                class="graf graf--blockquote graf-after--p"
+              >
+                A computable number
+                <strong class="markup--strong markup--blockquote-strong"
+                  >a</strong
+                >
+                is a number for which there exists some computable function
+                <strong class="markup--strong markup--blockquote-strong"
+                  >f</strong
+                >
+                such that
+                <strong class="markup--strong markup--blockquote-strong"
+                  >f(n)</strong
+                >
+                yields the
+                <strong class="markup--strong markup--blockquote-strong"
+                  >nth</strong
+                >
+                digit of
+                <strong class="markup--strong markup--blockquote-strong"
+                  >a</strong
+                >.
+              </blockquote>
+              <p
+                name="c3f9"
+                id="c3f9"
+                class="graf graf--p graf-after--blockquote"
+              >
+                Whoops, Wikipedia tells me that’s not quite right. Let’s swap it
+                out:
+              </p>
+              <blockquote
+                name="cfbb"
+                id="cfbb"
+                class="graf graf--blockquote graf-after--p"
+              >
+                A computable number
+                <strong class="markup--strong markup--blockquote-strong"
+                  >a</strong
+                >
+                is a number for which there exists some computable function
+                <strong class="markup--strong markup--blockquote-strong"
+                  >f</strong
+                >
+                such that
+                <strong class="markup--strong markup--blockquote-strong"
+                  >f(n)</strong
+                >
+                satisfies
+                <a
+                  href="https://en.wikipedia.org/wiki/Computable_number#Formal_definition"
+                  data-href="https://en.wikipedia.org/wiki/Computable_number#Formal_definition"
+                  class="markup--anchor markup--blockquote-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >this one weird inequality</a
+                >.
+              </blockquote>
+              <p
+                name="c0b1"
+                id="c0b1"
+                class="graf graf--p graf-after--blockquote"
+              >
+                The intuitive sense is the same either way: If you can calculate
+                a number to arbitrary precision, that number is computable.
+              </p>
+              <p name="a2d8" id="a2d8" class="graf graf--p graf-after--p">
+                It turns out a whole host of numbers are computable. Here’s a
+                quick taste:
+              </p>
+              <ul class="postList">
+                <li name="6fa7" id="6fa7" class="graf graf--li graf-after--p">
+                  All Rational Numbers
+                </li>
+                <li name="e0af" id="e0af" class="graf graf--li graf-after--li">
+                  <em class="markup--em markup--li-em">e</em>
+                </li>
+                <li name="ade0" id="ade0" class="graf graf--li graf-after--li">
+                  π
+                </li>
+                <li name="b5fb" id="b5fb" class="graf graf--li graf-after--li">
+                  <em class="markup--em markup--li-em">φ</em>
+                </li>
+                <li name="f84a" id="f84a" class="graf graf--li graf-after--li">
+                  Any computable function of any computable number
+                </li>
+                <li name="dce4" id="dce4" class="graf graf--li graf-after--li">
+                  Almost every number you can think of, really
+                </li>
+              </ul>
+              <p name="9c74" id="9c74" class="graf graf--p graf-after--li">
+                The point is we can do a heck of a lot of math using only the
+                computable numbers. Computable numbers make up most numbers we
+                think about on a daily basis — enough so that it’s
+                <a
+                  href="http://math.stackexchange.com/questions/462790/are-there-any-examples-of-non-computable-real-numbers"
+                  data-href="http://math.stackexchange.com/questions/462790/are-there-any-examples-of-non-computable-real-numbers"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >actually kind of hard to think of numbers that aren’t
+                  computable</a
+                >.
+              </p>
+              <h4 name="6693" id="6693" class="graf graf--h4 graf-after--p">
+                The Universal Turing Machine
+              </h4>
+              <p name="93fc" id="93fc" class="graf graf--p graf-after--h4">
+                The Universal Turing Machine(UTM) takes another Turing machine’s
+                <em class="markup--em markup--p-em">description number </em>as
+                input, and ‘simulates’ it. That is, the UTM’s output is the same
+                as the Turing machine corresponding to the description number
+                when that Turing machine is given a blank tape. Therefore, the
+                UTM has the capability of ‘simulating’ any other Turing machine.
+              </p>
+              <p name="ab32" id="ab32" class="graf graf--p graf-after--p">
+                Turing dedicated a fair number of pages to spelling out the
+                whole state transition table for such a Turing machine,
+                presumably because it’s not inherently obvious that a Turing
+                machine should be able to simulate other Turing machines. The
+                duality of a
+                <em class="markup--em markup--p-em">program as data</em> is
+                likely a lot more comfortable to us today than it was to
+                mathematicians back then. Today, we have few qualms with
+                treating a program as data — especially if we’re used to
+                programming languages with
+                <a
+                  href="https://en.wikipedia.org/wiki/First-class_function"
+                  data-href="https://en.wikipedia.org/wiki/First-class_function"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  ><em class="markup--em markup--p-em"
+                    >first-class functions</em
+                  ></a
+                >.
+              </p>
+              <h4 name="7992" id="7992" class="graf graf--h4 graf-after--p">
+                Incomputability
+              </h4>
+              <p name="77c8" id="77c8" class="graf graf--p graf-after--h4">
+                As the term<em class="markup--em markup--p-em">
+                  computable functions </em
+                >implies<em class="markup--em markup--p-em">,</em> there are
+                also
+                <em class="markup--em markup--p-em">incomputable functions: </em
+                >functions we can define for which no Turing machine can
+                possibly exist.
+              </p>
+              <p name="bef5" id="bef5" class="graf graf--p graf-after--p">
+                And, despite them being hard to construct, there are a LOT of
+                incomputable functions. In fact,
+                <a
+                  href="https://en.wikipedia.org/wiki/Almost_all"
+                  data-href="https://en.wikipedia.org/wiki/Almost_all"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >almost all</a
+                >
+                functions are incomputable. There are just that many more
+                possible functions than there ever could be Turing machines, so
+                there must be some that Turing machines miss. In the
+                mathematical language, the set of Turing machines is countable,
+                whereas the set of real numbers is uncountably large.
+              </p>
+              <p name="4178" id="4178" class="graf graf--p graf-after--p">
+                The canonical incomputable function posited by Martin Davis
+                (with an analogous problem in Turing’s original paper) is the
+                <a
+                  href="https://en.wikipedia.org/wiki/Halting_problem"
+                  data-href="https://en.wikipedia.org/wiki/Halting_problem"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Halting Problem</a
+                >. The problem can be stated very simply:
+              </p>
+              <blockquote
+                name="c475"
+                id="c475"
+                class="graf graf--blockquote graf-after--p"
+              >
+                <strong class="markup--strong markup--blockquote-strong"
+                  >Halting Problem: </strong
+                >Given a computer program and an input for said program, does
+                that program ever finish execution?
+              </blockquote>
+              <p
+                name="d329"
+                id="d329"
+                class="graf graf--p graf-after--blockquote"
+              >
+                It’s easy to imagine examples of programs where it’s possible to
+                figure out whether or not the program finishes: If a state
+                repeats itself exactly, or if the program immediately halts,
+                it’s easy to tell whether or not those programs will halt. But
+                try to come up with an algorithm to decide for ANY program, and
+                you’ll find that the problem becomes impossibly hard, quite
+                literally.
+              </p>
+              <p name="4113" id="4113" class="graf graf--p graf-after--p">
+                Davis proves that this function is
+                <em class="markup--em markup--p-em">incomputable, </em>that no
+                Turing machine can exist that can compute the correct answer.
+                Because this specific problem yields a yes/no answer, it is
+                considered a
+                <em class="markup--em markup--p-em">decision problem,</em> and
+                since it’s incomputable, the problem is deemed
+                <em class="markup--em markup--p-em">undecidable.</em>
+              </p>
+              <p name="d16a" id="d16a" class="graf graf--p graf-after--p">
+                You can get more information about incomputability from this
+                charmingly helpful
+                <a
+                  href="https://www.buzzfeed.com/misingnoglic/you-wont-believe-what-computers-cant-compute-1j8kv"
+                  data-href="https://www.buzzfeed.com/misingnoglic/you-wont-believe-what-computers-cant-compute-1j8kv"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Buzzfeed community post</a
+                >.
+              </p>
+              <h3 name="4511" id="4511" class="graf graf--h3 graf-after--p">
+                …as originally constructed by Turing
+              </h3>
+              <p name="7e98" id="7e98" class="graf graf--p graf-after--h3">
+                Here’s what I thought when I first read Turing’s paper:
+                <strong class="markup--strong markup--p-strong">“</strong>Ooh,
+                this is gonna be totally easy, isn’t it? We just match up the
+                terminology in the modern definition we just learned with
+                Turing’s original terminology! It’ll be a straightforward
+                mapping, right?
+              </p>
+              <p name="013d" id="013d" class="graf graf--p graf-after--p">
+                I mean, just look at the term circle-free! Circle-free’s easy,
+                it reaches it’s final state in a finite amount of time, like
+                lots of explanations of Turing’s original paper on the internet
+                suggests! Just look at the defi…
+              </p>
+              <blockquote
+                name="3340"
+                id="3340"
+                class="graf graf--blockquote graf-after--p"
+              >
+                If a computing machine never writes down more than a finite
+                number of [the symbols 1 and 0], it will be called circular.
+                Otherwise it is said to be circle-free.
+              </blockquote>
+              <blockquote
+                name="90e5"
+                id="90e5"
+                class="graf graf--blockquote graf-after--blockquote"
+              >
+                […]
+              </blockquote>
+              <blockquote
+                name="f52c"
+                id="f52c"
+                class="graf graf--blockquote graf-after--blockquote"
+              >
+                A sequence is said to be computable if it can be computed by a
+                circle-free machine. A number is computable if it differs by an
+                integer from the number computed by a circle-free machine
+              </blockquote>
+              <p
+                name="2ef6"
+                id="2ef6"
+                class="graf graf--p graf-after--blockquote"
+              >
+                Wait, that feels backwards. The machine that prints out an
+                <em class="markup--em markup--p-em">infinite</em> number of
+                <strong class="markup--strong markup--p-strong">1</strong>s and
+                <strong class="markup--strong markup--p-strong">0</strong>s,
+                never halting, computes
+                <em class="markup--em markup--p-em">computable numbers</em>?
+                Isn’t that contrary to how we outlined it before, wherein the
+                <em class="markup--em markup--p-em">only</em> defined output was
+                when the Turing machine halted in a standard configuration?”
+              </p>
+              <p name="d7ba" id="d7ba" class="graf graf--p graf-after--p">
+                Unfortunately for my past self, the mapping from the modern
+                definitions to Turing’s original paper isn’t quite so clean, and
+                so requires a fair amount of modification. Let’s throw away all
+                the definitions for
+                <em class="markup--em markup--p-em">computable functions</em>
+                and
+                <em class="markup--em markup--p-em">computable numbers </em>that
+                we spent so much time learning, so that we’re left with the just
+                the Turing machine itself.
+              </p>
+              <h4 name="5614" id="5614" class="graf graf--h4 graf-after--p">
+                Computable Sequences
+              </h4>
+              <p name="61c0" id="61c0" class="graf graf--p graf-after--h4">
+                In fact, Turing’s primary focus was on this idea of
+                <em class="markup--em markup--p-em">computable sequences, </em
+                >which we will use to define computable numbers shortly.
+              </p>
+              <p name="dde5" id="dde5" class="graf graf--p graf-after--p">
+                We can look at that non-halting Turing machine we constructed
+                earlier: On a blank tape, it prints
+                <strong class="markup--strong markup--p-strong"
+                  >10101010101…</strong
+                >. Because this was made by a Turing machine that ends up
+                printing out an infinite number of
+                <strong class="markup--strong markup--p-strong">1</strong>s and
+                <strong class="markup--strong markup--p-strong">0</strong>s,
+                Turing would consider this a
+                <em class="markup--em markup--p-em">computable sequence.</em>
+              </p>
+              <p name="c9b6" id="c9b6" class="graf graf--p graf-after--p">
+                Under Turing’s original construction, these sorts of infinite
+                sequences are exactly what we’re going for — we want to print
+                out a bunch of
+                <strong class="markup--strong markup--p-strong">1</strong>s and
+                <strong class="markup--strong markup--p-strong">0</strong>s
+                forever and ever. We’d call Turing machines that end up printing
+                an infinite sequence like this
+                <em class="markup--em markup--p-em">circle-free,</em> and
+                anything else <em class="markup--em markup--p-em">circular.</em>
+              </p>
+              <h4 name="df89" id="df89" class="graf graf--h4 graf-after--p">
+                From computable sequences to computable numbers
+              </h4>
+              <p name="6361" id="6361" class="graf graf--p graf-after--h4">
+                Just like we have decimals in base 10, we can have ‘decimals’ in
+                base 2 as well! They’re not called ‘decimals’, rather ‘binary
+                fractions’, but they operate pretty much exactly the same,
+                except in base 2 rather than base 10. For example, the number
+                <strong class="markup--strong markup--p-strong">0.75</strong>
+                converted to binary becomes
+                <strong class="markup--strong markup--p-strong">0.11</strong>,
+                or
+                <strong class="markup--strong markup--p-strong">2.8125 </strong
+                >converted to binary becomes
+                <strong class="markup--strong markup--p-strong">10.1101</strong
+                >. The exact conversion between decimal fractions and binary
+                fractions isn’t really important, but you can
+                <a
+                  href="https://www.youtube.com/watch?v=unsFz2j3cio"
+                  data-href="https://www.youtube.com/watch?v=unsFz2j3cio"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >watch a tutorial</a
+                >
+                if you <em class="markup--em markup--p-em">really</em> want.
+              </p>
+              <p name="708c" id="708c" class="graf graf--p graf-after--p">
+                We can interpret a
+                <em class="markup--em markup--p-em">computable sequence</em> as
+                the fractional part of a binary number. The sequence
+                <strong class="markup--strong markup--p-strong">101010… </strong
+                >would therefore becomes
+                <strong class="markup--strong markup--p-strong"
+                  >0.101010…</strong
+                >, giving us a number to work with. Anything that’s off by an
+                integer from this fractional component is itself computable.
+              </p>
+              <p name="edf1" id="edf1" class="graf graf--p graf-after--p">
+                It turns out, the set of computable numbers defined by the
+                modern construction and by Turing’s construction are the same!
+              </p>
+              <h4 name="9ac1" id="9ac1" class="graf graf--h4 graf-after--p">
+                But… why the modern construction then?
+              </h4>
+              <p name="0543" id="0543" class="graf graf--p graf-after--h4">
+                I have no clue what drove the modern construction. I believe
+                it’s clearer and easier to work with mathematically than its
+                original counterpart, but that’s about it. Perhaps there’s some
+                incurable ambiguity in the original construction that makes it
+                not mathematically rigorous enough. If anyone has input on this,
+                I’d love to hear it.
+              </p>
+              <h4 name="138b" id="138b" class="graf graf--h4 graf-after--p">
+                A quick pet peeve
+              </h4>
+              <p name="6b03" id="6b03" class="graf graf--p graf-after--h4">
+                If we’re gonna invoke the language of the original paper when
+                we’re forming arguments (which we shouldn’t have to do anyways),
+                we might at least do so genuinely and accurately. It’s cool to
+                say
+                <em class="markup--em markup--p-em"
+                  >a Turing machine is circle-free</em
+                >
+                if you actually mean
+                <em class="markup--em markup--p-em"
+                  >this Turing machine prints out a binary fraction ad
+                  infinitum</em
+                >, but try to refrain from doing so when that’s not exactly what
+                you mean.
+              </p>
+              <p name="46a8" id="46a8" class="graf graf--p graf-after--p">
+                If you get nothing else out of this article, get this: Being
+                pedantic about Turing machines’ definitions doesn’t get you very
+                far. It doesn’t generally make you more correct mathematically.
+                Most sane definitions of Turing’s initial definition will be
+                equivalent. Unless we’re solving problems within the specific
+                domain of computability, we shouldn’t be arguing about this
+                stuff in any meaningful capacity — it’s not worth it.
+              </p>
+              <h3 name="541a" id="541a" class="graf graf--h3 graf-after--p">
+                Equivalence to other computational systems
+              </h3>
+              <p name="66c9" id="66c9" class="graf graf--p graf-after--h3">
+                So, as I mentioned earlier, there are a fair number of
+                equivalent models of Turing machines. Google these away to your
+                heart’s content.
+              </p>
+              <ul class="postList">
+                <li name="e791" id="e791" class="graf graf--li graf-after--p">
+                  Post-Turing Machines
+                </li>
+                <li name="8407" id="8407" class="graf graf--li graf-after--li">
+                  Multi-tape Turing Machines
+                </li>
+              </ul>
+              <p name="0b8c" id="0b8c" class="graf graf--p graf-after--li">
+                And also equivalent models that aren’t Turing Machines:
+              </p>
+              <ul class="postList">
+                <li name="4945" id="4945" class="graf graf--li graf-after--p">
+                  μ-recursive functions
+                </li>
+                <li name="c8d0" id="c8d0" class="graf graf--li graf-after--li">
+                  the
+                  <a
+                    href="http://www.lambda-explorer.net/"
+                    data-href="http://www.lambda-explorer.net/"
+                    class="markup--anchor markup--li-anchor"
+                    rel="noopener"
+                    target="_blank"
+                    >Untyped Lambda Calculus</a
+                  >
+                </li>
+                <li name="9d4e" id="9d4e" class="graf graf--li graf-after--li">
+                  <a
+                    href="https://en.wikipedia.org/wiki/One_instruction_set_computer"
+                    data-href="https://en.wikipedia.org/wiki/One_instruction_set_computer"
+                    class="markup--anchor markup--li-anchor"
+                    rel="noopener"
+                    target="_blank"
+                    >OISCs</a
+                  >, highly minimalistic computers with just one instruction.
+                </li>
+                <li name="c79a" id="c79a" class="graf graf--li graf-after--li">
+                  Conway’s Game of Life
+                </li>
+                <li name="d68d" id="d68d" class="graf graf--li graf-after--li">
+                  Most programming languages
+                </li>
+                <li name="6a55" id="6a55" class="graf graf--li graf-after--li">
+                  Abacuses (with a few simple rules)
+                </li>
+                <li name="0c91" id="0c91" class="graf graf--li graf-after--li">
+                  Buckets and rocks (with a few simple rules)
+                </li>
+                <li name="d69e" id="d69e" class="graf graf--li graf-after--li">
+                  Whichever system Randall Munroe was implying with
+                  <a
+                    href="https://xkcd.com/505/"
+                    data-href="https://xkcd.com/505/"
+                    class="markup--anchor markup--li-anchor"
+                    rel="noopener"
+                    target="_blank"
+                    >this</a
+                  >
+                </li>
+              </ul>
+              <p name="d163" id="d163" class="graf graf--p graf-after--li">
+                We can prove that in each of these cases, these computational
+                systems can compute the exact same set of functions as any
+                other. And boy, that’s a lot of different Turing equivalent
+                systems. Abaci, recursive functions, the lambda calculus, a
+                bunch of rocks? They’re all
+                <em class="markup--em markup--p-em">exactly</em> equivalent?
+                Huh, weird…
+              </p>
+              <p name="f979" id="f979" class="graf graf--p graf-after--p">
+                Anyways, let’s take a closer look at programming languages.
+              </p>
+              <h3 name="1877" id="1877" class="graf graf--h3 graf-after--p">
+                Programming Languages as Turing Complete
+              </h3>
+              <p name="a947" id="a947" class="graf graf--p graf-after--h3">
+                Intuitively, programming languages can be Turing complete. Let’s
+                see if we can formalize the notion.
+              </p>
+              <p name="18b7" id="18b7" class="graf graf--p graf-after--p">
+                Pragmatically, all we have to do to get our programming language
+                into the throes of beautiful formalism is to equip it with an
+                input and output format, just like we did for Turing machines
+                above. Like before, we have some play with exactly how we define
+                our input and outputs, but most reasonable choices should give
+                us all the power we need. We’re not trying to make waves with
+                this choice, we’re just trying to bootstrap to the point where
+                “input” and “output” make sense mathematically.
+              </p>
+              <p name="7e67" id="7e67" class="graf graf--p graf-after--p">
+                For a quick example of how dead simple I’m thinking, we’ll do a
+                quick one for javascript:
+              </p>
+              <pre
+                name="9582"
+                id="9582"
+                class="graf graf--pre graf-after--p"
+              >If a javascript program exposes a function named <strong class="markup--strong markup--pre-strong">run() </strong>which, when executed with a primitive integer as the first argument, returns either an integer or <strong class="markup--strong markup--pre-strong">undefined</strong>, the output is the return value. Otherwise the output is <strong class="markup--strong markup--pre-strong">undefined</strong>.</pre>
+              <p name="069e" id="069e" class="graf graf--p graf-after--pre">
+                I’m gonna return to this particular definition later, but for
+                right now, just note that it is one of many possible definitions
+                we could choose.
+              </p>
+              <h4 name="21e2" id="21e2" class="graf graf--h4 graf-after--p">
+                Boundedness
+              </h4>
+              <p name="fe1a" id="fe1a" class="graf graf--p graf-after--h4">
+                Turing machines can hold an unbounded amount of state, whereas
+                computers cannot.
+              </p>
+              <p name="fa27" id="fa27" class="graf graf--p graf-after--p">
+                Any program running on a computer isn’t going to be fully Turing
+                complete; there exists a limit. No computer ever is going to be
+                able to compute
+                <a
+                  href="https://en.wikipedia.org/wiki/Graham%27s_number"
+                  data-href="https://en.wikipedia.org/wiki/Graham%27s_number"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Graham’s Number</a
+                >
+                * 2, ever — there’s just not enough space in the universe for a
+                computer that large. Yet, to a Turing machine which doubles
+                numbers, the practical boundedness of the universe isn’t an
+                issue. A Turing machine is just as capable of computing Graham’s
+                Number * 2 as it is computing the 2 * 2, it just takes a few
+                more steps. This gap implies that real world computers can’t
+                compute Turing Computable functions for all inputs, and are
+                therefore not Turing Complete.
+              </p>
+              <p name="3f61" id="3f61" class="graf graf--p graf-after--p">
+                So what are they?
+              </p>
+              <p name="450a" id="450a" class="graf graf--p graf-after--p">
+                We have a separate name for these — they’re not quite equivalent
+                to full-blown Turing machines but they can do everything that a
+                Turing machine can, up to a certain limit. These are called
+                <a
+                  href="https://en.wikipedia.org/wiki/Linear_bounded_automaton"
+                  data-href="https://en.wikipedia.org/wiki/Linear_bounded_automaton"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Linear Bounded Automations</a
+                >. Linear Bounded Automations are nearly identical to Turing
+                machines, except they impose a left and right boundary to the
+                tape.
+              </p>
+              <p name="ebf5" id="ebf5" class="graf graf--p graf-after--p">
+                So if computers aren’t fully Turing complete, how can a
+                programming language, which runs on a computer, ever hope to be
+                Turing complete?
+              </p>
+              <p name="f47d" id="f47d" class="graf graf--p graf-after--p">
+                The trick is that languages don’t necessarily imply limits
+                within their specifications and instead push this problem to the
+                lower level. A language can either be Turing complete or Turing
+                incomplete, based solely on its specification, and independently
+                of any implementation on a real-world computer. The difference
+                might be more subtle than you think, which I can demonstrate
+                using Brainfuck.²
+              </p>
+              <p name="b8c4" id="b8c4" class="graf graf--p graf-after--p">
+                Let’s compare 2 different common interpretations of the
+                Brainfuck <em class="markup--em markup--p-em">byte pointer</em>:
+              </p>
+              <pre
+                name="530a"
+                id="530a"
+                class="graf graf--pre graf-after--p"
+              ><strong class="markup--strong markup--pre-strong">Original Definition</strong><br>A Brainfuck program has an implicit byte pointer, called “the pointer”, which is free to move around within an <em class="markup--em markup--pre-em">array of 30000 bytes</em>, initially all set to zero. The pointer itself is initialized to point to the beginning of this array.</pre>
+              <pre
+                name="ea48"
+                id="ea48"
+                class="graf graf--pre graf-after--pre"
+              ><strong class="markup--strong markup--pre-strong">Modified Definition</strong><br>A Brainfuck program has an implicit byte pointer, called “the pointer”, which is free to move around within <em class="markup--em markup--pre-em">an infinite array</em>, initially all set to zero. The pointer itself is initialized to point to the beginning of this array.</pre>
+              <p name="e084" id="e084" class="graf graf--p graf-after--pre">
+                Spot the difference? It’s that bound on the tape length. In the
+                former case, the
+                <em class="markup--em markup--p-em">language itself </em>has a
+                finite bound, making it equivalent to a linearly bound automata,
+                independent of any machine it runs on. On a theoretical computer
+                without bounds, the functions expressible by the original
+                definition is NOT Turing complete.
+              </p>
+              <p name="9287" id="9287" class="graf graf--p graf-after--p">
+                Compare with the bottom definition.³ On a theoretical computer
+                without bounds, we can express any Turing computable function
+                using Brainfuck. Thus the language itself, separate from any
+                implementation or computer it might run on, is Turing complete.
+              </p>
+              <p name="5569" id="5569" class="graf graf--p graf-after--p">
+                So when someone says “language [x] is Turing complete” and
+                doesn’t prove that the language itself can theoretically support
+                unbounded memory, you can out-pedant them and tell them that you
+                won’t believe them until they show it does!
+              </p>
+              <p name="a66c" id="a66c" class="graf graf--p graf-after--p">
+                …speaking of which, let’s go back to the definition for input
+                and output we chose for Javascript. We’ll do a sanity check to
+                see whether or not our input and output allow for ANY size
+                number, up to and beyond Graham’s Number. Here’s what we laid
+                out before:
+              </p>
+              <pre
+                name="948e"
+                id="948e"
+                class="graf graf--pre graf-after--p"
+              >If a javascript program exposes a function named <strong class="markup--strong markup--pre-strong">run() </strong>which, when executed with a primitive integer as the first argument, returns either an integer or <strong class="markup--strong markup--pre-strong">undefined</strong>, the output is the return value. Otherwise the output is <strong class="markup--strong markup--pre-strong">undefined</strong>.</pre>
+              <p name="6eb0" id="6eb0" class="graf graf--p graf-after--pre">
+                So does that work with mind-bogglingly huge numbers like
+                Graham’s number? Unfortunately, no. In Javascript, primitive
+                integers are
+                <a
+                  href="http://www.ecma-international.org/ecma-262/7.0/#sec-number.max_safe_integer"
+                  data-href="http://www.ecma-international.org/ecma-262/7.0/#sec-number.max_safe_integer"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >only guaranteed exact to 2⁵³</a
+                >, so it looks like this specific input/output schema wasn’t
+                sufficient.
+              </p>
+              <h4 name="c181" id="c181" class="graf graf--h4 graf-after--p">
+                Establishing an Input/Output schema for Javascript
+              </h4>
+              <p name="0c61" id="0c61" class="graf graf--p graf-after--h4">
+                So what input/output schema would be viable? Can we use strings
+                to represent infinite data?
+                <a
+                  href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length#Description"
+                  data-href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length#Description"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Not anymore</a
+                >. Can we use very large unary arrays to represent numbers?
+                <a
+                  href="https://stackoverflow.com/questions/6154989/maximum-size-of-an-array-in-javascript#answer-6155063"
+                  data-href="https://stackoverflow.com/questions/6154989/maximum-size-of-an-array-in-javascript#answer-6155063"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Sadly, no</a
+                >.
+              </p>
+              <p name="3872" id="3872" class="graf graf--p graf-after--p">
+                Let’s move to a different data structure, away from primitives
+                for input, and consider using instead a linked list of various
+                objects in JS. Remember, we’re just looking for a viable way to
+                represent natural numbers:
+              </p>
+              <pre
+                name="551f"
+                id="551f"
+                class="graf graf--pre graf-after--p"
+              >// null wrapped 3 times represents the number 3<br>{ next: { next: { next: null }}}</pre>
+              <p name="d67d" id="d67d" class="graf graf--p graf-after--pre">
+                This schema should work⁴. The only limit to how deeply this
+                structure can nest are limits in the interpreter and computer
+                themselves — not within the spec. We can, as far as the
+                Javascript specification is concerned, represent numbers as
+                large as Graham’s number using this recursive pattern.⁶
+              </p>
+              <p name="a93e" id="a93e" class="graf graf--p graf-after--p">
+                Does this mean Javascript is Turing complete? We should avoid
+                jumping to conclusions too early: There might be some critical
+                roadblock to handling extremely large recursive structures, but
+                for JavaScript, I doubt there’s any such roadblock.⁵
+              </p>
+              <h4 name="f60f" id="f60f" class="graf graf--h4 graf-after--p">
+                Hypercomputation in Programming Languages
+              </h4>
+              <p name="4fe1" id="4fe1" class="graf graf--p graf-after--h4">
+                The ability to specify non-implementable processes has an
+                interesting implication: A programming language’s specification
+                need not be bounded by computability. That is, a programming
+                language itself can be specified to be Super-Turing complete,
+                able to compute things a Turing machine never could.
+              </p>
+              <p name="dbe6" id="dbe6" class="graf graf--p graf-after--p">
+                For example, imagine something called JS-Hyper. JS-Hyper is
+                equivalent to JS, with the addition of a new builtin function
+                <strong class="markup--strong markup--p-strong"
+                  >willHalt(dn, args)</strong
+                >, where
+                <strong class="markup--strong markup--p-strong"
+                  >willHalt</strong
+                >
+                is an
+                <a
+                  href="https://en.wikipedia.org/wiki/Oracle_machine"
+                  data-href="https://en.wikipedia.org/wiki/Oracle_machine"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >oracle</a
+                >
+                that determines whether the Turing machine with
+                <em class="markup--em markup--p-em">description number</em>
+                <strong class="markup--strong markup--p-strong">dn </strong>will
+                halt for arguments
+                <strong class="markup--strong markup--p-strong">args</strong>.
+                Since a Turing machine can’t compute that function, JS-Hyper is
+                Super-Turing complete
+              </p>
+              <p name="99eb" id="99eb" class="graf graf--p graf-after--p">
+                This serves to show that even though we expect computers to be
+                able to execute programming languages, nothing stops us from
+                defining a programming language unconstrained by such silly
+                notions such as computability. We can do anything we want! The
+                power is ours!
+                <a
+                  href="https://www.youtube.com/watch?v=e_DqV1xdf-Y"
+                  data-href="https://www.youtube.com/watch?v=e_DqV1xdf-Y"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Haha</a
+                >!
+              </p>
+              <h3 name="d297" id="d297" class="graf graf--h3 graf-after--p">
+                The Church-Turing Thesis
+              </h3>
+              <p name="09c4" id="09c4" class="graf graf--p graf-after--h3">
+                Why should we care so much about this weird set of functions
+                called the computable functions? Why does it even make sense to
+                call this set of functions the computable functions?
+              </p>
+              <p name="9aca" id="9aca" class="graf graf--p graf-after--p">
+                What Turing and Alonzo Church claim is that humans are bound by
+                these rules just like machines are; that any process a human can
+                use to calculate a number can also be done by a computer, and
+                vice versa. The Church-Turing thesis, in essence, claims that
+                human beings are (computationally at least) Turing Equivalent.
+              </p>
+              <p name="b8e8" id="b8e8" class="graf graf--p graf-after--p">
+                Turing calls the numbers that humans can algorithmically compute
+                in finite time the
+                <em class="markup--em markup--p-em">effectively calculable</em>
+                numbers. In essence, the effectively calculable numbers are all
+                the numbers we’d ever have hope of computing — any number
+                wherein we can think of a method to compute that number is
+                considered to be effectively calculable.
+              </p>
+              <p name="8bc1" id="8bc1" class="graf graf--p graf-after--p">
+                We can restate the Church-Turing thesis in this language,
+                yielding:
+              </p>
+              <blockquote
+                name="ed0a"
+                id="ed0a"
+                class="graf graf--blockquote graf-after--p"
+              >
+                <strong class="markup--strong markup--blockquote-strong"
+                  >Church-Turing Thesis:</strong
+                >
+                The sets of effectively calculable numbers and computable
+                numbers are equivalent.
+              </blockquote>
+              <p
+                name="1ce0"
+                id="1ce0"
+                class="graf graf--p graf-after--blockquote"
+              >
+                Looks almost formal, doesn’t it?
+              </p>
+              <h4 name="a8d4" id="a8d4" class="graf graf--h4 graf-after--p">
+                And away from rigor
+              </h4>
+              <p name="c08f" id="c08f" class="graf graf--p graf-after--h4">
+                As you might have noticed, the Church-Turing thesis isn’t an
+                argument based on strict formalisms or on rigorous proofs. No,
+                we’ve strayed deep into what is essentially a
+                <em class="markup--em markup--p-em">philosophical</em> argument
+                about the limits of computability and of minds themselves — a
+                wonderful example of philosophy and mathematics coexisting and
+                complementing one other.
+              </p>
+              <p name="bdf9" id="bdf9" class="graf graf--p graf-after--p">
+                Turing’s argument provides three pieces of evidence to make his
+                case for the equivalence of the
+                <em class="markup--em markup--p-em"
+                  >effectively calculable numbers </em
+                >and the
+                <em class="markup--em markup--p-em">computable numbers</em>.
+              </p>
+              <blockquote
+                name="27fa"
+                id="27fa"
+                class="graf graf--blockquote graf-after--p"
+              >
+                The arguments which I shall use are of three kinds.<br /><strong
+                  class="markup--strong markup--blockquote-strong"
+                  >(a)</strong
+                >
+                A direct appeal to intuition. <br /><strong
+                  class="markup--strong markup--blockquote-strong"
+                  >(b)</strong
+                >
+                A proof of the equivalence of two definitions (in case the new
+                definition has a greater intuitive appeal). <br /><strong
+                  class="markup--strong markup--blockquote-strong"
+                  >(c)</strong
+                >
+                Giving examples of large classes of numbers which are
+                computable.
+              </blockquote>
+              <p
+                name="2418"
+                id="2418"
+                class="graf graf--p graf-after--blockquote"
+              >
+                We’ve already brought up equivalent systems before, and we’ve
+                also brought up large classes of computable numbers as well
+                (neither of which we’re bothering to prove here). So that just
+                leaves the
+                <em class="markup--em markup--p-em"
+                  >direct appeal to intuition </em
+                >to complete Turing’s argument.
+              </p>
+              <p name="ecaf" id="ecaf" class="graf graf--p graf-after--p">
+                In essence, Turing argues that the process a computer (as in the
+                old school human occupation) executes to compute a number
+                essentially boils down to an infinite tape paired with a finite
+                state machine. A human can focus on only at a finite number of
+                symbols at a time, and a human only has a finite number of
+                possible head-states (due to a finite number of neurons). Given
+                that a certain head-state defines what action you take next, you
+                can imagine a massive, massive transition table, encompassing
+                every possible mental transition.
+              </p>
+              <p name="a25d" id="a25d" class="graf graf--p graf-after--p">
+                Obviously, this is a very rough sketch argument. But at least
+                you can sort of see how a combination of infinite paper and
+                finite mental capacity hints towards the Church-Turing thesis.
+              </p>
+              <h4 name="e5ee" id="e5ee" class="graf graf--h4 graf-after--p">
+                Broader implications
+              </h4>
+              <p name="e6c1" id="e6c1" class="graf graf--p graf-after--h4">
+                What’s so interesting about the Church-Turing thesis
+                philosophically is that it points towards Turing completeness as
+                being ‘it’, in a sense. It points towards no deterministic<em
+                  class="markup--em markup--p-em"
+                >
+                </em
+                >system being able to compute more than what a Turing machine
+                can compute. In this sense,
+                <em class="markup--em markup--p-em">incomputable</em> means not
+                only incomputable for Turing machines, but for ANY type of
+                deterministic machine.
+              </p>
+              <p name="0ce9" id="0ce9" class="graf graf--p graf-after--p">
+                Given how many systems are Turing equivalent, how simple a
+                system can be to be Turing equivalent, and how prevalent Turing
+                equivalence is, does it still make sense to think of Turing
+                completeness in terms of Turing machines? Maybe pragmatically,
+                but in my opinion, these machines shouldn’t form the
+                <em class="markup--em markup--p-em">essence</em> of Turing
+                computability, rather merely the
+                <em class="markup--em markup--p-em">origin</em> of Turing
+                computability.
+              </p>
+              <p name="1f2c" id="1f2c" class="graf graf--p graf-after--p">
+                To me, thinking about Turing equivalence as being inexorably
+                bound to Turing machines kind of devalues how fundamental
+                <em class="markup--em markup--p-em">computable numbers</em> and
+                <em class="markup--em markup--p-em">computable functions</em>
+                are. This set of functions has deep mathematical and
+                philosophical importance separate from how we defined them;
+                Turing machines just happened to be how we bootstrapped
+                ourselves to understanding what they are. I think that’s really
+                cool.
+              </p>
+              <h3 name="7372" id="7372" class="graf graf--h3 graf-after--p">
+                Tackling the incomputable
+              </h3>
+              <p name="61e9" id="61e9" class="graf graf--p graf-after--h3">
+                Can we go beyond these restrictions? What tools do we have
+                against the uncountably many incomputable numbers? You might be
+                tempted to think that there’s no way for a computer to compute
+                anything uncomputable — I mean, it’s exactly what Turing claims!
+              </p>
+              <p name="b28b" id="b28b" class="graf graf--p graf-after--p">
+                Well, our edge against these problems lies in not solving the
+                <em class="markup--em markup--p-em">general </em>problems that
+                are proven incomputable, but tackling
+                <em class="markup--em markup--p-em">specific</em> sub-problems
+                that it might be useful to solve anyways. If we had a program
+                that verified whether a certain program would terminate or not
+                for most programs (but not all), that’s something we can use to
+                help us write algorithms and proofs. Pathological cases need not
+                stop us from providing answers in straightforward cases.
+              </p>
+              <p name="6a5b" id="6a5b" class="graf graf--p graf-after--p">
+                In software engineering, we solve specific subproblems like this
+                <em class="markup--em markup--p-em">all the time</em>. So often,
+                in fact, we might not realize what we’re doing. For example,
+                does this JS program ever finish execution?
+              </p>
+              <pre
+                name="3a16"
+                id="3a16"
+                class="graf graf--pre graf-after--p"
+              >function run(){<br>  for(let i = 0; i !== -1; i++);<br>}</pre>
+              <p name="a85a" id="a85a" class="graf graf--p graf-after--pre">
+                The answer is “No, of course not.
+                <strong class="markup--strong markup--p-strong">i</strong> will
+                never equal
+                <strong class="markup--strong markup--p-strong"
+                  >-1<em class="markup--em markup--p-em">, </em></strong
+                >so this program will run forever.” Well, you just performed a
+                little subproblem of the great and undecidable halting problem,
+                and it wasn’t even difficult! Yay!
+              </p>
+              <p name="1749" id="1749" class="graf graf--p graf-after--p">
+                Compilers automate this process heavily, deciding whether code
+                is unreachable, whether certain subroutines will ever stop, so
+                on and so forth. In essence, compilers solve the halting problem
+                in specific cases, just like we did above. If we extend this
+                kind of reasoning, we can cover some pretty complicated
+                examples.⁷
+              </p>
+              <h4 name="7d73" id="7d73" class="graf graf--h4 graf-after--p">
+                Hypercomputation
+              </h4>
+              <p name="6462" id="6462" class="graf graf--p graf-after--h4">
+                There is, however, a field of study called hypercomputation that
+                deals with the calculation of incomputable numbers. Like actual,
+                real, manifestable incomputable numbers in the real world.
+                Hypercomputation as a subject requires either:
+              </p>
+              <ol class="postList">
+                <li name="000e" id="000e" class="graf graf--li graf-after--p">
+                  That the Church-Turing thesis is false, such that there exists
+                  some mechanical process that humans can do to compute numbers
+                  that can’t be performed by computers.
+                </li>
+                <li name="fca5" id="fca5" class="graf graf--li graf-after--li">
+                  That the Church-Turing thesis is fundamentally weaker than the
+                  common interpretation, such that there exist functions that
+                  machines can compute which humans cannot (given infinite time
+                  and space).
+                </li>
+                <li name="122d" id="122d" class="graf graf--li graf-after--li">
+                  That there are physically realizable incomputable numbers,
+                  such that there are instances wherein we can
+                  <em class="markup--em markup--li-em">measure</em> incomputable
+                  numbers physically rather than
+                  <em class="markup--em markup--li-em">compute </em>them.
+                </li>
+              </ol>
+              <p name="a362" id="a362" class="graf graf--p graf-after--li">
+                Philosophically, if any of these things are true, then that says
+                something very profound about the nature of the universe: that
+                the universe explicitly does NOT operate like a Turing machine.
+                This might be really interesting to know.
+              </p>
+              <p name="50a6" id="50a6" class="graf graf--p graf-after--p">
+                For potentially unsurprising reasons, studying something that
+                relies on one of those three unproven assumptions has led to a
+                number of skeptics. Notably, Martin Davis (the fellow who as
+                mentioned earlier popularized the modern definition of Turing
+                machines), wrote a paper with the wonderfully sassy title
+                <a
+                  href="http://www1.maths.leeds.ac.uk/~pmt6sbc/docs/davis.myth.pdf"
+                  data-href="http://www1.maths.leeds.ac.uk/~pmt6sbc/docs/davis.myth.pdf"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >The Myth of Hypercomputation</a
+                >. Davis argues that 1: many ‘results’ in hypercomputation
+                either implicitly or explicitly presume having access to
+                incomputable numbers to begin with, and that 2: if there was a
+                manifestation of an incomputable number physically, it wouldn’t
+                be useful.
+              </p>
+              <p name="e0d7" id="e0d7" class="graf graf--p graf-after--p">
+                This controversy ended up prompting one of the better lines in
+                academia, written by Davis in
+                <strong class="markup--strong markup--p-strong"
+                  ><em class="markup--em markup--p-em"
+                    >Vol. 178 of Applied Mathematics and Computation</em
+                  ></strong
+                >:
+              </p>
+              <blockquote
+                name="7b73"
+                id="7b73"
+                class="graf graf--blockquote graf-after--p"
+              >
+                The editors have kindly invited me to write an introduction to
+                this special issue devoted to ‘‘hypercomputation’’ despite their
+                perfect awareness of my belief that there is no such subject.
+              </blockquote>
+              <p
+                name="b93b"
+                id="b93b"
+                class="graf graf--p graf-after--blockquote"
+              >
+                I had no other reason to include this mention of
+                hypercomputation except that I find the above quote hilarious
+                and wanted a reason to share it.
+              </p>
+              <p name="b040" id="b040" class="graf graf--p graf-after--p">
+                Does this field exist? Tell us what you think in the comment
+                section below. Don’t forget to rate, comment, and subscribe for
+                more videos like this!
+              </p>
+              <h3 name="0a7d" id="0a7d" class="graf graf--h3 graf-after--p">
+                Is Turing computability useful knowledge in software
+                engineering?
+              </h3>
+              <p name="d61b" id="d61b" class="graf graf--p graf-after--h3">
+                There’s a lot of talk about languages being Turing-complete. I
+                don’t think this is a very useful consideration, for several
+                reasons:
+              </p>
+              <ul class="postList">
+                <li name="5196" id="5196" class="graf graf--li graf-after--p">
+                  It’s not a high bar. You wouldn’t differentiate a programming
+                  language as being Turing complete, given that practically
+                  every other programming language for which Turing completeness
+                  matters is itself Turing complete.
+                </li>
+                <li name="a4ce" id="a4ce" class="graf graf--li graf-after--li">
+                  Whether a language is fully Turing complete vs. linearly
+                  bounded isn’t a very useful distinction, because we run our
+                  programs on computers of finite size and speed, not within the
+                  boundless logic-sphere of mathematics, and most
+                  language-specified bounds are going to be large enough for any
+                  purpose.
+                </li>
+                <li name="28ee" id="28ee" class="graf graf--li graf-after--li">
+                  Turing completeness doesn’t make a language useful. I
+                  mentioned earlier that Brainfuck is Turing complete, but that
+                  doesn’t mean I’m going to consider it for any serious project.
+                  Languages in this category are said to fall into the
+                  <a
+                    href="https://en.wikipedia.org/wiki/Turing_tarpit"
+                    data-href="https://en.wikipedia.org/wiki/Turing_tarpit"
+                    class="markup--anchor markup--li-anchor"
+                    rel="noopener"
+                    target="_blank"
+                    >Turing Tarpit</a
+                  >.
+                </li>
+                <li name="9ef2" id="9ef2" class="graf graf--li graf-after--li">
+                  Turing incompleteness doesn’t make a language useless, either.
+                  If HTML ends up being Turing incomplete, that doesn’t make
+                  HTML any less useful: It’s a tool to specify document
+                  structure. It doesn’t need to be Turing complete.
+                </li>
+              </ul>
+              <p name="9369" id="9369" class="graf graf--p graf-after--li">
+                So if it ever is useful in arguments about software engineering,
+                it’s rarely useful at best. Any argument in software engineering
+                hinging on Turing completeness either misunderstands Turing
+                completeness or forms a particularly weak claim.
+              </p>
+              <p name="db0d" id="db0d" class="graf graf--p graf-after--p">
+                Fortunately, people don’t care purely about the immediate
+                utility of information. That would be fairly annoying.
+              </p>
+              <h3 name="937c" id="937c" class="graf graf--h3 graf-after--p">
+                Is this article over?
+              </h3>
+              <p
+                name="371b"
+                id="371b"
+                class="graf graf--p graf-after--h3 graf--trailing"
+              >
+                Yes.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section name="5aef" class="section section--body">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <p name="0d93" id="0d93" class="graf graf--p graf--leading">
+                Sources include
+                <a
+                  href="https://www.amazon.com/Computability-Logic-George-S-Boolos/dp/0521701465"
+                  data-href="https://www.amazon.com/Computability-Logic-George-S-Boolos/dp/0521701465"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Computability and Logic</a
+                >,
+                <a
+                  href="http://The%20Annotated%20Turing"
+                  data-href="http://The Annotated Turing"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >The Annotated Turing</a
+                >, lots of Wikipedia, all papers mentioned (and a few others now
+                long gone in my browser history), assorted blog posts,
+                conversations about computability with friends, a few of my own
+                arguments, and hopefully comments from Viewers Like You. Thank
+                you.
+              </p>
+              <p
+                name="770f"
+                id="770f"
+                class="graf graf--p graf-after--p graf--trailing"
+              >
+                If I’m wrong about ANYTHING, regardless how pedantic, feel free
+                to comment and tell me about why. I have no formal background in
+                theory of computation, so it’s very likely I got something wrong
+                here, just hoping it wasn’t anything too major.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section name="28b8" class="section section--body section--last">
+          <div class="section-divider"><hr class="section-divider" /></div>
+          <div class="section-content">
+            <div class="section-inner sectionLayout--insetColumn">
+              <h4 name="6ad5" id="6ad5" class="graf graf--h4 graf--leading">
+                <em class="markup--em markup--h4-em">Footnotes</em>
+              </h4>
+              <p name="cb74" id="cb74" class="graf graf--p graf-after--h4">
+                (1): The definition I chose to use here differs only minimally
+                from Kleene and Martin’s description of the partial function,
+                which requires an extra tally for each input, such that an input
+                of
+                <strong class="markup--strong markup--p-strong">3 </strong>would
+                be encoded
+                <strong class="markup--strong markup--p-strong">1111</strong>,
+                rather than
+                <strong class="markup--strong markup--p-strong">111</strong>.
+                I’m not sure why
+                <strong class="markup--strong markup--p-strong"
+                  >Computability and Logic</strong
+                >
+                chose to stray from that, but this isn’t a wildly important
+                difference.
+              </p>
+              <p name="6a56" id="6a56" class="graf graf--p graf-after--p">
+                (2): If you haven’t encountered Brainfuck before and you’re a
+                big enough nerd to have made it this far into an article about
+                Turing completeness, you’re in for a treat: It’s a hilariously
+                minimalistic and hard to use programming language.
+                <a
+                  href="https://copy.sh/brainfuck/"
+                  data-href="https://copy.sh/brainfuck/"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Seriously, try it out!</a
+                >)
+              </p>
+              <p name="cf70" id="cf70" class="graf graf--p graf-after--p">
+                (3) I believe this is the definition implicitly used in
+                <a
+                  href="http://www.iwriteiam.nl/Ha_bf_Turing.html"
+                  data-href="http://www.iwriteiam.nl/Ha_bf_Turing.html"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Brainfuck is Turing Complete</a
+                >
+              </p>
+              <p name="c5c6" id="c5c6" class="graf graf--p graf-after--p">
+                (4) It might have been more convenient to use nested arrays,
+                such as [] to represent 0, [[]] to represent 1, so on and so
+                forth. I thought objects would capture the nature a bit better.
+              </p>
+              <p name="f093" id="f093" class="graf graf--p graf-after--p">
+                (5) In this case, we can paint some strong intuition why we
+                likely don’t have such an issue. Remember the untyped lambda
+                calculus I mentioned earlier? It uses a recursive structure to
+                represent unary numbers in a very similar fashion, and one could
+                easily define a translation between the above linked list
+                representation and the
+                <em class="markup--em markup--p-em">Church Numerals</em> that
+                the untyped lambda calculus uses. Since the operations on the
+                lambda calculus are defined recursively, and (I don’t think)
+                there is any spec-defined limit on recursion depth, this format
+                should be sufficient. Javascript is almost certainly Turing
+                complete.
+              </p>
+              <p name="2b3f" id="2b3f" class="graf graf--p graf-after--p">
+                (6) To me, it seems like our looser sense of “Is this system
+                Turing Complete” implicitly asks “Does there exist an
+                input/output strategy such that the resulting system is Turing
+                Complete?” I’m not going to dig into this problem, because doing
+                so opens up the can of worms in terms of “well what defines an
+                input/output schema? Could that alone be Turing-complete?” and
+                I’m not yet equipped to tackle those questions. We’ll just have
+                to plug our ears and close our eyes and pretend we haven’t
+                thought of this minor complication.
+              </p>
+              <p
+                name="a484"
+                id="a484"
+                class="graf graf--p graf-after--p graf--trailing"
+              >
+                (7) I believe this is what
+                <a
+                  href="http://research.microsoft.com/en-us/um/cambridge/projects/terminator/collatz.htm"
+                  data-href="http://research.microsoft.com/en-us/um/cambridge/projects/terminator/collatz.htm"
+                  class="markup--anchor markup--p-anchor"
+                  rel="noopener"
+                  target="_blank"
+                  >Microsoft’s Terminator</a
+                >
+                research project was trying to tackle, but I don’t know what’s
+                up with that or where the current state of the art is.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+      <footer>
+        <p>
+          By
+          <a href="https://medium.com/@evinsellin" class="p-author h-card"
+            >Evin Sellin</a
+          >
+          on
+          <a href="https://medium.com/p/a08cc36b26e2"
+            ><time class="dt-published" datetime="2017-01-11T08:16:58.235Z"
+              >January 11, 2017</time
+            ></a
+          >.
+        </p>
+        <p>
+          <a
+            href="https://medium.com/@evinsellin/what-exactly-is-turing-completeness-a08cc36b26e2"
+            class="p-canonical"
+            >Canonical link</a
+          >
+        </p>
+        <p>
+          Exported from <a href="https://medium.com">Medium</a> on March 2,
+          2022.
+        </p>
+      </footer>
+    </article>
+  </body>
+</html>
