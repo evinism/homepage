@@ -72,3 +72,12 @@ iframe.process-sandbox {
     filter: hue-rotate(360deg);
   }
 }
+
+@keyframes backdropDiagonalMove {
+  0% {
+    background-position: 0;
+  }
+  100% {
+    background-position: 100px;
+  }
+}

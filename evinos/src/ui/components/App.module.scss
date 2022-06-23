@@ -12,13 +12,16 @@
       display: flex;
       flex-direction: column;
       flex-grow: 1;
-      background: repeating-linear-gradient(
+      animation: backdropDiagonalMove 20s infinite linear;
+      background-image: repeating-linear-gradient(
         45deg,
         white,
         white 10px,
-        #eee 10px,
-        #eee 20px
+        #ccc 10px,
+        #ccc 20px
       );
+      background-size: 100px 100px;
+      background-position: 0px;
     }
 
     .multiplier2 {
@@ -30,8 +33,8 @@
         0deg,
         white,
         white 1px,
-        #ccc 1px,
-        #ccc 2px
+        #aaa 1px,
+        #aaa 2px
       );
     }
 
