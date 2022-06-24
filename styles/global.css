@@ -50,6 +50,7 @@ iframe.process-sandbox {
   0% {
     opacity: 0.7;
     transform: scaleY(0);
+    filter: blur(2px);
   }
   5% {
     transform: scaleY(0.5) scaleX(1.5) skew(-10deg, -10deg);
@@ -59,6 +60,7 @@ iframe.process-sandbox {
   }
 
   100% {
+    filter: blur(0px);
     opacity: 1;
     transform: scale(1);
   }

@@ -7,7 +7,6 @@
   flex-direction: column;
   min-height: 100vh;
   :global {
-    animation: screenOn 1.5s;
     .multiplier1 {
       display: flex;
       flex-direction: column;
@@ -17,8 +16,8 @@
         45deg,
         white,
         white 10px,
-        #ccc 10px,
-        #ccc 20px
+        #ddd 10px,
+        #ddd 20px
       );
       background-size: 100px 100px;
       background-position: 0px;
@@ -43,7 +42,7 @@
       flex-direction: column;
       flex-grow: 1;
       mix-blend-mode: multiply;
-      background-color: black;
+      background-color: #000500;
       padding: 10px;
     }
 
@@ -68,6 +67,7 @@
     }
 
     .screen {
+      animation: screenOn 1.5s;
       flex-grow: 1;
       font-size: 1.4em;
       border: 3px solid #44ff44;

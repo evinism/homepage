@@ -21,6 +21,11 @@ const knownColors = {
   spin: -1,
 }
 
+const initialColors = [
+  knownColors.green,
+  knownColors.orange,
+];
+
 // lol lenses
 function changeParam<K extends keyof AppState>(key: K) {
   return (fn: (value: AppState[typeof key]) => void) => (state: AppState) => ({
@@ -49,7 +54,7 @@ class App extends React.Component<AppProps, AppState> {
   state = {
     output: "",
     off: false,
-    hueRotation: pickRandom(Object.values(knownColors)),
+    hueRotation: pickRandom(Object.values(initialColors)),
   };
   button: undefined | HTMLButtonElement;
 
@@ -113,13 +118,13 @@ class App extends React.Component<AppProps, AppState> {
       case "colorCommand": {
         const color = cmd.color;
         let newRotation = undefined;
-        if (color === 'random'){
+        if (color === "random") {
           newRotation = Math.random();
         } else {
           newRotation = knownColors[color];
         }
-        if (newRotation !== undefined){
-          this.setState(changeHueRotation(() => newRotation))
+        if (newRotation !== undefined) {
+          this.setState(changeHueRotation(() => newRotation));
         }
         break;
       }
@@ -170,20 +175,20 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   render() {
-    const {hueRotation} = this.state;
+    const { hueRotation } = this.state;
     let inlineStyle: any;
-    if (hueRotation >= 0){
+    if (hueRotation >= 0) {
       inlineStyle = {
         filter: `hue-rotate(${this.state.hueRotation * 360}deg)`,
-      }
+      };
     } else {
       inlineStyle = {
         animation: `hueSpin 7s 0s infinite linear`,
-      }
+      };
     }
 
     return (
-      <div className={styles.app} style={inlineStyle} >
+      <div className={styles.app} style={inlineStyle}>
         <Screen
           output={this.state.output}
           off={this.state.off}
