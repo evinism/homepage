@@ -44,7 +44,11 @@ const ImportExport = ({ tables, setTables, close }: ImportExportProps) => {
   const handleSecret = async () => {
     const secret = prompt("Secret Code?");
     try {
-      const newText = await (await fetch(`/${secret}.txt`)).text();
+      const res = await fetch(`https://secrets.evin.dev/dmtools/${secret}.txt`);
+      if (!res.ok) {
+        throw new Error("Invalid secret code");
+      }
+      const newText = await res.text();
       setTables(loadTables(newText));
       alert("Secret worked!!");
     } catch (err) {
