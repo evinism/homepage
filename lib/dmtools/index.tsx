@@ -1,3 +1,6 @@
-import App from "./App";
+import dynamic from "next/dynamic";
 
-export default App;
+// Because of annoying things.
+const NoSSRApp = dynamic(() => import("./App"), { ssr: false });
+
+export default NoSSRApp;
