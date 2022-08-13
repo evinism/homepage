@@ -1,0 +1,143 @@
+.diceTableGrid {
+  width: 620px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+}
+
+.diceTablePage {
+  padding: 8px;
+  display: flex;
+  width: 100vw;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.diceTablePage h5 {
+  width: 100%;
+  padding: 8px;
+}
+
+.diceTablePage .events {
+  flex-grow: 1;
+  min-height: calc(100vh - 200px);
+  max-width: 620px;
+  margin: 8px 4px;
+}
+
+.diceTableModalFull {
+  max-width: calc(100vw - 50px);
+  max-height: calc(100vh - 50px);
+  margin: 10px auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.diceTableModalPaper .dataWrapper {
+  padding: 0 8px;
+  display: flex;
+  overflow: scroll;
+}
+
+.diceTableModalPaper textarea {
+  min-width: 760px;
+  font-size: 15px;
+  line-height: 18px;
+}
+
+.diceTablePage .buttonRow {
+  padding: 8px 0;
+  text-align: right;
+}
+
+.diceTableModalPaper h5 {
+  padding: 8px 0;
+}
+
+.diceTableModalPaper .buttonRow {
+  text-align: right;
+  padding: 8px 0;
+}
+
+.diceTableCardTag {
+  display: inline-block;
+  line-height: 16px;
+  border-radius: 8px;
+  border: 1px solid gray;
+  padding: 0 8px;
+}
+
+.diceTableCardTag button {
+  background-color: transparent;
+  color: inherit;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.diceTableCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.diceTableCardContent {
+  flex-grow: 1;
+}
+
+.diceTableCard .tagRow {
+  overflow: hidden;
+}
+
+.diceTableEditorTags {
+  padding: 8px 0;
+}
+
+.diceTableEditorTags > * {
+  margin-left: 4px;
+}
+
+.diceTableImportExport {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.diceTableImportExport textarea {
+  flex-grow: 1;
+  width: 100%;
+}
+
+.diceTableImportExport .buttonRow {
+  text-align: right;
+  padding: 8px 0;
+}
+
+.diceTableGridCards {
+  position: relative;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin: 8px 0;
+  flex-grow: 1;
+  padding-bottom: 40px;
+}
+
+.diceTableGrid .buttonRow {
+  position: relative;
+}
+
+.diceTableGrid .buttonRow::before {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  content: "";
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(0, #303030, transparent);
+}
+.noTablesMatch {
+  padding-bottom: 40px;
+}

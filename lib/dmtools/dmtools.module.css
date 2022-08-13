@@ -1,0 +1,52 @@
+.App {
+  min-height: 100vh;
+  text-align: center;
+}
+
+.diceResult {
+  font-size: 20px;
+}
+
+.castDie {
+  border: 1px solid white;
+  border-radius: 8px;
+  height: 64px;
+  width: 64px;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  margin: 2px;
+}
+
+.castDieResult {
+  font-size: 20px;
+  display: block;
+}
+
+span.castDieSides {
+  font-size: 15px;
+}
+
+.diceLineItem {
+  padding: 10px;
+  margin: 10px 0;
+  border-top: 1px solid gray;
+}
+
+.diceQuery {
+  padding-bottom: 16px;
+  cursor: pointer;
+}
+
+.App label {
+  padding-bottom: 16px;
+  display: block;
+}
+
+.clearButton {
+  margin: 1rem;
+}
+
+.headerLink {
+  padding: 0 12px;
+}
