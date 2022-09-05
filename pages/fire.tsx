@@ -35,9 +35,18 @@ const FireLinks = () => {
           . Satellite data. ~24 hr lag, but it's easy to tell what's real. Can
           be shown on FireMappers.
         </li>
+      </ul>
+      <h2>Assorted Sites</h2>
+      <ul>
+        <li>
+          <a href="https://www.alertwildfire.org/region/northbay/?camera=Axis-SEPopeValley1">
+            Fire Cameras
+          </a>{" "}
+          (via AlertWildfire)
+        </li>
         <li>
           <a href="https://www.fire.ca.gov/incidents/">Cal Fire Incidents</a>{" "}
-          Accuracy over completeness.
+          Official AF.
         </li>
       </ul>
     </article>
