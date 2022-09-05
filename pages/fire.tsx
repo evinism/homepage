@@ -2,6 +2,10 @@ const FireLinks = () => {
   return (
     <article>
       <h1>CA Fire Links</h1>
+      <p>
+        Below are a lot of sources for tracking wildfires in California. Each
+        source is ordered in "best to worst" information.
+      </p>
       <h2>Twit</h2>
       <ul>
         <li>
@@ -40,14 +44,24 @@ const FireLinks = () => {
       <h2>Assorted Sites</h2>
       <ul>
         <li>
+          <a href="https://www.fire.ca.gov/incidents/">Cal Fire Incidents</a>{" "}
+          Very official.
+        </li>
+        <li>
+          <a href="https://www.broadcastify.com/listen/?stid=6">
+            Live radio feeds
+          </a>
+          . Hard to parse, but as up-to-date as central controllers have.
+        </li>
+        <li>
           <a href="https://www.alertwildfire.org/region/northbay/?camera=Axis-SEPopeValley1">
             Fire Cameras
           </a>{" "}
-          (via AlertWildfire)
+          (via AlertWildfire). They'll often be pointed at major incidents.
         </li>
         <li>
-          <a href="https://www.fire.ca.gov/incidents/">Cal Fire Incidents</a>{" "}
-          Official AF.
+          <a href="https://www.flightradar24.com/">FlightRadar24</a>. For
+          following where the tankers are during major incidents.
         </li>
       </ul>
     </article>
