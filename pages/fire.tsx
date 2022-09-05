@@ -33,7 +33,8 @@ const FireLinks = () => {
             FIRMS
           </a>
           . Satellite data. ~24 hr lag, but it's easy to tell what's real. Can
-          be shown on FireMappers.
+          be shown on FireMappers. Also beware that refineries often show up as
+          fires.
         </li>
       </ul>
       <h2>Assorted Sites</h2>
