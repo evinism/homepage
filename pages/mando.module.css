@@ -1,11 +1,19 @@
+@font-face {
+  font-family: 'FreeMono';
+  src: url('../assets/freefont/FreeMono.ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
 .mando {
   padding: 0 8px;
   max-width: 800px;
 }
 
 .fretdiagram {
-  font-family: monospace;
+  font-family: FreeMono;
   line-height: 20px;
+  font-size: 20px;
 }
 
 .noheight {
