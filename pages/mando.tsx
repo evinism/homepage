@@ -1,24 +1,5 @@
-import { FunctionComponent, useState } from "react";
-
-function shuffle(array) {
-  let currentIndex = array.length,
-    randomIndex;
-
-  // While there remain elements to shuffle.
-  while (currentIndex != 0) {
-    // Pick a remaining element.
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
-  }
-
-  return array;
-}
+import { useState } from "react";
+import styles from "./mando.module.css";
 
 type Optional<T> = T | undefined;
 
@@ -64,7 +45,7 @@ const noteOrder: Note[] = [
   "G#",
 ];
 
-const baseChords: Chord[] = [
+const knownRootChords: Chord[] = [
   {
     shape: [0, 0, 2, 3],
     base: "G",
@@ -180,41 +161,39 @@ const baseChords: Chord[] = [
   },
 ];
 
-const allChords: Chord[] = baseChords.flatMap((chord) => {
-  const { shape, base } = chord;
-  return Array(12)
-    .fill(0)
-    .map((_, i) => {
-      const newShape = shape.map((fret) => {
-        return fret + i;
+const expandChords = (rootChords: Chord[]): Chord[] =>
+  rootChords.flatMap((chord) => {
+    const { shape, base } = chord;
+    return Array(12)
+      .fill(0)
+      .map((_, i) => {
+        const newShape = shape.map((fret) => {
+          return fret + i;
+        });
+        return {
+          shape: newShape as Shape,
+          base: noteOrder[(noteOrder.indexOf(base) + i) % 12],
+          modifier: chord.modifier,
+        };
       });
-      return {
-        shape: newShape as Shape,
-        base: noteOrder[(noteOrder.indexOf(base) + i) % 12],
-        modifier: chord.modifier,
-      };
-    });
-});
+  });
 
-const makeFretLine = (fret: Optional<number>) => {
-  const frets = (" ┠" + "─╂".repeat(18)).split("");
+const makeFretLine = (fret: Optional<number>, length = 18) => {
+  const frets = (" ┠" + "─╂".repeat(length)).split("");
   if (fret !== undefined) {
     frets[fret * 2] = fret === 0 ? "◯" : "◯";
   }
   return "\u00A0" + frets.join("");
 };
 
-type Settings = {
-  flip?: boolean;
-};
-
 interface ChordDisplayProps {
   shape: Shape;
-  settings?: Settings;
+  flip?: boolean;
+  numFrets?: number;
 }
 
-const FretDiagram = ({ shape, settings = {} }: ChordDisplayProps) => {
-  const { flip } = settings;
+const FretDiagram = ({ shape, flip, numFrets = 18 }: ChordDisplayProps) => {
+  const lenInChars = numFrets * 2 + 2;
   const nonOctaveDots = [
     "\u00A0".repeat(7),
     "•",
@@ -226,24 +205,24 @@ const FretDiagram = ({ shape, settings = {} }: ChordDisplayProps) => {
     "•",
     "\u00A0".repeat(9),
     "•",
-  ].join("");
-  const octaveDots = "\u00A0".repeat(25) + "•";
+  ]
+    .join("")
+    .slice(0, lenInChars);
+  const octaveDots = ("\u00A0".repeat(25) + "•").slice(0, lenInChars);
 
   if (flip) {
     shape = shape.slice().reverse() as Shape;
   }
 
   return (
-    <div>
-      <div style={{ lineHeight: "20px", fontFamily: "monospace" }}>
-        <div>{makeFretLine(shape[3])}</div>
-        <div style={{ lineHeight: "0" }}>{octaveDots}</div>
-        <div>{makeFretLine(shape[2])}</div>
-        <div style={{ lineHeight: "0" }}>{nonOctaveDots}</div>
-        <div>{makeFretLine(shape[1])}</div>
-        <div style={{ lineHeight: "0" }}>{octaveDots}</div>
-        <div>{makeFretLine(shape[0])}</div>
-      </div>
+    <div className={styles.fretdiagram}>
+      <div>{makeFretLine(shape[3], numFrets)}</div>
+      <div className={styles.noheight}>{octaveDots}</div>
+      <div>{makeFretLine(shape[2], numFrets)}</div>
+      <div className={styles.noheight}>{nonOctaveDots}</div>
+      <div>{makeFretLine(shape[1], numFrets)}</div>
+      <div className={styles.noheight}>{octaveDots}</div>
+      <div>{makeFretLine(shape[0], numFrets)}</div>
     </div>
   );
 };
@@ -260,19 +239,15 @@ type GameState =
 interface GameDisplayProps {
   chord: Chord;
   next: () => void;
+  flip: boolean;
 }
 
 const displayChord = (chord: Chord) => {
   return chord.base + (chord.modifier ? chord.modifier : "");
 };
 
-function GameDisplay({ chord, next }: GameDisplayProps) {
+function GameDisplay({ chord, next, flip }: GameDisplayProps) {
   const [answerRevealed, setAnswerRevealed] = useState(false);
-  const [flipped, setFlipped] = useState(false);
-
-  const settings = {
-    flip: flipped,
-  };
 
   const handleNext = () => {
     setAnswerRevealed(false);
@@ -281,24 +256,19 @@ function GameDisplay({ chord, next }: GameDisplayProps) {
   return (
     <div>
       <p>
-        <FretDiagram shape={chord.shape} settings={settings} />
+        <FretDiagram shape={chord.shape} flip={flip} />
       </p>
       <button onClick={handleNext}>Next</button>
       {!answerRevealed && (
         <button onClick={() => setAnswerRevealed(true)}>Show Answer</button>
       )}
       {answerRevealed && <span>{displayChord(chord)}</span>}
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            onChange={(e) => setFlipped(e.target.checked)}
-          />
-          Lefty?
-        </label>
-      </div>
     </div>
   );
+}
+
+function sample<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 export default function ChordGame(props) {
@@ -306,37 +276,77 @@ export default function ChordGame(props) {
     state: "none",
   });
 
+  const [flip, setFlip] = useState(false);
+  const [enabledRootChords, setEnabledRootChords] = useState(
+    knownRootChords.map(() => true)
+  );
+  const rootChords = knownRootChords.filter((_, i) => enabledRootChords[i]);
+  const allChords = expandChords(rootChords);
+
   const makeGameARandomChord = () => {
-    const randomChord = allChords[Math.floor(Math.random() * allChords.length)];
     setGameState({
       state: "playing",
-      currentChord: randomChord,
+      currentChord: sample(allChords),
     });
   };
 
-  if (gameState.state === "none") {
-    return (
-      <div>
-        <h3>Mando Chord Quiz Tool</h3>
+  const inner =
+    gameState.state === "none" ? (
+      <>
         <p>
           This will shove lots of common (and some uncommon, some nigh
           unplayable) chord shapes at you, all across the fretboard. I made it
           to help me get faster at identifying chords on the fly.
         </p>
         <button onClick={makeGameARandomChord}>Start</button>
-      </div>
+      </>
+    ) : (
+      <GameDisplay
+        chord={gameState.currentChord}
+        next={makeGameARandomChord}
+        flip={flip}
+      />
     );
-  } else {
-    return (
-      <div>
-        <h3>Mando Chord Quiz Tool</h3>
-        <GameDisplay
-          chord={gameState.currentChord}
-          next={makeGameARandomChord}
-        />
-      </div>
-    );
-  }
+
+  const settingsSlot = (
+    <>
+      <label>
+        <input type="checkbox" onChange={(e) => setFlip(e.target.checked)} />
+        Lefty?
+      </label>
+      <h4>Enabled Root Chords</h4>
+      <ul>
+        {knownRootChords.map((chord, i) => (
+          <li key={i} className={styles.rootchordli}>
+            <label>
+              <input
+                type="checkbox"
+                checked={enabledRootChords[i]}
+                onChange={(e) => {
+                  const newEnabledRootChords = [...enabledRootChords];
+                  newEnabledRootChords[i] = e.target.checked;
+                  setEnabledRootChords(newEnabledRootChords);
+                }}
+              />{" "}
+              {displayChord(chord)}
+              <FretDiagram shape={chord.shape} numFrets={7} />
+            </label>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+
+  return (
+    <main className={styles.mando}>
+      <h3>Mando Chord Quiz Tool</h3>
+      {inner}
+      <details>
+        <summary>Settings</summary>
+        {settingsSlot}
+      </details>
+    </main>
+  );
 }
 
 export async function getStaticProps() {

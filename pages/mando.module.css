@@ -1,0 +1,17 @@
+.mando {
+  padding: 0 8px;
+  max-width: 800px;
+}
+
+.fretdiagram {
+  font-family: monospace;
+  line-height: 20px;
+}
+
+.noheight {
+  line-height: 0;
+}
+
+.rootchordli {
+  padding: 5px
+}
