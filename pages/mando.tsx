@@ -196,17 +196,25 @@ const allChords: Chord[] = baseChords.flatMap((chord) => {
     });
 });
 
-const makeFretLine = (fret: number) => {
+const makeFretLine = (fret: Optional<number>) => {
   const frets = (" ┠" + "─╂".repeat(18)).split("");
-  frets[fret * 2] = fret === 0 ? "◯" : "◯";
+  if (fret !== undefined) {
+    frets[fret * 2] = fret === 0 ? "◯" : "◯";
+  }
   return "\u00A0" + frets.join("");
 };
 
+type Settings = {
+  flip?: boolean;
+};
+
 interface ChordDisplayProps {
-  chord: Chord;
+  shape: Shape;
+  settings?: Settings;
 }
 
-const ChordDisplay = ({ chord }: ChordDisplayProps) => {
+const FretDiagram = ({ shape, settings = {} }: ChordDisplayProps) => {
+  const { flip } = settings;
   const nonOctaveDots = [
     "\u00A0".repeat(7),
     "•",
@@ -220,16 +228,21 @@ const ChordDisplay = ({ chord }: ChordDisplayProps) => {
     "•",
   ].join("");
   const octaveDots = "\u00A0".repeat(25) + "•";
+
+  if (flip) {
+    shape = shape.slice().reverse() as Shape;
+  }
+
   return (
     <div>
       <div style={{ lineHeight: "20px", fontFamily: "monospace" }}>
-        <div>{makeFretLine(chord.shape[3])}</div>
+        <div>{makeFretLine(shape[3])}</div>
         <div style={{ lineHeight: "0" }}>{octaveDots}</div>
-        <div>{makeFretLine(chord.shape[2])}</div>
+        <div>{makeFretLine(shape[2])}</div>
         <div style={{ lineHeight: "0" }}>{nonOctaveDots}</div>
-        <div>{makeFretLine(chord.shape[1])}</div>
+        <div>{makeFretLine(shape[1])}</div>
         <div style={{ lineHeight: "0" }}>{octaveDots}</div>
-        <div>{makeFretLine(chord.shape[0])}</div>
+        <div>{makeFretLine(shape[0])}</div>
       </div>
     </div>
   );
@@ -255,6 +268,11 @@ const displayChord = (chord: Chord) => {
 
 function GameDisplay({ chord, next }: GameDisplayProps) {
   const [answerRevealed, setAnswerRevealed] = useState(false);
+  const [flipped, setFlipped] = useState(false);
+
+  const settings = {
+    flip: flipped,
+  };
 
   const handleNext = () => {
     setAnswerRevealed(false);
@@ -263,13 +281,22 @@ function GameDisplay({ chord, next }: GameDisplayProps) {
   return (
     <div>
       <p>
-        <ChordDisplay chord={chord} />
+        <FretDiagram shape={chord.shape} settings={settings} />
       </p>
       <button onClick={handleNext}>Next</button>
       {!answerRevealed && (
         <button onClick={() => setAnswerRevealed(true)}>Show Answer</button>
       )}
       {answerRevealed && <span>{displayChord(chord)}</span>}
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            onChange={(e) => setFlipped(e.target.checked)}
+          />
+          Lefty?
+        </label>
+      </div>
     </div>
   );
 }
