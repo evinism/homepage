@@ -11,7 +11,7 @@
 }
 
 .fretdiagram {
-  font-family: FreeMono;
+  font-family: FreeMono, monospace;
   line-height: 20px;
   font-size: 20px;
 }
