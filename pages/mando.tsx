@@ -267,7 +267,7 @@ function GameDisplay({ chord, next, flip }: GameDisplayProps) {
   );
 }
 
-function sample<T>(arr: T[]): T {
+function sample<T>(arr: T[]): Optional<T> {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
@@ -284,10 +284,15 @@ export default function ChordGame(props) {
   const allChords = expandChords(rootChords);
 
   const makeGameARandomChord = () => {
-    setGameState({
-      state: "playing",
-      currentChord: sample(allChords),
-    });
+    const newChord = sample(allChords);
+    if (newChord) {
+      setGameState({
+        state: "playing",
+        currentChord: newChord,
+      });
+    } else {
+      alert("No chords enabled!");
+    }
   };
 
   const inner =
@@ -315,6 +320,16 @@ export default function ChordGame(props) {
         Lefty?
       </label>
       <h4>Enabled Root Chords</h4>
+      <button
+        onClick={() => setEnabledRootChords(knownRootChords.map(() => true))}
+      >
+        All
+      </button>
+      <button
+        onClick={() => setEnabledRootChords(knownRootChords.map(() => false))}
+      >
+        None
+      </button>
       <ul>
         {knownRootChords.map((chord, i) => (
           <li key={i} className={styles.rootchordli}>
@@ -329,7 +344,7 @@ export default function ChordGame(props) {
                 }}
               />{" "}
               {displayChord(chord)}
-              <FretDiagram shape={chord.shape} numFrets={7} />
+              <FretDiagram shape={chord.shape} numFrets={5} />
             </label>
           </li>
         ))}
@@ -343,7 +358,7 @@ export default function ChordGame(props) {
       {inner}
       <details>
         <summary>Settings</summary>
-        {settingsSlot}
+        <div className={styles.settingsslot}>{settingsSlot}</div>
       </details>
     </main>
   );

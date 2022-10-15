@@ -15,3 +15,8 @@
 .rootchordli {
   padding: 5px
 }
+
+.settingsslot {
+  padding-left: 10px;
+  border-left: 3px solid black;
+}
