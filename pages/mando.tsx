@@ -51,6 +51,11 @@ const knownRootChords: Chord[] = [
     base: "G",
   },
   {
+    shape: [0, 0, 2, 2],
+    base: "G",
+    modifier: "maj7",
+  },
+  {
     shape: [0, 0, 1, 3],
     base: "G",
     modifier: "m",
@@ -74,6 +79,16 @@ const knownRootChords: Chord[] = [
   {
     shape: [5, 3, 0, 1],
     base: "F",
+  },
+  {
+    shape: [5, 3, 0, 0],
+    base: "F",
+    modifier: "maj7",
+  },
+  {
+    shape: [6, 4, 1, 0],
+    base: "F#",
+    modifier: "7",
   },
   // ---
   {
@@ -100,9 +115,19 @@ const knownRootChords: Chord[] = [
     base: "A#",
   },
   {
+    shape: [3, 0, 0, 1],
+    base: "A#",
+    modifier: "maj7",
+  },
+  {
     shape: [4, 0, 2, 2],
     base: "B",
     modifier: "m",
+  },
+  {
+    shape: [4, 1, 0, 2],
+    base: "B",
+    modifier: "7",
   },
   {
     shape: [4, 0, 0, 2],
@@ -118,6 +143,11 @@ const knownRootChords: Chord[] = [
     shape: [2, 0, 3, 2],
     base: "D",
     modifier: "7",
+  },
+  {
+    shape: [2, 0, 4, 2],
+    base: "D",
+    modifier: "maj7",
   },
   {
     shape: [2, 0, 0, 1],
@@ -142,6 +172,11 @@ const knownRootChords: Chord[] = [
     shape: [2, 5, 4, 0],
     base: "A",
     modifier: "7",
+  },
+  {
+    shape: [2, 6, 4, 0],
+    base: "A",
+    modifier: "maj7",
   },
   {
     shape: [2, 2, 3, 0],
@@ -346,6 +381,24 @@ export default function ChordGame(props) {
         onClick={() => setEnabledRootChords(knownRootChords.map(() => false))}
       >
         None
+      </button>
+      <button
+        onClick={() =>
+          setEnabledRootChords(knownRootChords.map((chord) => !chord.modifier))
+        }
+      >
+        Major Only
+      </button>
+      <button
+        onClick={() =>
+          setEnabledRootChords(
+            knownRootChords.map(
+              (chord) => !chord.modifier || chord.modifier === "m"
+            )
+          )
+        }
+      >
+        Major + Minor
       </button>
       <ul>
         {knownRootChords.map((chord, i) => (
