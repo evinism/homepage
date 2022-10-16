@@ -104,6 +104,11 @@ const knownRootChords: Chord[] = [
     base: "B",
     modifier: "m",
   },
+  {
+    shape: [4, 0, 0, 2],
+    base: "B",
+    modifier: "m7",
+  },
   // ---
   {
     shape: [2, 0, 0, 2],
