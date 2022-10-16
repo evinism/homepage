@@ -61,6 +61,11 @@ const knownRootChords: Chord[] = [
     modifier: "7",
   },
   {
+    shape: [0, 3, 2, 3],
+    base: "G",
+    modifier: "7",
+  },
+  {
     shape: [0, 0, 1, 1],
     base: "G",
     modifier: "m7",
@@ -122,6 +127,10 @@ const knownRootChords: Chord[] = [
   // ---
   {
     shape: [2, 2, 4, 0],
+    base: "A",
+  },
+  {
+    shape: [6, 2, 0, 0],
     base: "A",
   },
   {
@@ -347,7 +356,7 @@ export default function ChordGame(props) {
                 }}
               />{" "}
               {displayChord(chord)}
-              <FretDiagram shape={chord.shape} numFrets={5} />
+              <FretDiagram shape={chord.shape} numFrets={6} />
             </label>
           </li>
         ))}
