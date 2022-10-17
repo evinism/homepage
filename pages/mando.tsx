@@ -210,10 +210,10 @@ const knownRootChords: Chord[] = [
   },
 ];
 
-const expandChords = (rootChords: Chord[]): Chord[] =>
+const expandChords = (rootChords: Chord[], expansions = 11): Chord[] =>
   rootChords.flatMap((chord) => {
     const { shape, base } = chord;
-    return Array(12)
+    return Array(expansions + 1)
       .fill(0)
       .map((_, i) => {
         const newShape = shape.map((fret) => {
@@ -329,11 +329,12 @@ export default function ChordGame(props) {
   });
 
   const [flip, setFlip] = useState(false);
+  const [expansions, setExpansions] = useState(12);
   const [enabledRootChords, setEnabledRootChords] = useState(
     knownRootChords.map(() => true)
   );
   const rootChords = knownRootChords.filter((_, i) => enabledRootChords[i]);
-  const allChords = expandChords(rootChords);
+  const allChords = expandChords(rootChords, expansions);
 
   const makeGameARandomChord = () => {
     const newChord = sample(allChords);
@@ -367,10 +368,24 @@ export default function ChordGame(props) {
 
   const settingsSlot = (
     <>
-      <label>
-        <input type="checkbox" onChange={(e) => setFlip(e.target.checked)} />
-        Lefty?
-      </label>
+      <div>
+        <label>
+          <input type="checkbox" onChange={(e) => setFlip(e.target.checked)} />
+          Lefty?
+        </label>
+      </div>
+      <div>
+        <label>
+          <input
+            type="number"
+            value={expansions}
+            min={0}
+            max={14}
+            onChange={(e) => setExpansions(parseInt(e.target.value) || 0)}
+          />
+          How many frets up the fretboard to duplicate chords?
+        </label>
+      </div>
       <h4>Enabled Root Chords</h4>
       <button
         onClick={() => setEnabledRootChords(knownRootChords.map(() => true))}
