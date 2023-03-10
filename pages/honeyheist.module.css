@@ -35,9 +35,11 @@
   position: absolute;
   height: 100%;
   width: 0px;
+  left: 50%;
+  transform: translateX(-50%);
   margin: auto;
   content: "";
-  border: 1px solid white;
+  border: 4px solid white;
 }
 
 .bearCrimeInnerDiagram > .slot {
@@ -59,7 +61,7 @@
   top: 0;
   left: 0;
   text-align: center;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   z-index: 1;
 }
 
@@ -115,7 +117,9 @@
   padding: 0.5rem;
 }
 
-
+.infoPanel textarea {
+  min-height: 10em;
+}
 
 .infoPanelRow {
   display: flex;
@@ -129,4 +133,11 @@
   bottom: 2rem;
   background-color: transparent;
   border-style: ridge;
+}
+
+.rollItems {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  margin: 1rem;
 }

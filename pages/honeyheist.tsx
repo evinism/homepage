@@ -77,9 +77,39 @@ const CriminalBearChart = () => {
     );
   }
 
+  const rollForBear = () => {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    if (roll <= bearAmount) {
+      window.alert(
+        `You rolled a ${roll} and succeeded! Amazing Bear! (needed ${bearAmount} or below)`
+      );
+    } else {
+      window.alert(
+        `You rolled a ${roll} and failed! Drat! (needed ${bearAmount} or below)`
+      );
+    }
+  };
+
+  const rollForCrime = () => {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    if (roll <= criminalAmount) {
+      window.alert(
+        `You rolled a ${roll} and succeeded! Crime Pays! (needed ${criminalAmount} or below)`
+      );
+    } else {
+      window.alert(
+        `You rolled a ${roll} and failed! Drat! (needed ${criminalAmount} or below)`
+      );
+    }
+  };
+
   return (
     <div className={styles.bearCrimeChartBlock}>
       <div>Bear Crime Chart</div>
+      <div className={styles.rollItems}>
+        <button onClick={rollForBear}>Roll For Bear</button>
+        <button onClick={rollForCrime}>Roll For Crime</button>
+      </div>
       <div className={styles.bearCrimeOuterDiagram}>
         <div className={styles.bearCrimeMiddleRow}>
           <button onClick={toBear}>MORE BEAR</button>
@@ -108,9 +138,8 @@ const descriptor = [
 ];
 
 const bearTypes = [
-  "Honey Bear",
-  "Polar Bear",
   "Grizzly Bear",
+  "Polar Bear",
   "Panda Bear",
   "Black Bear",
   "Sun Bear",
@@ -118,6 +147,17 @@ const bearTypes = [
   "Primordial Bear",
   "Space Bear",
 ];
+
+const skills = {
+  "Grizzly Bear": "Terrify",
+  "Polar Bear": "Swim",
+  "Panda Bear": "Eat anything that looks like bamboo.",
+  "Black Bear": "Climb",
+  "Sun Bear": "Sense Honey",
+  "Honey Badger": "Carnage",
+  "Primordial Bear": "History",
+  "Space Bear": "Astral Sight, a fancy name for darkvision",
+};
 
 const roles = [
   "Muscle",
@@ -168,7 +208,13 @@ const generateCharacter = (): Character => {
 };
 
 const characterToDescription = (character: Character): string => {
-  return `Your bear is a ${character.descriptor} ${character.bearType} who is the ${character.role} of the group! They wear a ${character.hat} on their head.`;
+  return `Your bear is a ${character.descriptor} ${
+    character.bearType
+  } who is the ${character.role} of the group! They wear a ${
+    character.hat
+  } on their head. As a ${character.bearType}, their special ability is "${
+    skills[character.bearType]
+  }".`;
 };
 
 const initStateForDescription =
