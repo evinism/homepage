@@ -204,7 +204,7 @@ const roles = [
   "Face",
   "Thief",
   "Demolitions Expert",
-  "Bait",
+  "Wild Card",
 ];
 
 const hats = [
