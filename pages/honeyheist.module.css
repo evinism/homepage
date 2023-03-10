@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .page h1 {
@@ -18,6 +19,10 @@
 
 .bearCrimeMiddleRow > button {
   margin: 0.5em;
+}
+
+.bearCrimeOuterDiagram {
+  padding-bottom: 2.5em;
 }
 
 .bearCrimeInnerDiagram {
