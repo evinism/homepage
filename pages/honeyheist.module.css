@@ -1,0 +1,132 @@
+.page {
+  min-width: 100vw;
+  min-height: 100vh;
+  background-color: #333;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page h1 {
+  margin: 0;
+}
+.page h2 {
+  margin: 0;
+}
+
+
+.bearCrimeMiddleRow > button {
+  margin: 0.5em;
+}
+
+.bearCrimeInnerDiagram {
+  flex-grow: 1;
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  overflow: hidden;
+  border: 1px solid white;
+  border-radius: 1em;
+  background-color: slategray;
+}
+
+.bearCrimeInnerDiagram::after {
+  position: absolute;
+  height: 100%;
+  width: 0px;
+  margin: auto;
+  content: "";
+  border: 1px solid white;
+}
+
+.bearCrimeInnerDiagram > .slot {
+  border-right: 1px solid white;
+  border-left: 1px solid white;
+  flex-grow: 1;
+  height: 3em;
+}
+
+.bearCrimeMiddleRow {
+  position: relative;
+  display: flex;
+}
+
+.innerDiagramOverlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  text-align: center;
+  backdrop-filter: blur(5px);
+  z-index: 1;
+}
+
+.innerDiagramOverlay.bear {
+  background-color: rgba(65, 105, 225, 0.3);
+}
+
+.innerDiagramOverlay.crime {
+  background-color: rgba(0, 128, 0, 0.3);
+}
+
+
+.bearCrimeLabels {
+  position: absolute;
+  top: 100%;
+  display: flex;
+  width: 60%;
+  left: 20%;
+  justify-content: space-between;
+}
+
+.bearCrimeLabels > div {
+  border-radius: 0 0 0.5em 0.5em;
+  border: 1px solid gray;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 0.2rem 1rem;
+}
+
+.slot.bear {
+  background-color: royalblue;
+}
+
+.slot.crime {
+  background-color: green;
+}
+
+.bearCrimeChartBlock {
+  width: 100%;
+  max-width: 50em;
+}
+
+.infoPanel {
+  width: 50%;
+}
+
+.infoPanel input, .infoPanel textarea {
+  font-family: monospace;
+  background-color: transparent;
+  color: white;
+  width: 100%;
+  font-size: 1rem;
+  border-style: ridge;
+  padding: 0.5rem;
+}
+
+
+
+.infoPanelRow {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 2em;
+}
+
+.clearLocalStorageButton {
+  position: absolute;
+  bottom: 2rem;
+  background-color: transparent;
+  border-style: ridge;
+}
