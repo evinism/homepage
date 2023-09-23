@@ -67,7 +67,11 @@ const ColorChooser = () => {
             } = parseHSL(color);
             const squaredSaturation = (s / 100) ** 2;
             const squaredLucidity = (l / 100) ** 2;
-            const left = ((squaredSaturation * h / 360) + (1 - squaredSaturation) * squaredLucidity) * 720;
+            //const left = ((squaredSaturation * h / 360) + (1 - squaredSaturation) * squaredLucidity) * 720;
+            //const top = 190 - squaredSaturation * 190;
+            const left = h / 360 * 720;
+            const top = (squaredSaturation - squaredLucidity) * 90 + 90;
+
             return (
               <div
                 key={color}
@@ -80,7 +84,7 @@ const ColorChooser = () => {
                   transform: `translate(-50%, -50%)`,
                   left,
                   fontSize: "10px",
-                  top: 190 - squaredSaturation * 190,
+                  top,
                 }}
               >
                 <div style={{}}>
