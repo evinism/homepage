@@ -116,8 +116,8 @@ const ColorChooser = () => {
         <div className={styles.ButtonRow}>
           <Button variant="outlined" onClick={submitColorScore(2)}>Amazing</Button>
           <Button variant="outlined" onClick={submitColorScore(1)}>Good</Button>
-          <Button variant="outlined" onClick={submitColorScore(0)}>Neutral</Button>
-          <Button variant="outlined" onClick={submitColorScore(-1)}>Meh</Button>
+          <Button variant="outlined" onClick={submitColorScore(0)}>Meh</Button>
+          <Button variant="outlined" onClick={submitColorScore(-1)}>Bad</Button>
           <Button variant="outlined" onClick={submitColorScore(-2)}>Terrible</Button>
           <Button
             variant="outlined"
