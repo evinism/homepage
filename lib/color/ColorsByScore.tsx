@@ -14,8 +14,8 @@ const ColorsByScore = ({ colorScores }: Props) => {
           <summary>
             {{
               "-2": "Terrible",
-              "-1": "Meh",
-              "0": "Neutral",
+              "-1": "Bad",
+              "0": "Meh",
               "1": "Good",
               "2": "Amazing",
             }[score]
