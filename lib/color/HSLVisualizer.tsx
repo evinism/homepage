@@ -1,3 +1,4 @@
+import { Slider } from "@material-ui/core";
 import { useState } from "react";
 import { parseHSL } from "./color";
 import { ColorScores } from "./type";
@@ -5,6 +6,7 @@ import { ColorScores } from "./type";
 interface HSLVisualizerProps {
   colorScores: ColorScores,
   bg: string,
+  iconSize?: number,
 };
 
 const bgImages = [
@@ -13,7 +15,8 @@ const bgImages = [
   "linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(0,0,0,1) 100%)",
 ];
 
-const HSLVisualizer = ({ colorScores, bg }: HSLVisualizerProps) => {
+const HSLVisualizer = ({ colorScores, bg, iconSize = 20 }: HSLVisualizerProps) => {
+
   return (
     <div style={{
       width: 720, height: 200, position: "relative",
@@ -39,14 +42,14 @@ const HSLVisualizer = ({ colorScores, bg }: HSLVisualizerProps) => {
             key={color}
             style={{
               color: color,
-              height: "10px",
+              height: `${iconSize}px`,
               position: "absolute",
               textAlign: "center",
-              lineHeight: "10px",
+              lineHeight: `${iconSize}px`,
               transform: `translate(-50%, -50%)`,
-              left,
-              fontSize: "10px",
-              top,
+              left: `${left}px`,
+              fontSize: `${iconSize}px`,
+              top: `${top}px`,
             }}
           >
             <div style={{}}>
@@ -71,16 +74,28 @@ interface HSLVisualizerWidgetProps {
 
 const HSLVisualizerWidget = ({ colorScores }: HSLVisualizerWidgetProps) => {
   const [visBG, setVisBG] = useState(0);
+  const [visIconSize, setVisIconSize] = useState(20);
   const bg = bgImages[visBG]!;
   return (
     <>
-      <HSLVisualizer colorScores={colorScores} bg={bg} />
+      <HSLVisualizer colorScores={colorScores} bg={bg} iconSize={visIconSize} />
       <button onClick={() => {
         setVisBG((visBG + bgImages.length - 1) % bgImages.length);
       }}>← Prev</button>
       <button onClick={() => {
         setVisBG((visBG + 1) % bgImages.length);
       }}>Next →</button>
+      <span>Icon size: {visIconSize}px</span>
+      <Slider defaultValue={20}
+        step={1}
+        min={1}
+        max={50}
+        value={visIconSize}
+        onChange={(e, v) => {
+          setVisIconSize(v as number);
+        }}
+
+      />
     </>
   )
 }

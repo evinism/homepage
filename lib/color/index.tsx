@@ -1,11 +1,16 @@
-import dynamic from "next/dynamic";
+import { Button, createTheme, CssBaseline, ThemeProvider, Typography } from "@material-ui/core";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
 import { chooseRandomColor, naturalColorSort } from "./color";
 import ColorsByScore from "./ColorsByScore";
 import HSLVisualizerWidget from "./HSLVisualizer";
 import { ColorScoreValue, ColorScores } from "./type";
+import styles from './app.module.css'
 
+const darkTheme = createTheme({
+  palette: {
+  },
+});
 
 
 const appendColorScore = <T extends 'historical' | 'natural',>(colorScores: ColorScores<T>, color: string, score: ColorScoreValue): ColorScores<T> => {
@@ -22,7 +27,7 @@ const appendColorScore = <T extends 'historical' | 'natural',>(colorScores: Colo
   if (colorScores.order === 'natural')
     newScores.scores.sort(({ color: a }, { color: b }) => naturalColorSort(a, b));
   return newScores;
-}
+};
 
 
 const ColorChooser = () => {
@@ -37,7 +42,6 @@ const ColorChooser = () => {
     setColor(chooseRandomColor());
   };
 
-
   const undo = () => {
     if (colorScores.scores.length === 0) return;
     const prevColor = colorScores.scores[colorScores.scores.length - 1];
@@ -49,25 +53,26 @@ const ColorChooser = () => {
   };
 
   return (
-    <article style={{ padding: 20 }}>
-      <h1>Color Chooser</h1>
-      <div>
-        Is this color good or bad?
-        <div style={{
+    <article className={styles.App}>
+      <Typography variant="h2" align="center">Color Chooser</Typography>
+      <div className={styles.ColorChooserWidget}>
+        <Typography>
+          Is this color good or bad?
+        </Typography>
+        <div className={styles.ColorBox} style={{
           backgroundColor: color,
-          width: "200px",
-          height: "200px",
         }}>
         </div>
-        <div>
-          <button onClick={submitColorScore(2)}>Amazing</button>
-          <button onClick={submitColorScore(1)}>Good</button>
-          <button onClick={submitColorScore(0)}>Neutral</button>
-          <button onClick={submitColorScore(-1)}>Meh</button>
-          <button onClick={submitColorScore(-2)}>Terrible</button>
-        </div>
-        <div>
-          <button onClick={undo} disabled={colorScores.scores.length === 0}>Undo</button>
+        <div className={styles.ButtonRow}>
+          <Button variant="outlined" onClick={submitColorScore(2)}>Amazing</Button>
+          <Button variant="outlined" onClick={submitColorScore(1)}>Good</Button>
+          <Button variant="outlined" onClick={submitColorScore(0)}>Neutral</Button>
+          <Button variant="outlined" onClick={submitColorScore(-1)}>Meh</Button>
+          <Button variant="outlined" onClick={submitColorScore(-2)}>Terrible</Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={undo} disabled={colorScores.scores.length === 0}>Undo</Button>
         </div>
       </div>
       <details>
@@ -94,5 +99,14 @@ const ColorChooser = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(ColorChooser), { ssr: false });
+const App = () => {
+  return (
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <ColorChooser />
+    </ThemeProvider>
+  );
+};
+
+export default App;
 
