@@ -1,19 +1,17 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { usePersistentState } from "../dmtools/hooks";
 import { chooseRandomColor, naturalColorSort } from "./color";
 import HSLVisualizerWidget from "./HSLVisualizer";
 import { ColorScoreValue, LegacyColorScores } from "./type";
 
 const ColorChooser = () => {
   const [color, setColor] = useState(chooseRandomColor());
-  const [colorScores, setColorScores] = useState<LegacyColorScores>(
-    JSON.parse(localStorage.getItem("colorScores") || "{}")
-  );
+  const [colorScores, setColorScores] = usePersistentState<LegacyColorScores>('colorScores', {});
 
   const submitColorScore = (score: ColorScoreValue) => () => {
     let newColorScores = { ...colorScores, [color]: score };
     setColorScores(newColorScores);
-    localStorage.setItem("colorScores", JSON.stringify(newColorScores));
     setColor(chooseRandomColor());
   };
 
@@ -97,7 +95,6 @@ const ColorChooser = () => {
           {JSON.stringify(colorScores, null, 2)}
         </pre>
         <button onClick={() => {
-          localStorage.setItem("colorScores", "{}");
           setColorScores({});
         }}>Reset</button>
       </details>
