@@ -1,4 +1,4 @@
-import { Button, createTheme, CssBaseline, ThemeProvider, Typography } from "@material-ui/core";
+import { Button, createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@material-ui/core";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
 import { chooseRandomColor, naturalColorSort } from "./color";
@@ -29,13 +29,49 @@ const appendColorScore = <T extends 'historical' | 'natural',>(colorScores: Colo
   return newScores;
 };
 
+const categories = [
+  'Default',
+  'General Makeup',
+  'Hair',
+  'Eye Shadow',
+  'Lipstick',
+  'Nail',
+  'General Fashion',
+  'Jewelry',
+  'Tops / Dresses',
+  'Pants / Skirts',
+  'Jackets / Coats',
+  'Shoes',
+  'Pjs',
+  'Underwear',
+  'Swimsuit',
+  'General Home',
+  'Living / Dining Room',
+  'Kitchen',
+  'Bedroom',
+  'Bathroom',
+  'Tarot Room',
+  'Music Room',
+  'Hookah Room',
+  'Garden',
+];
 
 const ColorChooser = () => {
+  const [category, setCategory] = useState('Default');
   const [color, setColor] = useState(chooseRandomColor());
-  const [colorScores, setColorScores] = usePersistentState<ColorScores>('colorScores2', {
+  const [categorizedColorScores, setCategorizedColorScores] = usePersistentState<{ [key: string]: ColorScores }>('colorScores3', {});
+
+  const colorScores = categorizedColorScores[category] ?? {
     order: 'historical',
     scores: [],
-  });
+  };
+
+  const setColorScores = (newScores: ColorScores) => {
+    setCategorizedColorScores({
+      ...categorizedColorScores,
+      [category]: newScores,
+    });
+  };
 
   const submitColorScore = (score: ColorScoreValue) => () => {
     setColorScores(appendColorScore(colorScores, color, score));
@@ -59,6 +95,20 @@ const ColorChooser = () => {
         <Typography>
           Is this color good or bad?
         </Typography>
+        <div className={styles.CategorySelector}>
+          Category:&nbsp;
+          <Select
+            value={category}
+            label="Category"
+            onChange={(e) => setCategory(e.target.value as string)}
+          >
+            {categories.map((category) => {
+              return (
+                <MenuItem key={category} value={category}>{category}</MenuItem>
+              );
+            })}
+          </Select>
+        </div>
         <div className={styles.ColorBox} style={{
           backgroundColor: color,
         }}>

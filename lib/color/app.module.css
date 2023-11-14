@@ -20,3 +20,7 @@
 .ButtonRow *:last-child {
   margin-left: 20px;
 }
+
+.CategorySelector {
+  margin-bottom: 4px;
+}
