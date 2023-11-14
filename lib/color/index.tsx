@@ -38,6 +38,16 @@ const ColorChooser = () => {
   };
 
 
+  const undo = () => {
+    if (colorScores.scores.length === 0) return;
+    const prevColor = colorScores.scores[colorScores.scores.length - 1];
+    setColorScores({
+      order: colorScores.order,
+      scores: colorScores.scores.slice(0, -1),
+    });
+    setColor(prevColor.color);
+  };
+
   return (
     <article style={{ padding: 20 }}>
       <h1>Color Chooser</h1>
@@ -55,6 +65,9 @@ const ColorChooser = () => {
           <button onClick={submitColorScore(0)}>Neutral</button>
           <button onClick={submitColorScore(-1)}>Meh</button>
           <button onClick={submitColorScore(-2)}>Terrible</button>
+        </div>
+        <div>
+          <button onClick={undo} disabled={colorScores.scores.length === 0}>Undo</button>
         </div>
       </div>
       <details>
