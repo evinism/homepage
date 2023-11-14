@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { parseHSL } from "./color";
-import { LegacyColorScores } from "./type";
+import { ColorScores } from "./type";
 
 interface HSLVisualizerProps {
-  colorScores: LegacyColorScores,
+  colorScores: ColorScores,
   bg: string,
 };
 
@@ -21,7 +21,7 @@ const HSLVisualizer = ({ colorScores, bg }: HSLVisualizerProps) => {
       backgroundImage: bg,
       margin: "20px 0",
     }}>
-      {Object.entries(colorScores).map(([color, score]) => {
+      {colorScores.scores.map(({ color, score }) => {
         const {
           h,
           s,
@@ -66,7 +66,7 @@ const HSLVisualizer = ({ colorScores, bg }: HSLVisualizerProps) => {
 }
 
 interface HSLVisualizerWidgetProps {
-  colorScores: LegacyColorScores,
+  colorScores: ColorScores,
 };
 
 const HSLVisualizerWidget = ({ colorScores }: HSLVisualizerWidgetProps) => {

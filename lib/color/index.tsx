@@ -2,30 +2,41 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
 import { chooseRandomColor, naturalColorSort } from "./color";
+import ColorsByScore from "./ColorsByScore";
 import HSLVisualizerWidget from "./HSLVisualizer";
-import { ColorScoreValue, LegacyColorScores } from "./type";
+import { ColorScoreValue, ColorScores } from "./type";
+
+
+
+const appendColorScore = <T extends 'historical' | 'natural',>(colorScores: ColorScores<T>, color: string, score: ColorScoreValue): ColorScores<T> => {
+  const newScores = {
+    order: colorScores.order,
+    scores: [
+      ...colorScores.scores,
+      {
+        color,
+        score,
+      },
+    ]
+  };
+  if (colorScores.order === 'natural')
+    newScores.scores.sort(({ color: a }, { color: b }) => naturalColorSort(a, b));
+  return newScores;
+}
+
 
 const ColorChooser = () => {
   const [color, setColor] = useState(chooseRandomColor());
-  const [colorScores, setColorScores] = usePersistentState<LegacyColorScores>('colorScores', {});
+  const [colorScores, setColorScores] = usePersistentState<ColorScores>('colorScores2', {
+    order: 'historical',
+    scores: [],
+  });
 
   const submitColorScore = (score: ColorScoreValue) => () => {
-    let newColorScores = { ...colorScores, [color]: score };
-    setColorScores(newColorScores);
+    setColorScores(appendColorScore(colorScores, color, score));
     setColor(chooseRandomColor());
   };
 
-  const colorsByScore = Object.entries(colorScores).reduce((acc, [color, score]) => {
-    if (!acc[score]) {
-      acc[score] = [];
-    }
-    acc[score].push(color);
-    return acc;
-  }, {} as { [key: number]: string[] });
-
-  Object.values(colorsByScore).forEach((colors) => {
-    colors.sort(naturalColorSort);
-  });
 
   return (
     <article style={{ padding: 20 }}>
@@ -52,42 +63,7 @@ const ColorChooser = () => {
       </details>
       <details>
         <summary>Colors by Score</summary>
-
-        {Object.entries(colorsByScore).sort(([a], [b]) => parseInt(b) - parseInt(a)).map(([score, colors]) => {
-          return (
-            <details style={{ paddingLeft: '8px', borderLeft: '1px solid gray' }}>
-              <summary>
-                {{
-                  "-2": "Terrible",
-                  "-1": "Meh",
-                  "0": "Neutral",
-                  "1": "Good",
-                  "2": "Amazing",
-                }[score]
-                }
-              </summary>
-              <div key={score} style={{
-                display: "flex",
-                margin: "0px",
-                flexWrap: "wrap",
-              }}>
-
-                {colors.map((color) => {
-                  return (
-                    <div key={color} style={{
-                      backgroundColor: color,
-                      width: "50px",
-                      height: "50px",
-                      margin: "0px",
-                    }}>
-                    </div>
-                  );
-                })}
-              </div>
-            </details>
-
-          );
-        })}
+        <ColorsByScore colorScores={colorScores} />
       </details>
       <details>
         <summary>Debug</summary>
@@ -95,7 +71,10 @@ const ColorChooser = () => {
           {JSON.stringify(colorScores, null, 2)}
         </pre>
         <button onClick={() => {
-          setColorScores({});
+          setColorScores({
+            order: 'historical',
+            scores: [],
+          });
         }}>Reset</button>
       </details>
     </article >
