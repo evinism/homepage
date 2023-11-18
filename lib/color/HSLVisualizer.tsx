@@ -2,6 +2,7 @@ import { Slider } from "@material-ui/core";
 import { useState } from "react";
 import { parseHSL } from "./color";
 import { ColorScores } from "./type";
+import styles from "./app.module.css";
 
 interface HSLVisualizerProps {
   colorScores: ColorScores,
@@ -19,10 +20,10 @@ const HSLVisualizer = ({ colorScores, bg, iconSize = 20 }: HSLVisualizerProps) =
 
   return (
     <div style={{
-      width: 720, height: 200, position: "relative",
+      height: '20vw', position: "relative",
       border: "1px solid black",
       backgroundImage: bg,
-      margin: "20px 0",
+      overflow: "hidden",
     }}>
       {colorScores.scores.map(({ color, score }) => {
         const {
@@ -32,10 +33,8 @@ const HSLVisualizer = ({ colorScores, bg, iconSize = 20 }: HSLVisualizerProps) =
         } = parseHSL(color);
         const squaredSaturation = (s / 100) ** 2;
         const squaredLucidity = (l / 100) ** 2;
-        //const left = ((squaredSaturation * h / 360) + (1 - squaredSaturation) * squaredLucidity) * 720;
-        //const top = 190 - squaredSaturation * 190;
-        const left = h / 360 * 720;
-        const top = (squaredSaturation - squaredLucidity) * 90 + 90;
+        const left = h / 360 * 96 + 2;
+        const top = (squaredSaturation - squaredLucidity) * 48 + 50;
 
         return (
           <div
@@ -47,9 +46,9 @@ const HSLVisualizer = ({ colorScores, bg, iconSize = 20 }: HSLVisualizerProps) =
               textAlign: "center",
               lineHeight: `${iconSize}px`,
               transform: `translate(-50%, -50%)`,
-              left: `${left}px`,
+              left: `${left}%`,
               fontSize: `${iconSize}px`,
-              top: `${top}px`,
+              top: `${top}%`,
             }}
           >
             <div style={{}}>
@@ -79,23 +78,25 @@ const HSLVisualizerWidget = ({ colorScores }: HSLVisualizerWidgetProps) => {
   return (
     <>
       <HSLVisualizer colorScores={colorScores} bg={bg} iconSize={visIconSize} />
-      <button onClick={() => {
-        setVisBG((visBG + bgImages.length - 1) % bgImages.length);
-      }}>← Prev</button>
-      <button onClick={() => {
-        setVisBG((visBG + 1) % bgImages.length);
-      }}>Next →</button>
-      <span>Icon size: {visIconSize}px</span>
-      <Slider defaultValue={20}
-        step={1}
-        min={1}
-        max={50}
-        value={visIconSize}
-        onChange={(e, v) => {
-          setVisIconSize(v as number);
-        }}
+      <div className={styles.HSLControls}>
+        <button onClick={() => {
+          setVisBG((visBG + bgImages.length - 1) % bgImages.length);
+        }}>← Prev</button>
+        <button onClick={() => {
+          setVisBG((visBG + 1) % bgImages.length);
+        }}>Next →</button>
+        <span>Icon size: {visIconSize}px</span>
+        <Slider defaultValue={20}
+          step={1}
+          min={1}
+          max={50}
+          value={visIconSize}
+          onChange={(e, v) => {
+            setVisIconSize(v as number);
+          }}
 
-      />
+        />
+      </div>
     </>
   )
 }

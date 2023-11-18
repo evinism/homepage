@@ -24,3 +24,49 @@
 .CategorySelector {
   margin-bottom: 4px;
 }
+
+.HSLControls {
+  display: flex;
+}
+
+.HSLControls > button {
+  white-space: nowrap;
+}
+
+.UpDownGraph {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.UpDownGraphBucketsAbove, .UpDownGraphBucketsBelow {
+  display: flex;
+}
+
+.UpDownGraphBucketBelow, .UpDownGraphBucketAbove {
+  display: flex;
+  flex-direction: column;
+}
+
+.UpDownGraphBucketAbove {
+  flex-direction: column-reverse;
+}
+
+.UpDownGraphColor {
+  height: 10px;
+  position: relative;
+}
+
+.UpDownGraphCenterline {
+  height: 1px;
+  width: 100%;
+  background-color: #000;
+  position: relative;
+}
+.UpDownGraphAveragePip {
+  border-top: 2px dotted #000;
+  width: 12px;
+  position: absolute;
+  transform: translate(-50%);
+  z-index: 1;
+}

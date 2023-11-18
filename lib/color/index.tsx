@@ -6,6 +6,7 @@ import ColorsByScore from "./ColorsByScore";
 import HSLVisualizerWidget from "./HSLVisualizer";
 import { ColorScoreValue, ColorScores } from "./type";
 import styles from './app.module.css'
+import ColorsByProperty from "./ColorsByProperty";
 
 const darkTheme = createTheme({
   palette: {
@@ -132,6 +133,10 @@ const ColorChooser = () => {
       <details>
         <summary>Colors by Score</summary>
         <ColorsByScore colorScores={colorScores} />
+      </details>
+      <details>
+        <summary>Colors by Property</summary>
+        <ColorsByProperty scores={colorScores} />
       </details>
       <details>
         <summary>Debug</summary>

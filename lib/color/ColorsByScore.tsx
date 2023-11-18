@@ -40,7 +40,6 @@ const ColorsByScore = ({ colorScores }: Props) => {
             })}
           </div>
         </details>
-
       );
     })
     }
