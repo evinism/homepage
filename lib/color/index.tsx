@@ -57,6 +57,15 @@ const categories = [
   'Garden',
 ];
 
+const serializeScores = (scores: ColorScores) => {
+  // use base64 encoding to avoid issues with special characters
+  return btoa(JSON.stringify(scores));
+};
+
+const deserializeScores = (serializedScores: string): ColorScores => {
+  return JSON.parse(atob(serializedScores));
+};
+
 const ColorChooser = () => {
   const [category, setCategory] = useState('Default');
   const [color, setColor] = useState(chooseRandomColor());
@@ -140,15 +149,26 @@ const ColorChooser = () => {
       </details>
       <details>
         <summary>Debug</summary>
+        <button onClick={() => {
+          navigator.clipboard.writeText(serializeScores(colorScores));
+        }}>Copy Scores</button>
+        <button onClick={() => {
+          const serializedScores = prompt('Paste scores here');
+          if (serializedScores) {
+            setColorScores(deserializeScores(serializedScores));
+          }
+        }}>Paste Scores</button>
+        <button onClick={() => {
+          if (window.confirm('Are you sure you want to reset?')) {
+            setColorScores({
+              order: 'historical',
+              scores: [],
+            });
+          }
+        }}>Reset</button>
         <pre>
           {JSON.stringify(colorScores, null, 2)}
         </pre>
-        <button onClick={() => {
-          setColorScores({
-            order: 'historical',
-            scores: [],
-          });
-        }}>Reset</button>
       </details>
     </article >
   );
