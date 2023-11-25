@@ -58,6 +58,8 @@ const categories = [
   'Garden',
 ];
 
+const serializationPrefix = 'colorchooser//';
+
 const serializeScores = (scores: ColorScores): string => {
   // use msgpack:
   const smaller = scores.scores.map(({ color, score }) => {
@@ -71,11 +73,15 @@ const serializeScores = (scores: ColorScores): string => {
     ]
   });
   const encoded = encode(smaller);
-  return Buffer.from(encoded).toString('base64');
+  return `${serializationPrefix}${Buffer.from(encoded).toString('base64')}`;
 };
 
 const deserializeScores = (serializedScores: string): ColorScores => {
-  const msgpacked = Buffer.from(serializedScores, 'base64');
+  if (!serializedScores.startsWith(serializationPrefix)) {
+    throw new Error(`Invalid serialized scores: ${serializedScores}`);
+  }
+  const withoutPrefix = serializedScores.slice(serializationPrefix.length);
+  const msgpacked = Buffer.from(withoutPrefix, 'base64');
   const scores = decode(msgpacked) as [ColorScoreValue, number, number, number][];
   return {
     order: 'historical',
