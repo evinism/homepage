@@ -1,12 +1,13 @@
 import { Button, createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@material-ui/core";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
-import { chooseRandomColor, naturalColorSort } from "./color";
+import { chooseRandomColor, naturalColorSort, parseHSL } from "./color";
 import ColorsByScore from "./ColorsByScore";
 import HSLVisualizerWidget from "./HSLVisualizer";
 import { ColorScoreValue, ColorScores } from "./type";
 import styles from './app.module.css'
 import ColorsByProperty from "./ColorsByProperty";
+import { encode, decode } from '@msgpack/msgpack';
 
 const darkTheme = createTheme({
   palette: {
@@ -57,13 +58,32 @@ const categories = [
   'Garden',
 ];
 
-const serializeScores = (scores: ColorScores) => {
-  // use base64 encoding to avoid issues with special characters
-  return btoa(JSON.stringify(scores));
+const serializeScores = (scores: ColorScores): string => {
+  // use msgpack:
+  const smaller = scores.scores.map(({ color, score }) => {
+    const {
+      h,
+      s,
+      l,
+    } = parseHSL(color);
+    return [
+      score, h, s, l,
+    ]
+  });
+  const encoded = encode(smaller);
+  return Buffer.from(encoded).toString('base64');
 };
 
 const deserializeScores = (serializedScores: string): ColorScores => {
-  return JSON.parse(atob(serializedScores));
+  const msgpacked = Buffer.from(serializedScores, 'base64');
+  const scores = decode(msgpacked) as [ColorScoreValue, number, number, number][];
+  return {
+    order: 'historical',
+    scores: scores.map(([score, h, s, l]) => ({
+      color: `hsl(${h}, ${s}%, ${l}%)`,
+      score,
+    })),
+  };
 };
 
 const ColorChooser = () => {
