@@ -63,7 +63,7 @@ const ColorRater = ({ colorScores, setColorScores }: ColorRaterProps) => {
       <Button variant="outlined" onClick={submitColorScore(-2)}>Terrible</Button>
       <Button
         variant="outlined"
-        color="secondary"
+        color="error"
         onClick={undo} disabled={colorScores.scores.length === 0}>Undo</Button>
     </div>
   </div>
