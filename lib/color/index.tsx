@@ -1,4 +1,4 @@
-import { Button, createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@material-ui/core";
+import { Button, createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@mui/material";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
 import { chooseRandomColor, naturalColorSort, parseHSL } from "./color";

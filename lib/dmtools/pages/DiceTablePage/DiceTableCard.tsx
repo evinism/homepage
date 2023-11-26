@@ -14,7 +14,7 @@ import {
   TableCell,
   TableBody,
   Input,
-} from "@material-ui/core";
+} from "@mui/material";
 import { DiceTable } from "../../data";
 import { outcomesToText, textToOutcomes, chooseFromTable } from "./util";
 import { useState } from "react";

@@ -8,13 +8,13 @@ import {
   Input,
   InputAdornment,
   IconButton,
-} from "@material-ui/core";
+} from "@mui/material";
 import { usePersistentState } from "../../hooks";
 import { initialDiceTables, DiceTable } from "../../data";
 import DiceTableCard from "./DiceTableCard";
 import { useState } from "react";
 import { dumpTables, loadTables } from "./util";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@mui/icons-material/Close";
 import styles from "./DiceTable.module.css";
 
 interface ImportExportProps {

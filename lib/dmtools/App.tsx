@@ -11,12 +11,12 @@ import {
   AppBar,
   Toolbar,
   Typography,
-} from "@material-ui/core";
-import { createTheme } from "@material-ui/core/styles";
+} from "@mui/material";
+import { createTheme } from "@mui/material/styles";
 
 const darkTheme = createTheme({
   palette: {
-    type: "dark",
+    mode: "dark",
   },
 });
 

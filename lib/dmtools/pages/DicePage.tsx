@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { usePersistentState } from "../hooks";
-import { Input, Button } from "@material-ui/core";
+import { Input, Button } from "@mui/material";
 import styles from "../dmtools.module.css";
 
 interface DieCast {

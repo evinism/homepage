@@ -1,4 +1,4 @@
-import { Slider } from "@material-ui/core";
+import { Slider } from "@mui/material";
 import { useState } from "react";
 import { parseHSL } from "./color";
 import { ColorScores } from "./type";

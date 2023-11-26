@@ -1,7 +1,7 @@
 import { naturalColorSort, parseHSL } from "./color";
 import { ColorScore, ColorScores } from "./type";
 import styles from "./app.module.css";
-import { Divider } from "@material-ui/core";
+import { Divider } from "@mui/material";
 
 interface UpDownGraphProps {
   bucketer: (score: ColorScore) => number;
