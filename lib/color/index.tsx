@@ -1,35 +1,20 @@
 import { Button, createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@mui/material";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
-import { chooseRandomColor, naturalColorSort, parseHSL } from "./color";
+import { chooseRandomColor } from "./color";
 import ColorsByScore from "./ColorsByScore";
 import HSLVisualizerWidget from "./HSLVisualizer";
 import { ColorScoreValue, ColorScores } from "./type";
 import styles from './app.module.css'
 import ColorsByProperty from "./ColorsByProperty";
-import { encode, decode } from '@msgpack/msgpack';
+import { deserializeScores, serializeScores } from "./util";
+import ColorRater from "./ColorRater";
 
 const darkTheme = createTheme({
   palette: {
   },
 });
 
-
-const appendColorScore = <T extends 'historical' | 'natural',>(colorScores: ColorScores<T>, color: string, score: ColorScoreValue): ColorScores<T> => {
-  const newScores = {
-    order: colorScores.order,
-    scores: [
-      ...colorScores.scores,
-      {
-        color,
-        score,
-      },
-    ]
-  };
-  if (colorScores.order === 'natural')
-    newScores.scores.sort(({ color: a }, { color: b }) => naturalColorSort(a, b));
-  return newScores;
-};
 
 const categories = [
   'Default',
@@ -58,43 +43,8 @@ const categories = [
   'Garden',
 ];
 
-const serializationPrefix = 'colorchooser//';
-
-const serializeScores = (scores: ColorScores): string => {
-  // use msgpack:
-  const smaller = scores.scores.map(({ color, score }) => {
-    const {
-      h,
-      s,
-      l,
-    } = parseHSL(color);
-    return [
-      score, h, s, l,
-    ]
-  });
-  const encoded = encode(smaller);
-  return `${serializationPrefix}${Buffer.from(encoded).toString('base64')}`;
-};
-
-const deserializeScores = (serializedScores: string): ColorScores => {
-  if (!serializedScores.startsWith(serializationPrefix)) {
-    throw new Error(`Invalid serialized scores: ${serializedScores}`);
-  }
-  const withoutPrefix = serializedScores.slice(serializationPrefix.length);
-  const msgpacked = Buffer.from(withoutPrefix, 'base64');
-  const scores = decode(msgpacked) as [ColorScoreValue, number, number, number][];
-  return {
-    order: 'historical',
-    scores: scores.map(([score, h, s, l]) => ({
-      color: `hsl(${h}, ${s}%, ${l}%)`,
-      score,
-    })),
-  };
-};
-
 const ColorChooser = () => {
   const [category, setCategory] = useState('Default');
-  const [color, setColor] = useState(chooseRandomColor());
   const [categorizedColorScores, setCategorizedColorScores] = usePersistentState<{ [key: string]: ColorScores }>('colorScores3', {});
 
   const colorScores = categorizedColorScores[category] ?? {
@@ -109,58 +59,24 @@ const ColorChooser = () => {
     });
   };
 
-  const submitColorScore = (score: ColorScoreValue) => () => {
-    setColorScores(appendColorScore(colorScores, color, score));
-    setColor(chooseRandomColor());
-  };
-
-  const undo = () => {
-    if (colorScores.scores.length === 0) return;
-    const prevColor = colorScores.scores[colorScores.scores.length - 1];
-    setColorScores({
-      order: colorScores.order,
-      scores: colorScores.scores.slice(0, -1),
-    });
-    setColor(prevColor.color);
-  };
-
   return (
     <article className={styles.App}>
       <Typography variant="h2" align="center">Color Chooser</Typography>
-      <div className={styles.ColorChooserWidget}>
-        <Typography>
-          Is this color good or bad?
-        </Typography>
-        <div className={styles.CategorySelector}>
-          Category:&nbsp;
-          <Select
-            value={category}
-            label="Category"
-            onChange={(e) => setCategory(e.target.value as string)}
-          >
-            {categories.map((category) => {
-              return (
-                <MenuItem key={category} value={category}>{category}</MenuItem>
-              );
-            })}
-          </Select>
-        </div>
-        <div className={styles.ColorBox} style={{
-          backgroundColor: color,
-        }}>
-        </div>
-        <div className={styles.ButtonRow}>
-          <Button variant="outlined" onClick={submitColorScore(2)}>Amazing</Button>
-          <Button variant="outlined" onClick={submitColorScore(1)}>Good</Button>
-          <Button variant="outlined" onClick={submitColorScore(0)}>Meh</Button>
-          <Button variant="outlined" onClick={submitColorScore(-1)}>Bad</Button>
-          <Button variant="outlined" onClick={submitColorScore(-2)}>Terrible</Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={undo} disabled={colorScores.scores.length === 0}>Undo</Button>
-        </div>
+      <div className={styles.CategorySelector}>
+        Category:&nbsp;
+        <Select
+          value={category}
+          label="Category"
+          onChange={(e) => setCategory(e.target.value as string)}
+        >
+          {categories.map((category) => {
+            return (
+              <MenuItem key={category} value={category}>{category}</MenuItem>
+            );
+          })}
+        </Select>
       </div>
+      <ColorRater colorScores={colorScores} setColorScores={setColorScores} />
       <details>
         <summary>HSL Visualizer</summary>
         <HSLVisualizerWidget colorScores={colorScores} />
