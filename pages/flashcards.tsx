@@ -49,7 +49,7 @@ const decks: Deck[] = [
       },
       {
         front: "The Magician",
-        back: "The Trickster",
+        back: "The Poet",
       },
       {
         front: "The High Priestess",
@@ -67,6 +67,55 @@ const decks: Deck[] = [
         front: "The Hierophant",
         back: "The Rebel",
       },
+      {
+        front: "The Lovers",
+        back: "The Suitor",
+      },
+      {
+        front: "The Chariot",
+        back: "The Executive",
+      },
+      {
+        front: "Strength",
+        back: "Fear",
+      },
+      {
+        front: "The Hermit",
+        back: "The Recluse",
+      },
+      {
+        front: "Wheel of Fortune",
+        back: "Wheel of Misfortune",
+      },
+      {
+        front: "Justice",
+        back: "Injustice",
+      },
+      {
+        front: "The Hanged Man",
+        back: "Conformity",
+      },
+      {
+        front: "Death",
+        back: "Rebirth", // Maybe???
+      },
+      {
+        front: "Temperance",
+        back: "Gluttony"
+      },
+      {
+        front: "The Devil",
+        back: "The Knot"
+      },
+      {
+        front: "The Tower",
+        back: "Foundations",
+      },
+      {
+        front: "The Star",
+        back: "The Comet",
+      }
+
     ]
   }
 ];
