@@ -115,7 +115,6 @@ const decks: Deck[] = [
         front: "The Star",
         back: "The Comet",
       }
-
     ]
   }
 ];
