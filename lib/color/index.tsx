@@ -1,10 +1,9 @@
-import { Button, createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@mui/material";
+import { createTheme, CssBaseline, MenuItem, Select, ThemeProvider, Typography } from "@mui/material";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
-import { chooseRandomColor } from "./color";
 import ColorsByScore from "./ColorsByScore";
 import HSLVisualizerWidget from "./HSLVisualizer";
-import { ColorScoreValue, ColorScores } from "./type";
+import { ColorScores } from "./type";
 import styles from './app.module.css'
 import ColorsByProperty from "./ColorsByProperty";
 import { deserializeScores, serializeScores } from "./util";
