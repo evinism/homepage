@@ -11,6 +11,4 @@ export interface ColorScores<T extends 'historical' | 'natural' = 'historical'> 
   scores: ColorScore[];
 }
 
-export type LegacyColorScores = {
-  [color: string]: ColorScoreValue;
-};
+export type Palette = ColorScores;

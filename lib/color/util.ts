@@ -21,11 +21,11 @@ export const toColorsByScore = (colorScores: ColorScores) => {
 }
 
 
-const serializationPrefix = 'colorchooser//';
+const serializationPrefix = 'color.palette.';
 
-export const serializeScores = (scores: ColorScores): string => {
+export const serializeScores = (scores: ColorScores, name: string): string => {
   // use msgpack:
-  const smaller = scores.scores.map(({ color, score }) => {
+  const value = scores.scores.map(({ color, score }) => {
     const {
       h,
       s,
@@ -35,22 +35,51 @@ export const serializeScores = (scores: ColorScores): string => {
       score, h, s, l,
     ]
   });
-  const encoded = encode(smaller);
+  const encoded = encode({
+    key: name,
+    value
+  });
   return `${serializationPrefix}${Buffer.from(encoded).toString('base64')}`;
 };
 
-export const deserializeScores = (serializedScores: string): ColorScores => {
+export const deserializeScores = (serializedScores: string): { key: string, value: ColorScores } => {
   if (!serializedScores.startsWith(serializationPrefix)) {
     throw new Error(`Invalid serialized scores: ${serializedScores}`);
   }
   const withoutPrefix = serializedScores.slice(serializationPrefix.length);
   const msgpacked = Buffer.from(withoutPrefix, 'base64');
-  const scores = decode(msgpacked) as [ColorScoreValue, number, number, number][];
+  const {
+    key, value
+  } = decode(msgpacked) as { key: string, value: [ColorScoreValue, number, number, number][] };
   return {
-    order: 'historical',
-    scores: scores.map(([score, h, s, l]) => ({
-      color: `hsl(${h}, ${s}%, ${l}%)`,
-      score,
-    })),
+    key,
+    value: {
+      order: 'historical',
+      scores: value.map(([score, h, s, l]) => ({
+        color: `hsl(${h}, ${s}%, ${l}%)`,
+        score,
+      })),
+    }
   };
 };
+
+export const chooseNewName = (existingNames: string[], name: string): string => {
+  if (!existingNames.includes(name)) {
+    return name;
+  }
+  // format is "name" for the first one, "name (1)" for the second, "name (2)" for the third, etc.
+  let newName = name;
+  while (existingNames.includes(newName)) {
+    newName = incrementName(newName);
+  }
+  return newName;
+};
+
+const incrementName = (name: string): string => {
+  const match = name.match(/^(.*) \((\d+)\)$/);
+  if (!match) {
+    return `${name} (1)`;
+  }
+  const [, prefix, number] = match;
+  return `${prefix} (${parseInt(number) + 1})`;
+}
