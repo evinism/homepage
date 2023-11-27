@@ -45,30 +45,24 @@ const predefinedCategories = [
 ];
 
 const getFirstPalette = (palettes: { [key: string]: ColorScores }) => {
-  const firstPalette = Object.keys(palettes)[0];
-  if (!firstPalette) {
-    return 'Default';
-  }
-  return firstPalette;
+  return Object.keys(palettes)[0];
 }
-
 
 interface SideDrawerProps {
   palettes: { [key: string]: ColorScores },
   setPalettes: (newPalettes: { [key: string]: ColorScores }) => void;
-  paletteId: string;
+  currentPaletteId: string;
   setCurrentPaletteId: (newPaletteId: string) => void;
   drawerOpen: boolean;
   setDrawerOpen: (newDrawerOpen: boolean) => void;
 }
 
-const SideDrawer = ({ palettes, setPalettes, paletteId, setCurrentPaletteId, drawerOpen, setDrawerOpen }: SideDrawerProps) => {
+const SideDrawer = ({ palettes, setPalettes, currentPaletteId, setCurrentPaletteId, drawerOpen, setDrawerOpen }: SideDrawerProps) => {
   const handleDeletePress = (paletteToDelete: string) => () => {
     if (window.confirm(`Are you sure you want to delete the ${paletteToDelete} palette?`)) {
       const newPalettes = { ...palettes };
       delete newPalettes[paletteToDelete];
-      console.log(newPalettes);
-      if (!newPalettes[paletteId]) {
+      if (!newPalettes[currentPaletteId]) {
         setCurrentPaletteId(getFirstPalette(newPalettes));
       }
       setPalettes(newPalettes);
@@ -78,6 +72,10 @@ const SideDrawer = ({ palettes, setPalettes, paletteId, setCurrentPaletteId, dra
   const handleRenamePress = (category: string) => () => {
     const newName = prompt('New Palette Name:', category);
     if (newName) {
+      if (palettes[newName]) {
+        alert('Palette with that name already exists!');
+        return;
+      }
       const newCategories = { ...palettes };
       newCategories[newName] = newCategories[category];
       delete newCategories[category];
@@ -99,6 +97,10 @@ const SideDrawer = ({ palettes, setPalettes, paletteId, setCurrentPaletteId, dra
       return;
     } catch (e) {
       if (input) {
+        if (palettes[input]) {
+          alert('Palette with that name already exists!');
+          return;
+        }
         setCurrentPaletteId(input);
         setPalettes({
           ...palettes,
@@ -129,24 +131,26 @@ const SideDrawer = ({ palettes, setPalettes, paletteId, setCurrentPaletteId, dra
           return (
             <ListItemButton
               key={listCategory}
-              selected={listCategory === paletteId}
+              selected={listCategory === currentPaletteId}
               onClick={() => {
                 setCurrentPaletteId(listCategory);
                 setDrawerOpen(false);
               }}
             >
               {listCategory}
+              <i>
+                &nbsp;
+                ({palettes[listCategory].scores.length} colors)
+              </i>
               <IconButton onClick={() => copyPaletteToClipboard(listCategory)}>
                 <ContentCopy />
               </IconButton>
               <IconButton onClick={handleRenamePress(listCategory)}>
                 <DriveFileRenameOutlineIcon />
               </IconButton>
-
               <IconButton onClick={handleDeletePress(listCategory)}>
                 <Delete />
               </IconButton>
-
             </ListItemButton>
           );
         })}
@@ -161,30 +165,30 @@ const SideDrawer = ({ palettes, setPalettes, paletteId, setCurrentPaletteId, dra
 }
 
 const ColorChooser = () => {
-  const [palettes, setPalettes] = usePersistentState<{ [key: string]: ColorScores }>('colorScores3', {});
+  let [palettes, setPalettes] = usePersistentState<{ [key: string]: ColorScores }>('colorScores3', {});
   if (Object.keys(palettes).length === 0) {
-    setPalettes({
+    palettes = {
       'Default': {
         order: 'historical',
         scores: [],
       },
-    });
+    };
   }
 
-  const [paletteId, setCurrentPaletteId] = useState(getFirstPalette(palettes));
+  let [currentPaletteId, setCurrentPaletteId] = useState(getFirstPalette(palettes));
+  if (!palettes[currentPaletteId]) {
+    currentPaletteId = getFirstPalette(palettes);
+  }
 
-
-  const colorScores = palettes[paletteId] ?? {
-    order: 'historical',
-    scores: [],
-  };
-
+  const colorScores = palettes[currentPaletteId];
   const setColorScores = (newScores: ColorScores) => {
     setPalettes({
       ...palettes,
-      [paletteId]: newScores,
+      [currentPaletteId]: newScores,
     });
   };
+
+
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   return (
@@ -193,9 +197,9 @@ const ColorChooser = () => {
         <IconButton onClick={() => setDrawerOpen(true)}>
           <MenuIcon />
         </IconButton>
-        Current Palette: {paletteId}
+        Current Palette: {currentPaletteId}
       </div>
-      <SideDrawer palettes={palettes} setPalettes={setPalettes} paletteId={paletteId} setCurrentPaletteId={setCurrentPaletteId} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
+      <SideDrawer palettes={palettes} setPalettes={setPalettes} currentPaletteId={currentPaletteId} setCurrentPaletteId={setCurrentPaletteId} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
       <Typography variant="h2" align="center">Color Chooser</Typography>
       <ColorRater colorScores={colorScores} setColorScores={setColorScores} />
       <details>
