@@ -70,3 +70,15 @@
   transform: translate(-50%);
   z-index: 1;
 }
+
+.ColorsByScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 800px;
+  margin: auto;
+}
+
+.SideDrawerInner {
+  padding: 8px;
+}

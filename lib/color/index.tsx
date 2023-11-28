@@ -1,4 +1,4 @@
-import { Button, createTheme, CssBaseline, Divider, IconButton, List, ListItemButton, MenuItem, Select, SwipeableDrawer, ThemeProvider, Typography } from "@mui/material";
+import { Button, createTheme, CssBaseline, Divider, FormControlLabel, FormGroup, IconButton, List, ListItemButton, MenuItem, Select, Slider, SwipeableDrawer, Switch, ThemeProvider, ToggleButton, Typography } from "@mui/material";
 import { useState } from "react";
 import { usePersistentState } from "../dmtools/hooks";
 import ColorsByScore from "./ColorsByScore";
@@ -12,37 +12,16 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import MenuIcon from '@mui/icons-material/Menu';
 import { ContentCopy, Create, Delete } from "@mui/icons-material";
 
-const darkTheme = createTheme({
+const lightTheme = createTheme({
   palette: {
   },
 });
 
-const predefinedCategories = [
-  'Default',
-  'General Makeup',
-  'Hair',
-  'Eye Shadow',
-  'Lipstick',
-  'Nail',
-  'General Fashion',
-  'Jewelry',
-  'Tops / Dresses',
-  'Pants / Skirts',
-  'Jackets / Coats',
-  'Shoes',
-  'Pjs',
-  'Underwear',
-  'Swimsuit',
-  'General Home',
-  'Living / Dining Room',
-  'Kitchen',
-  'Bedroom',
-  'Bathroom',
-  'Tarot Room',
-  'Music Room',
-  'Hookah Room',
-  'Garden',
-];
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 const getFirstPalette = (palettes: { [key: string]: ColorScores }) => {
   return Object.keys(palettes)[0];
@@ -55,9 +34,11 @@ interface SideDrawerProps {
   setCurrentPaletteId: (newPaletteId: string) => void;
   drawerOpen: boolean;
   setDrawerOpen: (newDrawerOpen: boolean) => void;
+  setDarkTheme: (newDarkTheme: boolean) => void;
+  darkTheme: boolean;
 }
 
-const SideDrawer = ({ palettes, setPalettes, currentPaletteId, setCurrentPaletteId, drawerOpen, setDrawerOpen }: SideDrawerProps) => {
+const SideDrawer = ({ palettes, setPalettes, currentPaletteId, setCurrentPaletteId, drawerOpen, setDrawerOpen, darkTheme, setDarkTheme }: SideDrawerProps) => {
   const handleDeletePress = (paletteToDelete: string) => () => {
     if (window.confirm(`Are you sure you want to delete the ${paletteToDelete} palette?`)) {
       const newPalettes = { ...palettes };
@@ -124,8 +105,15 @@ const SideDrawer = ({ palettes, setPalettes, currentPaletteId, setCurrentPalette
       onOpen={() => setDrawerOpen(true)}
       onClose={() => setDrawerOpen(false)}
     >
-      Palettes
+      <div className={styles.SideDrawerInner}>
+        <FormGroup>
+          <FormControlLabel required control={<Switch
+            checked={darkTheme}
+            onChange={(e) => setDarkTheme(e.target.checked)}
+          />} label="Toggle Light/Dark" />
+        </FormGroup>
       <Divider />
+        <Typography variant="h6">Palettes</Typography>
       <List component="nav">
         {Object.keys(palettes).map((listCategory) => {
           return (
@@ -154,17 +142,22 @@ const SideDrawer = ({ palettes, setPalettes, currentPaletteId, setCurrentPalette
             </ListItemButton>
           );
         })}
-      </List>
-      <Divider />
+        </List>
       <Button
         onClick={handleNewPalette}
         startIcon={<Create />}
       >New Palette</Button>
+      </div>
     </SwipeableDrawer>
   );
 }
 
-const ColorChooser = () => {
+interface ColorChooserProps {
+  setDarkTheme: (newDarkTheme: boolean) => void;
+  darkTheme: boolean;
+}
+
+const ColorChooser = ({ setDarkTheme, darkTheme }: ColorChooserProps) => {
   let [palettes, setPalettes] = usePersistentState<{ [key: string]: ColorScores }>('colorScores3', {});
   if (Object.keys(palettes).length === 0) {
     palettes = {
@@ -197,20 +190,21 @@ const ColorChooser = () => {
         </IconButton>
         Current Palette: {currentPaletteId}
       </div>
-      <SideDrawer palettes={palettes} setPalettes={setPalettes} currentPaletteId={currentPaletteId} setCurrentPaletteId={setCurrentPaletteId} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} />
+      <SideDrawer palettes={palettes} setPalettes={setPalettes} currentPaletteId={currentPaletteId} setCurrentPaletteId={setCurrentPaletteId} drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}
+        setDarkTheme={setDarkTheme}
+        darkTheme={darkTheme}
+      />
       <Typography variant="h2" align="center">Color Chooser</Typography>
       <ColorRater colorScores={colorScores} setColorScores={setColorScores} />
+      <Divider />
+      <Typography variant="h5">Colors by Score</Typography>
+      <ColorsByScore colorScores={colorScores} />
+      <Divider />
+      <Typography variant="h5">Colors by Property</Typography>
+      <ColorsByProperty scores={colorScores} />
       <details>
         <summary>HSL Visualizer</summary>
         <HSLVisualizerWidget colorScores={colorScores} />
-      </details>
-      <details>
-        <summary>Colors by Score</summary>
-        <ColorsByScore colorScores={colorScores} />
-      </details>
-      <details>
-        <summary>Colors by Property</summary>
-        <ColorsByProperty scores={colorScores} />
       </details>
       <details>
         <summary>Debug</summary>
@@ -240,10 +234,18 @@ const ColorChooser = () => {
 };
 
 const App = () => {
+  const [useDarkTheme, setDarkTheme] = usePersistentState(
+    'useDarkTheme',
+    false,
+  )
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={useDarkTheme ? darkTheme : lightTheme}>
       <CssBaseline />
-      <ColorChooser />
+      <ColorChooser
+        setDarkTheme={setDarkTheme}
+        darkTheme={useDarkTheme}
+      />
     </ThemeProvider>
   );
 };

@@ -1,5 +1,7 @@
 import { ColorScores } from "./type"
 import { toColorsByScore } from "./util"
+import styles from './app.module.css'
+import { Typography } from "@mui/material";
 
 interface Props {
   colorScores: ColorScores,
@@ -7,11 +9,11 @@ interface Props {
 
 const ColorsByScore = ({ colorScores }: Props) => {
   const colorsByScore = toColorsByScore(colorScores);
-  return <>
+  return <div className={styles.ColorsByScore}>
     {Object.entries(colorsByScore).sort(([a], [b]) => parseInt(b) - parseInt(a)).map(([score, colors]) => {
       return (
-        <details style={{ paddingLeft: '8px', borderLeft: '1px solid gray' }}>
-          <summary>
+        <>
+          <div>
             {{
               "-2": "Terrible",
               "-1": "Bad",
@@ -20,7 +22,7 @@ const ColorsByScore = ({ colorScores }: Props) => {
               "2": "Amazing",
             }[score]
             }
-          </summary>
+          </div>
           <div key={score} style={{
             display: "flex",
             margin: "0px",
@@ -31,19 +33,19 @@ const ColorsByScore = ({ colorScores }: Props) => {
               return (
                 <div key={color} style={{
                   backgroundColor: color,
-                  width: "50px",
-                  height: "50px",
+                  width: "25px",
+                  height: "25px",
                   margin: "0px",
                 }}>
                 </div>
               );
             })}
           </div>
-        </details>
+        </>
       );
     })
     }
-  </>
+  </div>
 }
 
 export default ColorsByScore;
