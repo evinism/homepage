@@ -188,8 +188,6 @@ const ColorChooser = () => {
     });
   };
 
-
-
   const [drawerOpen, setDrawerOpen] = useState(false);
   return (
     <article className={styles.App}>
@@ -217,7 +215,7 @@ const ColorChooser = () => {
       <details>
         <summary>Debug</summary>
         <button onClick={() => {
-          navigator.clipboard.writeText(serializeScores(colorScores, paletteId));
+          navigator.clipboard.writeText(serializeScores(colorScores, currentPaletteId));
         }}>Copy Scores</button>
         <button onClick={() => {
           const serializedScores = prompt('Paste scores here');
