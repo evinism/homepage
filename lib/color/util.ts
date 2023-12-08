@@ -21,7 +21,7 @@ export const toColorsByScore = (colorScores: ColorScores) => {
 }
 
 
-const serializationPrefix = 'color.palette.';
+export const serializationPrefix = 'color.palette.';
 
 export const serializeScores = (scores: ColorScores, name: string): string => {
   // use msgpack:

@@ -11,6 +11,7 @@ import ColorRater from "./ColorRater";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import MenuIcon from '@mui/icons-material/Menu';
 import { ContentCopy, Create, Delete } from "@mui/icons-material";
+import ColorComparisonWidget from "./ColorComparisonWidget";
 
 const lightTheme = createTheme({
   palette: {
@@ -202,6 +203,12 @@ const ColorChooser = ({ setDarkTheme, darkTheme }: ColorChooserProps) => {
       <Divider />
       <Typography variant="h5">Colors by Property</Typography>
       <ColorsByProperty scores={colorScores} />
+      <Divider />
+      <Typography variant="h5">Compare against...</Typography>
+      <ColorComparisonWidget
+        palettes={palettes}
+        currentPaletteId={currentPaletteId}
+      />
       <details>
         <summary>HSL Visualizer</summary>
         <HSLVisualizerWidget colorScores={colorScores} />
@@ -225,9 +232,6 @@ const ColorChooser = ({ setDarkTheme, darkTheme }: ColorChooserProps) => {
             });
           }
         }}>Reset</button>
-        <pre>
-          {JSON.stringify(colorScores, null, 2)}
-        </pre>
       </details>
     </article >
   );

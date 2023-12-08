@@ -82,3 +82,8 @@
 .SideDrawerInner {
   padding: 8px;
 }
+
+.ColorChooserWidget {
+  max-width: 800px;
+  margin: auto;
+}
