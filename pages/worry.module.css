@@ -1,0 +1,19 @@
+
+.container {
+  background-color: rgb(192, 137, 89);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.paper {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  align-items: center;
+  min-height: calc(100vh - 40px);
+  max-width: 500px;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+}
