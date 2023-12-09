@@ -1,4 +1,5 @@
-import { CssBaseline } from "@mui/material";
+import { CheckBox } from "@mui/icons-material";
+import { Button, Checkbox, createTheme, CssBaseline, Input, List, ListItem, ListItemIcon, ListItemText, TextField, ThemeProvider } from "@mui/material";
 import { useEffect, useState } from "react";
 import style from './worry.module.css';
 
@@ -49,10 +50,6 @@ const Widget = () => {
     if (state.mode === 'writePhase') {
       const interval = setInterval(() => {
         const now = Date.now();
-        if (now - state.startTime > writePhaseDuration) {
-          moveToMarkPhase();
-          clearInterval(interval);
-        }
         setDummyTimer(now);
       }, 1000);
       return () => clearInterval(interval);
@@ -65,23 +62,37 @@ const Widget = () => {
         Write down everything that's worrying you. Don't worry about spelling or grammar, just write down whatever comes to mind.
         Afterwards, go through your list and cross out anything that you can't do anything about.
       </p>
-      <button onClick={() => setState({
+      <Button onClick={() => setState({
         mode: 'writePhase',
         nextWorry: '',
         startTime: Date.now() - 1,
         worries: [],
-      })}>Start</button>
+      })}>Start</Button>
     </>
   }
   if (state.mode === 'writePhase') {
-    const timeLeft = writePhaseDuration - (Date.now() - state.startTime);
+    const timeLeft = Math.max(writePhaseDuration - (Date.now() - state.startTime), 0);
+
+    const addWorry = () => {
+      setState({
+        ...state,
+        nextWorry: '',
+        worries: [
+          ...state.worries,
+          {
+            text: state.nextWorry,
+          },
+        ],
+      });
+    };
+
     return <>
       <p>
         Time left: {prettyPrintTime(timeLeft)}
         {' '}
-        <button onClick={moveToMarkPhase}>
-          Finish Early
-        </button>
+        <Button onClick={moveToMarkPhase}>
+          {timeLeft > 0 ? 'Finish early' : 'Finish'}
+        </Button>
       </p>
       <p>
         Write down everything that's worrying you. Don't worry about spelling or grammar, just write down whatever comes to mind.
@@ -89,29 +100,29 @@ const Widget = () => {
       <form onSubmit={
         (e) => {
           e.preventDefault();
-          setState({
-            ...state,
-            nextWorry: '',
-            worries: [
-              ...state.worries,
-              {
-                text: state.nextWorry,
-              },
-            ],
-          });
+          addWorry();
         }
       }>
-        <input
+        <TextField
           value={state.nextWorry}
+          multiline
           autoFocus
+          fullWidth
           onChange={(e) => setState({
             ...state,
             nextWorry: e.target.value,
           })}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              addWorry();
+            }
+          }}
         />
-        <button type="submit">Add</button>
+        <Button type="submit"
+          disabled={state.nextWorry === ''}
+        >Add</Button>
       </form>
-
       <ul>
         {state.worries.slice().reverse().map(({ text }) => <li>{text}</li>)}
       </ul>
@@ -120,8 +131,11 @@ const Widget = () => {
   if (state.mode === 'markPhase') {
     return <>
       <p>Cross out anything that you can't do anything about.</p>
-      <ul>
-        {state.worries.map(({ text, actionable }, idx) => <li
+      <List>
+        {state.worries.map(({ text, actionable }, idx) =>
+          <ListItem
+            key={text}
+            disablePadding
           onClick={() => {
             const newWorries = state.worries.slice();
             newWorries[idx] = {
@@ -134,25 +148,52 @@ const Widget = () => {
             });
           }}
         >
-          {actionable ? text : <s>{text}</s>}
-        </li>)}
-      </ul>
+            <ListItemIcon>
+              <Checkbox
+                edge="start"
+                checked={actionable}
+                tabIndex={-1}
+                disableRipple
+                aria-labelledby={`checkbox-list-label-${idx}`}
+              />
+            </ListItemIcon>
+            <ListItemText
+              id={`checkbox-list-label-${idx}`}
+              primary={actionable ? text : <s>{text}</s>} />
+          </ListItem>)}
+      </List>
+      <Button onClick={() => {
+        if (
+          window.confirm('Are you sure you want to restart? This will delete everything.')
+        )
+          setState({
+            mode: 'notStarted',
+          });
+      }}>Restart</Button>
     </>
   }
 }
+
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+  },
+});
 
 const Worry = () => {
   return (
     <div>
       <CssBaseline />
-      <div className={style.container}>
-        <div className={style.paper}>
-          <h1>Worry Tool</h1>
-          <article>
-            <Widget />
-          </article>
+      <ThemeProvider theme={theme}>
+        <div className={style.container}>
+          <div className={style.paper}>
+            <h1>Worry Tool</h1>
+            <article>
+              <Widget />
+            </article>
+          </div>
         </div>
-      </div>
+      </ThemeProvider>
     </div>
   );
 
