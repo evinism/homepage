@@ -6,6 +6,7 @@ import OsProvider from "./OsProvider";
 import Screen from "./Screen";
 import styles from "./App.module.scss";
 import MobileCommands from "./MobileCommands";
+import { BrowserCommand } from "../../shared/browserTypes";
 
 
 interface AppState {
@@ -43,6 +44,7 @@ const isPrintableKey = (key) => key && key.length === 1;
 interface AppProps {
   screenPipe: Pipe<ScreenCommand>;
   keyPipe: Pipe<[string, boolean]>;
+  browserPipe: Pipe<BrowserCommand>;
   os: OS;
 }
 
@@ -60,7 +62,8 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor(props: AppProps) {
     super(props);
-    props.screenPipe.subscribe((str) => this.writeToScreen(str));
+    props.screenPipe.subscribe((cmd) => this.writeToScreen(cmd));
+    props.browserPipe.subscribe((cmd) => this.handleBrowserCommand(cmd));
   }
 
   componentDidMount() {
@@ -130,6 +133,24 @@ class App extends React.Component<AppProps, AppState> {
       }
       default:
         return;
+    }
+  }
+
+  handleBrowserCommand = (cmd: BrowserCommand) => {
+    switch (cmd.type) {
+      case "authCommand": {
+        // This pierces into netlify identity, breaking the abstraction
+        // but also i was worse at coding when i wrote this and the abstraction
+        // legit sucks
+        if (!(window as any).netlifyIdentity) {
+          return;
+        }
+        if (cmd.subcommand === "logout") {
+          (window as any).netlifyIdentity.logout();
+        } else if (cmd.subcommand === "login") {
+          (window as any).netlifyIdentity.open();
+        }
+      }
     }
   }
 

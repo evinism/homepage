@@ -686,17 +686,44 @@ const rmdir = {
 `,
 };
 
+const auth = {
+  _isFile: true,
+  owner: 0,
+  permissions: "75",
+  data: `
+    syscalls.fread('/lib/std', (err, stdlib) => {
+      const { stdout, stderr, errStr } = eval(stdlib);
+      if (args.length < 2) {
+        stdout("Usage: auth [login|logout]\\n")
+        syscalls.terminate(0);
+        return;
+      }
+      if (args[1] !== 'login' && args[1] !== 'logout') {
+        stdout("Usage: auth [login|logout]\\n")
+        syscalls.terminate(0);
+        return;
+      }
+      const subcommand = args[1];
+
+      syscalls.open({path: "/dev/browser", perms: 'w' }, (err, fd) => {
+        syscalls.write({fd, data: "auth:" + subcommand}, (err) => {});
+        syscalls.terminate(0);
+      });
+    });
+`,
+};
+
 const help = {
   _isFile: true,
   owner: 0,
-  permissions: '75',
+  permissions: "75",
   data: `
     syscalls.exec({
       path: "/bin/cat",
       args: ["/bin/cat", "/etc/help.txt"],
     }, () => syscalls.terminate(0));
-`
-}
+`,
+};
 
 const about_me = {
   _isFile: true,
@@ -872,8 +899,8 @@ write   This isn't a standard unix command, but I needed an easy way to write fi
         Type write blah.txt to start creating a file called blah.txt. From there, type
         in the contents of the file. To finish, type Ctrl+D to send the "End of File" 
         command.
-`
-}
+`,
+};
 
 const fs = {
   name: "root",
@@ -898,6 +925,7 @@ const fs = {
         touch,
         whoami,
         write,
+        auth,
       },
     },
     dev: { owner: 0, perm: "75", children: {} },
@@ -906,7 +934,7 @@ const fs = {
       perm: "75",
       children: {
         passwd,
-        "help.txt": help_txt
+        "help.txt": help_txt,
       },
     },
     lib: {

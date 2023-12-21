@@ -9,17 +9,21 @@ import DeviceType from "./vmtypes";
 import OS from "./os";
 import Pipe from "../shared/pipe";
 import { ScreenCommand } from "../shared/screenTypes";
+import { BrowserCommand } from "../shared/browserTypes";
+import Browser from "./os/devices/browser";
 
 interface BootstrapOptions {
   keyPipe: Pipe<[string, boolean]>;
   screenPipe: Pipe<ScreenCommand>;
+  browserPipe: Pipe<BrowserCommand>;
 }
 
 // really doesn't need to be async, but it makes the cool startup seq super fun.
-const bootstrap = async ({ keyPipe, screenPipe }: BootstrapOptions) => {
+const bootstrap = async ({ keyPipe, screenPipe, browserPipe }: BootstrapOptions) => {
   const screen = new Screen(screenPipe);
   const keyboard = new Keyboard(keyPipe);
   const tty = new Tty(keyboard, screen);
+  const browser = new Browser(browserPipe);
 
   await startupAnim(screen);
 
@@ -27,6 +31,7 @@ const bootstrap = async ({ keyPipe, screenPipe }: BootstrapOptions) => {
   os.registerDevice(keyboard, DeviceType.KEYBOARD);
   os.registerDevice(screen, DeviceType.SCREEN);
   os.registerDevice(tty, DeviceType.TTY);
+  os.registerDevice(browser, DeviceType.BROWSER);
   os.start();
 
   (window as any).os = os;

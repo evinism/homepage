@@ -7,11 +7,11 @@ class Pipe<T> {
     });
   }
  
-  subscribe(subscriber : (T) => any) {
+  subscribe(subscriber: (arg: T) => any) {
     this.subscribers.push(subscriber);
   }
 
-  unsubscribe(toUnsubscribe : (T) => any) {
+  unsubscribe(toUnsubscribe: (arg: T) => any) {
     this.subscribers = this.subscribers.filter(
       subscriber => subscriber !== toUnsubscribe
     )

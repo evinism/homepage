@@ -66,6 +66,7 @@ class OS {
       [DeviceType.KEYBOARD]: "/dev/keyboard",
       [DeviceType.SCREEN]: "/dev/screen",
       [DeviceType.TTY]: "/dev/tty",
+      [DeviceType.BROWSER]: "/dev/browser",
     };
     this.devices.forEach(([dev, deviceType]) => {
       this.filesystem.mountDevice(dev, mapping[deviceType]);

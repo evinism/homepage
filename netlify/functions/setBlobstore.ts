@@ -17,18 +17,18 @@ CREATE TABLE blobstore (
 export const handler: Handler = (event: HandlerEvent, context: HandlerContext) => {
   const user_id = context.clientContext.user;
   if (!user_id) {
-    return {
+    return Promise.resolve({
       statusCode: 401,
       body: "Unauthorized -- User not logged in",
-    };
+    });
   }
 
   const { body } = event;
   if (!body) {
-    return {
+    return Promise.resolve({
       statusCode: 400,
       body: "Missing body",
-    };
+    });
   }
 
   const { key, data } = JSON.parse(body);
