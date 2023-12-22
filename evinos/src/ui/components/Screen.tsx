@@ -1,4 +1,4 @@
-import AutolinkerWrapper from "react-autolinker-wrapper";
+import AutolinkerWrapper from "../../vendor/AutolinkerWrapper";
 import cx from "classnames";
 
 interface ScreenProps {

@@ -3,7 +3,7 @@ import DicePage from "./pages/DicePage";
 import DiceTablePage from "./pages/DiceTablePage/DiceTablePage";
 import HomePage from "./pages/HomePage";
 import styles from "./dmtools.module.css";
-import { MemoryRouter as Router, Link, Switch, Route } from "react-router-dom";
+import { MemoryRouter as Router, Link, Routes, Route } from "react-router-dom";
 import {
   ThemeProvider,
   CssBaseline,
@@ -50,17 +50,11 @@ function App() {
             </Toolbar>
           </AppBar>
           <div>
-            <Switch>
-              <Route path="/dice">
-                <DicePage />
-              </Route>
-              <Route path="/tables">
-                <DiceTablePage />
-              </Route>
-              <Route path="/">
-                <HomePage />
-              </Route>
-            </Switch>
+            <Routes>
+              <Route path="/dice" element={<DicePage />} />
+              <Route path="/tables" element={<DiceTablePage />} />
+              <Route path="/" element={<HomePage />} />
+            </Routes>
           </div>
         </Router>
       </div>
