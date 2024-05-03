@@ -356,9 +356,12 @@ const App = () => {
     <>
       <CssBaseline />
       <ThemeProvider theme={darkTheme}>
-        <div className={styles.App} id="backdrop">
+        <div className={styles.App}>
+          <div className={styles.Background} />
           <Paper className={styles.AppInner} elevation={4}>
-            <Typography variant="h4">Metronome</Typography>
+            <Typography variant="h4" className={styles.Title}>
+              Metronome
+            </Typography>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={2}>
                 BPM

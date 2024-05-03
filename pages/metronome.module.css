@@ -5,9 +5,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.Background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: #202020;
+}
+
+.Background::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: url(data:image/svg+xml;charset=utf-8;base64,PHN2ZyBoZWlnaHQ9IjIwIiB3aWR0aD0iOTciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDx0ZXh0IGZpbGwtb3BhY2l0eT0iMC4xIiB4PSIwIiBmaWxsPSIjRkZGRkZGIiB5PSIxMiI+dGFjb3RhY29idXJyaXRvPC90ZXh0Pg0KPC9zdmc+) 0 0 repeat;
+  transform: rotate(30deg);
+  filter:brightness(0.3)
+}
+
+.Title {
+  padding-bottom: 1rem;
 }
 
 .AppInner {
+  z-index: 1;
   max-width: 600px;
   width: 600px;
   padding: 2rem;
