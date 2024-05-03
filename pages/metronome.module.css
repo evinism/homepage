@@ -44,8 +44,8 @@
 
 .AppInner {
   z-index: 1;
-  max-width: 600px;
   width: 600px;
+  min-width: 600px;
   padding: 2rem;
   margin: auto;
   background-color: #444444;
@@ -57,7 +57,7 @@
 }
 
 .BeatArray {
-  padding: 0.5rem;
+  padding: 1rem 0 0.25rem 0;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -107,6 +107,8 @@
 .ClickInstructions {
   font-style: italic;
   color: #999;
+  padding-bottom: 1rem;
+  padding-left: 0.25rem;
 }
 
 .ButtonGroup {

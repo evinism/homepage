@@ -19,6 +19,7 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 
 import styles from "./metronome.module.css";
+import { usePersistentState } from "../lib/hooks";
 
 const darkTheme = createTheme({
   palette: {
@@ -279,35 +280,40 @@ const useMetronome = (spec: MetronomeSpec) => {
 };
 
 const App = () => {
-  const [metronomeSpec, setMetronomeSpec] = useState<MetronomeSpec>({
-    bpm: 120,
-    beats: ["strong", "weak", "weak", "weak"],
-    volume: 1,
-    soundPack: "default",
-  });
+  const [beats, setBeats] = useState<BeatStrength[]>([
+    "strong",
+    "weak",
+    "weak",
+    "weak",
+  ]);
+  const [bpm, setBpm] = useState<number>(120);
+  const [volume, setVolume] = usePersistentState<number>("volume", 1);
+  const [soundPack, setSoundPack] = useState<SoundPackId>("default");
 
-  const [requestedSize, setRequestedSize] = useState<number | void>(
-    metronomeSpec.beats.length
-  );
   const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+
   let [beatArrayWrapping, setBeatArrayWrapping] = useState<number>(8);
-  const [beatFill, setBeatFill] = useState<BeatStrength>("weak");
+  const [beatFill, setBeatFill] = usePersistentState<BeatStrength>(
+    "beatStrength",
+    "weak"
+  );
+
+  const [requestedSize, setRequestedSize] = useState<number | void>(
+    beats.length
+  );
+
+  const { metronome, beat: currentBeat } = useMetronome({
+    bpm,
+    beats,
+    volume,
+    soundPack,
+  });
 
   // Easy normalizing
   if (isNaN(beatArrayWrapping) || beatArrayWrapping <= 0) {
     beatArrayWrapping = 8;
   }
-
-  const updateBpm = (bpm: number) => {
-    setMetronomeSpec({ ...metronomeSpec, bpm });
-  };
-
-  const updateBeats = (beats: BeatStrength[]) => {
-    setMetronomeSpec({ ...metronomeSpec, beats });
-  };
-
-  const { metronome, beat: currentBeat } = useMetronome(metronomeSpec);
 
   const handleBeatsNumChange = (event) => {
     const newLength = event.target.value;
@@ -315,29 +321,27 @@ const App = () => {
     if (isNaN(newLength) || newLength <= 0) {
       return;
     }
-    if (newLength > metronomeSpec.beats.length) {
+    if (newLength > beats.length) {
       const newBeats = [
-        ...metronomeSpec.beats,
-        ...Array(newLength - metronomeSpec.beats.length).fill(beatFill),
+        ...beats,
+        ...Array(newLength - beats.length).fill(beatFill),
       ];
-      setMetronomeSpec({ ...metronomeSpec, beats: newBeats });
+      setBeats(newBeats);
     } else {
-      const newBeats = metronomeSpec.beats.slice(0, newLength);
-      setMetronomeSpec({ ...metronomeSpec, beats: newBeats });
+      const newBeats = beats.slice(0, newLength);
+      setBeats(newBeats);
     }
   };
 
   const clear = () => {
     if (window.confirm("Are you sure you want to clear all beats?")) {
-      updateBeats(Array(metronomeSpec.beats.length).fill("off"));
+      setBeats(Array(beats.length).fill("off"));
     }
   };
 
   const changeBeatStrength = (index: number, strength: BeatStrength) => {
-    const newBeats = metronomeSpec.beats.map((beat, i) =>
-      i === index ? strength : beat
-    );
-    updateBeats(newBeats);
+    const newBeats = beats.map((beat, i) => (i === index ? strength : beat));
+    setBeats(newBeats);
   };
   const rotateBeatStrength = (index: number) => {
     changeBeatStrength(
@@ -346,12 +350,12 @@ const App = () => {
         strong: "weak",
         weak: "off",
         off: "strong",
-      }[metronomeSpec.beats[index]] as BeatStrength
+      }[beats[index]] as BeatStrength
     );
   };
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    updateBpm(newValue as number);
+    setBpm(newValue as number);
   };
 
   const handleTapTempoClick = () => {
@@ -369,7 +373,7 @@ const App = () => {
       const averageTimeBetweenTaps =
         tapGaps.reduce((a, b) => a + b, 0) / tapGaps.length;
       const newBpm = Math.round(60000 / averageTimeBetweenTaps);
-      updateBpm(newBpm);
+      setBpm(newBpm);
     }
     setTapTimeHistory(recentTaps);
   };
@@ -415,12 +419,9 @@ const App = () => {
                       min={0}
                       max={1}
                       step={0.01}
-                      value={metronomeSpec.volume}
+                      value={volume}
                       onChange={(event, newValue) => {
-                        setMetronomeSpec({
-                          ...metronomeSpec,
-                          volume: newValue as number,
-                        });
+                        setVolume(newValue as number);
                       }}
                     />
                   </Grid>
@@ -429,12 +430,9 @@ const App = () => {
                   </Grid>
                   <Grid item xs={3}>
                     <Select
-                      value={metronomeSpec.soundPack || "default"}
+                      value={soundPack || "default"}
                       onChange={(event) => {
-                        setMetronomeSpec({
-                          ...metronomeSpec,
-                          soundPack: event.target.value as SoundPackId,
-                        });
+                        setSoundPack(event.target.value as SoundPackId);
                       }}
                     >
                       {Object.keys(soundPacks).map((soundPackKey) => (
@@ -482,15 +480,15 @@ const App = () => {
                 <Input
                   type="number"
                   inputProps={{ min: 1 }}
-                  value={metronomeSpec.bpm}
-                  onChange={(event) => updateBpm(parseInt(event.target.value))}
+                  value={bpm}
+                  onChange={(event) => setBpm(parseInt(event.target.value))}
                 />
               </Grid>
               <Grid item xs={6}>
                 <Slider
                   min={20}
                   max={500}
-                  value={metronomeSpec.bpm}
+                  value={bpm}
                   onChange={handleSliderChange}
                   aria-labelledby="input-slider"
                 />
@@ -511,7 +509,7 @@ const App = () => {
               </Grid>
             </Grid>
             <div className={styles.BeatArray}>
-              {metronomeSpec.beats.map((beat, index) => (
+              {beats.map((beat, index) => (
                 <>
                   <div
                     className={
@@ -536,7 +534,7 @@ const App = () => {
               ))}
             </div>
             <Typography className={styles.ClickInstructions}>
-              Click to change beat accents
+              Tap to change beat accents
             </Typography>
             <div className={styles.ButtonGroup}>
               <Button onClick={() => metronome.play()}>Play</Button>
