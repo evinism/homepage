@@ -3,15 +3,9 @@ import { useEffect, useState } from "react";
 
 import {
   Button,
-  Checkbox,
   createTheme,
   CssBaseline,
   Input,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  TextField,
   Grid,
   Paper,
   ThemeProvider,
@@ -34,7 +28,7 @@ type MetronomeSpec = {
   beats: BeatStrength[];
 };
 
-type Options = {
+type FreqSampleFnOptions = {
   duration: number;
   noise: number;
   attack: number;
@@ -44,7 +38,7 @@ type Options = {
 };
 
 const makeFreqSampleFn =
-  (freqs: number[], options: Partial<Options> = {}) =>
+  (freqs: number[], options: Partial<FreqSampleFnOptions> = {}) =>
   (audioCtx: AudioContext) => {
     const { duration = 0.05, noise = 0 } = options;
     const myArrayBuffer = audioCtx.createBuffer(
@@ -117,13 +111,30 @@ class Metronome {
     });
   }
 
+  updateSpec(spec: MetronomeSpec) {
+    if (isNaN(spec.bpm) || spec.bpm <= 0) {
+      console.error("Invalid BPM", spec.bpm);
+      return;
+    }
+    if (spec.beats.length < 1) {
+      console.error("Invalid beats", spec.beats);
+      return;
+    }
+    if (this.spec.bpm * 9 < spec.bpm) {
+      // Garbage schedule hack to make it sound like it's changing
+      // nearly immediately on large changes
+      this.reset();
+    }
+    this.spec = spec;
+  }
+
   getBeat() {
     return this._latestNotifiedBeat;
   }
 
-  nextBeatDueToBeScheduled() {
-    const currentTime = this.audioContext.currentTime;
-    return this._nextScheduledBeatTime < currentTime;
+  reset() {
+    this.stop();
+    this.play();
   }
 
   play() {
@@ -133,11 +144,15 @@ class Metronome {
     this.audioContext = new AudioContext({
       latencyHint: "interactive",
     });
+    this.audioContext.resume();
+
     this._nextScheduledBeatTime =
       this.audioContext.currentTime + this._startDelay - 60 / this.spec.bpm;
     this._currentBeatIndex = 0;
-    this.audioContext.resume();
     this.handleScheduler();
+    if (this._schedulerId) {
+      clearInterval(this._schedulerId);
+    }
     this._schedulerId = setInterval(
       () => this.handleScheduler(),
       this._schedulerInterval * 1000
@@ -160,7 +175,7 @@ class Metronome {
 
   handleScheduler() {
     const currentTime = this.audioContext.currentTime;
-    if (this.nextBeatDueToBeScheduled()) {
+    if (this._nextScheduledBeatTime < currentTime) {
       this._nextScheduledBeatTime += 60 / this.spec.bpm;
       this.scheduleClick(
         this.spec.beats[this._currentBeatIndex % this.spec.beats.length],
@@ -206,7 +221,7 @@ class Metronome {
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
   if (metronome.spec !== spec) {
-    metronome.spec = spec;
+    metronome.updateSpec(spec);
   }
   const [beat, setBeat] = useState<number>(-1);
   useEffect(() => {
@@ -226,10 +241,15 @@ const useMetronome = (spec: MetronomeSpec) => {
 };
 
 const App = () => {
-  const [metronomeSpec, setMetronomeSpecInner] = useState<MetronomeSpec>({
+  const [metronomeSpec, setMetronomeSpec] = useState<MetronomeSpec>({
     bpm: 120,
     beats: ["strong", "weak", "weak", "weak"],
   });
+
+  const [requestedSize, setRequestedSize] = useState<number | void>(
+    metronomeSpec.beats.length
+  );
+  const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
 
   const updateBpm = (bpm: number) => {
     setMetronomeSpec({ ...metronomeSpec, bpm });
@@ -239,21 +259,12 @@ const App = () => {
     setMetronomeSpec({ ...metronomeSpec, beats });
   };
 
-  const setMetronomeSpec = (newSpec: MetronomeSpec) => {
-    if (newSpec.bpm < 20) {
-      return;
-    }
-    if (newSpec.beats.length < 1) {
-      return;
-    }
-    setMetronomeSpecInner(newSpec);
-  };
-
   const { metronome, beat: currentBeat } = useMetronome(metronomeSpec);
 
   const handleBeatsNumChange = (event) => {
-    const newLength = parseInt(event.target.value);
-    if (newLength < 1) {
+    const newLength = event.target.value;
+    setRequestedSize(newLength);
+    if (isNaN(newLength) || newLength <= 0) {
       return;
     }
     if (newLength > metronomeSpec.beats.length) {
@@ -265,6 +276,12 @@ const App = () => {
     } else {
       const newBeats = metronomeSpec.beats.slice(0, newLength);
       setMetronomeSpec({ ...metronomeSpec, beats: newBeats });
+    }
+  };
+
+  const clear = () => {
+    if (window.confirm("Are you sure you want to clear all beats?")) {
+      updateBeats(Array(metronomeSpec.beats.length).fill("off"));
     }
   };
 
@@ -315,21 +332,41 @@ const App = () => {
     updateBpm(newValue as number);
   };
 
+  const handleTapTempoClick = () => {
+    const currentTime = new Date().getTime();
+    let recentTaps = tapTimeHistory.filter(
+      (tapTime) => currentTime - tapTime < 5000
+    );
+    recentTaps.push(currentTime);
+    recentTaps = recentTaps.slice(-6);
+    const tapGaps = [];
+    for (let i = 1; i < recentTaps.length; i++) {
+      tapGaps.push(recentTaps[i] - recentTaps[i - 1]);
+    }
+    if (tapGaps.length > 0) {
+      const averageTimeBetweenTaps =
+        tapGaps.reduce((a, b) => a + b, 0) / tapGaps.length;
+      const newBpm = Math.round(60000 / averageTimeBetweenTaps);
+      updateBpm(newBpm);
+    }
+    setTapTimeHistory(recentTaps);
+  };
+
   return (
     <>
       <CssBaseline />
       <ThemeProvider theme={darkTheme}>
-        <div className={styles.App}>
+        <div className={styles.App} id="backdrop">
           <Paper className={styles.AppInner} elevation={4}>
             <Typography variant="h4">Metronome</Typography>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={4}>
+              <Grid item xs={2}>
                 BPM
               </Grid>
               <Grid item xs={2}>
                 <Input
                   type="number"
-                  inputProps={{ min: 20 }}
+                  inputProps={{ min: 1 }}
                   value={metronomeSpec.bpm}
                   onChange={(event) => updateBpm(parseInt(event.target.value))}
                 />
@@ -343,6 +380,9 @@ const App = () => {
                   aria-labelledby="input-slider"
                 />
               </Grid>
+              <Grid item xs={2}>
+                <Button onClick={handleTapTempoClick}>Tap</Button>
+              </Grid>
               <Grid item xs={4}>
                 Beats per Measure
               </Grid>
@@ -350,7 +390,7 @@ const App = () => {
                 <Input
                   type="number"
                   inputProps={{ min: 1 }}
-                  value={metronomeSpec.beats.length}
+                  value={requestedSize}
                   onChange={handleBeatsNumChange}
                 />
               </Grid>
@@ -359,8 +399,12 @@ const App = () => {
             <Typography className={styles.ClickInstructions}>
               Click to change beat accents
             </Typography>
-            <Button onClick={() => metronome.play()}>Play</Button>
-            <Button onClick={() => metronome.stop()}>Stop</Button>
+            <div className={styles.ButtonGroup}>
+              <Button onClick={() => metronome.play()}>Play</Button>
+              <Button onClick={() => metronome.stop()}>Stop</Button>
+              <div className={styles.Spacer} />
+              <Button onClick={clear}>Clear</Button>
+            </div>
           </Paper>
         </div>
       </ThemeProvider>
