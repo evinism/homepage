@@ -293,7 +293,7 @@ const App = () => {
   const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
 
-  let [beatArrayWrapping, setBeatArrayWrapping] = useState<number>(8);
+  let [beatArrayWrapping, setBeatArrayWrapping] = useState<number>(0);
   const [beatFill, setBeatFill] = usePersistentState<BeatStrength>(
     "beatStrength",
     "weak"
@@ -314,7 +314,7 @@ const App = () => {
   });
 
   // Easy normalizing
-  if (isNaN(beatArrayWrapping) || beatArrayWrapping <= 0) {
+  if (isNaN(beatArrayWrapping) || beatArrayWrapping < 0) {
     beatArrayWrapping = 8;
   }
 
@@ -450,7 +450,7 @@ const App = () => {
                   <Grid item xs={3}>
                     <Input
                       type="number"
-                      inputProps={{ min: 1, max: 8 }}
+                      inputProps={{ min: 0, max: 32 }}
                       value={beatArrayWrapping}
                       onChange={(event) =>
                         setBeatArrayWrapping(parseInt(event.target.value))
@@ -533,7 +533,9 @@ const App = () => {
                   >
                     {index + 1}
                   </div>
-                  {(index + 1) % beatArrayWrapping === 0 ? <br /> : null}
+                  {(beatArrayWrapping &&
+                    (index + 1) % beatArrayWrapping === 0 && <br />) ||
+                    null}
                 </>
               ))}
             </div>
