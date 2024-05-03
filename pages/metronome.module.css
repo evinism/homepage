@@ -1,0 +1,66 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  background-color: #202020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.AppInner {
+  max-width: 600px;
+  width: 600px;
+  padding: 2rem;
+  margin: auto;
+  background-color: #444444;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
+}
+
+.BeatArray {
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.BeatIcon {
+  font-size: 1.5rem;
+  border: 1px gray dotted;
+
+  margin: 0.25rem;
+  border-radius: 1rem;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  width: 3rem;
+  height: 3rem;
+}
+
+.BeatIcon.inactive {
+  color: gray;
+}
+
+.BeatIcon.active {
+  color: white;
+  border-color: white;
+}
+
+.BeatIcon.weak {
+  border-width: 0.25rem;
+  border-style: solid;
+}
+
+.BeatIcon.strong {
+  border-width: 0.5rem;
+  border-style: solid;
+}
+
+.ClickInstructions {
+  font-style: italic;
+  color: #999;
+}
