@@ -303,6 +303,9 @@ const App = () => {
     beats.length
   );
 
+  const [userHasChangedAccents, setUserHasChangedAccents] =
+    useState<boolean>(false);
+
   const { metronome, beat: currentBeat } = useMetronome({
     bpm,
     beats,
@@ -344,6 +347,7 @@ const App = () => {
     setBeats(newBeats);
   };
   const rotateBeatStrength = (index: number) => {
+    setUserHasChangedAccents(true);
     changeBeatStrength(
       index,
       {
@@ -533,7 +537,14 @@ const App = () => {
                 </>
               ))}
             </div>
-            <Typography className={styles.ClickInstructions}>
+            <Typography
+              className={
+                styles.ClickInstructions +
+                " " +
+                (userHasChangedAccents ? styles.IsIrrelevant : "")
+              }
+              fontSize={16}
+            >
               Tap to change beat accents
             </Typography>
             <div className={styles.ButtonGroup}>
