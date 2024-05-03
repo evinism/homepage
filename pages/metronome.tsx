@@ -11,7 +11,12 @@ import {
   ThemeProvider,
   Typography,
   Slider,
+  IconButton,
+  Divider,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import styles from "./metronome.module.css";
 
@@ -26,6 +31,8 @@ type BeatStrength = "strong" | "weak" | "off";
 type MetronomeSpec = {
   bpm: number;
   beats: BeatStrength[];
+  volume: number;
+  soundPack?: SoundPackId;
 };
 
 type FreqSampleFnOptions = {
@@ -84,11 +91,29 @@ const cluster = (bottom, top, count) => {
     .map((_, index) => bottom + index * step);
 };
 
-const sounds = {
+type SoundPack = {
+  strong: (audioCtx: AudioContext) => AudioScheduledSourceNode;
+  weak: (audioCtx: AudioContext) => AudioScheduledSourceNode;
+};
+
+type SoundPackId = keyof typeof soundPacks;
+
+const defaultSoundPack: SoundPack = {
   strong: makeFreqSampleFn(cluster(2000, 2020, 6)),
   weak: makeFreqSampleFn(cluster(1000, 1020, 6)),
 };
 
+// TODO: Make it so we might be able to adjust the base frequency
+// within a sound pack, rather than having to make a new sound pack
+const soundPacks = {
+  default: defaultSoundPack,
+  inverted: {
+    strong: makeFreqSampleFn(cluster(1000, 1020, 6)),
+    weak: makeFreqSampleFn(cluster(2000, 2020, 6)),
+  },
+};
+
+// --- METRONOME CLASS ---
 class Metronome {
   audioContext: AudioContext;
   spec: MetronomeSpec;
@@ -97,6 +122,7 @@ class Metronome {
   _currentBeatIndex: number = 0; // This is a weirdly named item
   _schedulerInterval: number = 0.005;
   _schedulerId: NodeJS.Timer | null = null;
+  _gainNode: GainNode;
 
   // Source of truth for what beats have played is the audioContext,
   // which is outside of the scheduler loop (and we probably shouldn't
@@ -106,9 +132,19 @@ class Metronome {
 
   constructor(spec: MetronomeSpec) {
     this.spec = spec;
-    this.audioContext = new AudioContext({
+    const { audioContext, gainNode } = this.makeAudioContext(spec);
+    this.audioContext = audioContext;
+    this._gainNode = gainNode;
+  }
+
+  makeAudioContext(spec: MetronomeSpec) {
+    const audioContext = new AudioContext({
       latencyHint: "interactive",
     });
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = spec.volume;
+    gainNode.connect(audioContext.destination);
+    return { audioContext, gainNode };
   }
 
   updateSpec(spec: MetronomeSpec) {
@@ -126,6 +162,7 @@ class Metronome {
       this.reset();
     }
     this.spec = spec;
+    this._gainNode.gain.value = spec.volume;
   }
 
   getBeat() {
@@ -141,9 +178,10 @@ class Metronome {
     if (this.audioContext.state === "running") {
       return;
     }
-    this.audioContext = new AudioContext({
-      latencyHint: "interactive",
-    });
+    const { audioContext, gainNode } = this.makeAudioContext(this.spec);
+    this.audioContext = audioContext;
+    this._gainNode = gainNode;
+
     this.audioContext.resume();
 
     this._nextScheduledBeatTime =
@@ -193,14 +231,12 @@ class Metronome {
   }
 
   scheduleClick = (strength: BeatStrength, time: number) => {
-    console.log("scheduling beat", time);
-    console.log("current time", this.audioContext.currentTime);
     if (strength === "off") {
       return;
     }
-    const source = sounds[strength](this.audioContext);
+    const source = soundPacks[this.spec.soundPack][strength](this.audioContext);
     source.start(time);
-    source.connect(this.audioContext.destination);
+    source.connect(this._gainNode);
   };
 
   _notifyBeatHit = (beatNumber: number) => {
@@ -217,6 +253,8 @@ class Metronome {
     (document as any).removeEventListener("beat", callback);
   }
 }
+
+// --- REACT COMPONENTS ---
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
@@ -244,12 +282,22 @@ const App = () => {
   const [metronomeSpec, setMetronomeSpec] = useState<MetronomeSpec>({
     bpm: 120,
     beats: ["strong", "weak", "weak", "weak"],
+    volume: 1,
+    soundPack: "default",
   });
 
   const [requestedSize, setRequestedSize] = useState<number | void>(
     metronomeSpec.beats.length
   );
   const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  let [beatArrayWrapping, setBeatArrayWrapping] = useState<number>(8);
+  const [beatFill, setBeatFill] = useState<BeatStrength>("weak");
+
+  // Easy normalizing
+  if (isNaN(beatArrayWrapping) || beatArrayWrapping <= 0) {
+    beatArrayWrapping = 8;
+  }
 
   const updateBpm = (bpm: number) => {
     setMetronomeSpec({ ...metronomeSpec, bpm });
@@ -270,7 +318,7 @@ const App = () => {
     if (newLength > metronomeSpec.beats.length) {
       const newBeats = [
         ...metronomeSpec.beats,
-        ...Array(newLength - metronomeSpec.beats.length).fill("weak"),
+        ...Array(newLength - metronomeSpec.beats.length).fill(beatFill),
       ];
       setMetronomeSpec({ ...metronomeSpec, beats: newBeats });
     } else {
@@ -292,41 +340,15 @@ const App = () => {
     updateBeats(newBeats);
   };
   const rotateBeatStrength = (index: number) => {
-    switch (metronomeSpec.beats[index]) {
-      case "strong":
-        changeBeatStrength(index, "weak");
-        break;
-      case "weak":
-        changeBeatStrength(index, "off");
-        break;
-      case "off":
-        changeBeatStrength(index, "strong");
-        break;
-    }
+    changeBeatStrength(
+      index,
+      {
+        strong: "weak",
+        weak: "off",
+        off: "strong",
+      }[metronomeSpec.beats[index]] as BeatStrength
+    );
   };
-
-  const beatArray = (
-    <div className={styles.BeatArray}>
-      {metronomeSpec.beats.map((beat, index) => (
-        <div
-          className={
-            styles.BeatIcon +
-            " " +
-            (index === currentBeat ? styles.active : styles.inactive) +
-            " " +
-            {
-              strong: styles.strong,
-              weak: styles.weak,
-              off: styles.off,
-            }[beat]
-          }
-          onClick={() => rotateBeatStrength(index)}
-        >
-          {index + 1}
-        </div>
-      ))}
-    </div>
-  );
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     updateBpm(newValue as number);
@@ -359,9 +381,99 @@ const App = () => {
         <div className={styles.App}>
           <div className={styles.Background} />
           <Paper className={styles.AppInner} elevation={4}>
-            <Typography variant="h4" className={styles.Title}>
-              Metronome
-            </Typography>
+            <div className={styles.TitleLine}>
+              <Typography variant="h4" className={styles.Title}>
+                Metronome
+              </Typography>
+              <IconButton
+                aria-label="Settings"
+                onClick={() => setSettingsOpen(!settingsOpen)}
+              >
+                <SettingsIcon />
+              </IconButton>
+            </div>
+            <div
+              className={
+                styles.Settings +
+                " " +
+                (settingsOpen ? styles.Open : styles.Closed)
+              }
+            >
+              <div
+                className={
+                  styles.SettingsInner +
+                  " " +
+                  (settingsOpen ? styles.Closed : styles.Open)
+                }
+              >
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={3}>
+                    Volume
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Slider
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={metronomeSpec.volume}
+                      onChange={(event, newValue) => {
+                        setMetronomeSpec({
+                          ...metronomeSpec,
+                          volume: newValue as number,
+                        });
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={3}>
+                    Sound Pack
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Select
+                      value={metronomeSpec.soundPack || "default"}
+                      onChange={(event) => {
+                        setMetronomeSpec({
+                          ...metronomeSpec,
+                          soundPack: event.target.value as SoundPackId,
+                        });
+                      }}
+                    >
+                      {Object.keys(soundPacks).map((soundPackKey) => (
+                        <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
+                      ))}
+                    </Select>
+                  </Grid>
+                  <Grid item xs={3}>
+                    Beats per Row
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Input
+                      type="number"
+                      inputProps={{ min: 1, max: 8 }}
+                      value={beatArrayWrapping}
+                      onChange={(event) =>
+                        setBeatArrayWrapping(parseInt(event.target.value))
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={3}>
+                    New Beat Fill
+                  </Grid>
+                  <Grid item xs={3}>
+                    <Select
+                      value={beatFill}
+                      onChange={(event) =>
+                        setBeatFill(event.target.value as BeatStrength)
+                      }
+                    >
+                      <MenuItem value="strong">Strong</MenuItem>
+                      <MenuItem value="weak">Weak</MenuItem>
+                      <MenuItem value="off">Off</MenuItem>
+                    </Select>
+                  </Grid>
+                </Grid>
+              </div>
+            </div>
+            <Divider />
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={2}>
                 BPM
@@ -398,7 +510,31 @@ const App = () => {
                 />
               </Grid>
             </Grid>
-            {beatArray}
+            <div className={styles.BeatArray}>
+              {metronomeSpec.beats.map((beat, index) => (
+                <>
+                  <div
+                    className={
+                      styles.BeatIcon +
+                      " " +
+                      (index === currentBeat
+                        ? styles.active
+                        : styles.inactive) +
+                      " " +
+                      {
+                        strong: styles.strong,
+                        weak: styles.weak,
+                        off: styles.off,
+                      }[beat]
+                    }
+                    onClick={() => rotateBeatStrength(index)}
+                  >
+                    {index + 1}
+                  </div>
+                  {(index + 1) % beatArrayWrapping === 0 ? <br /> : null}
+                </>
+              ))}
+            </div>
             <Typography className={styles.ClickInstructions}>
               Click to change beat accents
             </Typography>
