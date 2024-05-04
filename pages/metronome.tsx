@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 
 import {
   Button,
@@ -384,21 +385,36 @@ const App = () => {
 
   return (
     <>
+      <Head>
+        <title>🌮🌮🌯</title>
+        <meta
+          name="description"
+          content="A simple metronome for not-so-simple times"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <CssBaseline />
       <ThemeProvider theme={darkTheme}>
         <div className={styles.App}>
           <div className={styles.Background} />
           <Paper className={styles.AppInner} elevation={4}>
             <div className={styles.TitleLine}>
-              <Typography variant="h4" className={styles.Title}>
-                Metronome
-              </Typography>
-              <IconButton
-                aria-label="Settings"
-                onClick={() => setSettingsOpen(!settingsOpen)}
-              >
-                <SettingsIcon />
-              </IconButton>
+              <div>
+                <Typography variant="h5" className={styles.Title}>
+                  TacoTacoBurrito
+                </Typography>
+                <Typography variant="body1" className={styles.SubTitle}>
+                  a simple metronome for not-so-simple times
+                </Typography>
+              </div>
+              <div className={styles.SettingsIconWrapper}>
+                <IconButton
+                  aria-label="Settings"
+                  onClick={() => setSettingsOpen(!settingsOpen)}
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </div>
             </div>
             <div
               className={

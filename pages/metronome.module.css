@@ -32,14 +32,21 @@
 
 .TitleLine {
   display: flex;
+  justify-content: space-between;
+}
+
+.SubTitle {
+  color: #666666;
+}
+
+.SettingsIconWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .App hr {
   margin: 1rem 0;
-}
-
-.Title {
-  flex-grow: 1;
 }
 
 .AppInner {
