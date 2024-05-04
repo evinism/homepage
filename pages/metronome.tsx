@@ -419,77 +419,87 @@ const App = () => {
             </div>
             <div
               className={
-                styles.Settings +
+                styles.SettingsGridWrapper +
                 " " +
                 (settingsOpen ? styles.Open : styles.Closed)
               }
             >
               <div
                 className={
-                  styles.SettingsInner +
+                  styles.Settings +
                   " " +
-                  (settingsOpen ? styles.Closed : styles.Open)
+                  (settingsOpen ? styles.Open : styles.Closed)
                 }
               >
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={3}>
-                    Volume
+                <div
+                  className={
+                    styles.SettingsInner +
+                    " " +
+                    (settingsOpen ? styles.Closed : styles.Open)
+                  }
+                >
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={3}>
+                      Volume
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Slider
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={volume}
+                        onChange={(event, newValue) => {
+                          setVolume(newValue as number);
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      Sound Pack
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Select
+                        value={soundPack || "default"}
+                        onChange={(event) => {
+                          setSoundPack(event.target.value as SoundPackId);
+                        }}
+                      >
+                        {Object.keys(soundPacks).map((soundPackKey) => (
+                          <MenuItem value={soundPackKey}>
+                            {soundPackKey}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={3}>
+                      Beats per Row
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Input
+                        type="number"
+                        inputProps={{ min: 0, max: 32 }}
+                        value={beatArrayWrappingInput}
+                        onChange={(event) =>
+                          setBeatArrayWrappingInput(event.target.value)
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      New Beat Fill
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Select
+                        value={beatFill}
+                        onChange={(event) =>
+                          setBeatFill(event.target.value as BeatStrength)
+                        }
+                      >
+                        <MenuItem value="strong">Strong</MenuItem>
+                        <MenuItem value="weak">Weak</MenuItem>
+                        <MenuItem value="off">Off</MenuItem>
+                      </Select>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={3}>
-                    <Slider
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      value={volume}
-                      onChange={(event, newValue) => {
-                        setVolume(newValue as number);
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    Sound Pack
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Select
-                      value={soundPack || "default"}
-                      onChange={(event) => {
-                        setSoundPack(event.target.value as SoundPackId);
-                      }}
-                    >
-                      {Object.keys(soundPacks).map((soundPackKey) => (
-                        <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
-                      ))}
-                    </Select>
-                  </Grid>
-                  <Grid item xs={3}>
-                    Beats per Row
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Input
-                      type="number"
-                      inputProps={{ min: 0, max: 32 }}
-                      value={beatArrayWrappingInput}
-                      onChange={(event) =>
-                        setBeatArrayWrappingInput(event.target.value)
-                      }
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    New Beat Fill
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Select
-                      value={beatFill}
-                      onChange={(event) =>
-                        setBeatFill(event.target.value as BeatStrength)
-                      }
-                    >
-                      <MenuItem value="strong">Strong</MenuItem>
-                      <MenuItem value="weak">Weak</MenuItem>
-                      <MenuItem value="off">Off</MenuItem>
-                    </Select>
-                  </Grid>
-                </Grid>
+                </div>
               </div>
             </div>
             <Divider className={settingsOpen ? styles.Invisible : ""} />

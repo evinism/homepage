@@ -153,23 +153,27 @@
   flex-grow: 1;
 }
 
-.Settings {
+.SettingsGridWrapper {
   position: relative;
+  
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease-out;
   background-color: #444;
-  transition: height 0.2s ease-out;
-  left: 0;
+  margin: 0 -2rem 0 -2rem;
   top: 1rem;
-  height: 190px;
-  margin: 0 -2rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) inset;
+}
+
+.SettingsGridWrapper.Open {
+  grid-template-rows: 1fr;
+}
+
+.Settings {
   overflow-x: auto;
   overflow-y: hidden;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) inset;
 }
 
 .SettingsInner {
   padding: 1rem 2rem;
-}
-
-.Settings.Closed {
-  height: 0;
 }
