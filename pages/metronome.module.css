@@ -35,6 +35,10 @@
   justify-content: space-between;
 }
 
+.Title {
+  filter: saturate(0.5);
+}
+
 .SubTitle {
   color: #666666;
 }
@@ -151,7 +155,8 @@
   top: 1rem;
   height: 190px;
   margin: 0 -2rem;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) inset;
 }
 

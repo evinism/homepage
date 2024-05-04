@@ -260,9 +260,8 @@ class Metronome {
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
-  if (metronome.spec !== spec) {
-    metronome.updateSpec(spec);
-  }
+  metronome.updateSpec(spec);
+
   const [beat, setBeat] = useState<number>(-1);
   useEffect(() => {
     metronome.subscribeToBeat((beat) => {
@@ -401,7 +400,7 @@ const App = () => {
             <div className={styles.TitleLine}>
               <div>
                 <Typography variant="h5" className={styles.Title}>
-                  TacoTacoBurrito
+                  🌮🌮🌯
                 </Typography>
                 <Typography variant="body1" className={styles.SubTitle}>
                   a simple metronome for not-so-simple times
