@@ -293,7 +293,9 @@ const App = () => {
   const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
 
-  let [beatArrayWrapping, setBeatArrayWrapping] = useState<number>(0);
+  let [beatArrayWrappingInput, setBeatArrayWrappingInput] = useState<
+    string | void
+  >();
   const [beatFill, setBeatFill] = usePersistentState<BeatStrength>(
     "beatStrength",
     "weak"
@@ -313,9 +315,9 @@ const App = () => {
     soundPack,
   });
 
-  // Easy normalizing
+  let beatArrayWrapping = parseInt(beatArrayWrappingInput || "");
   if (isNaN(beatArrayWrapping) || beatArrayWrapping < 0) {
-    beatArrayWrapping = 8;
+    beatArrayWrapping = 0;
   }
 
   const handleBeatsNumChange = (event) => {
@@ -466,9 +468,9 @@ const App = () => {
                     <Input
                       type="number"
                       inputProps={{ min: 0, max: 32 }}
-                      value={beatArrayWrapping}
+                      value={beatArrayWrappingInput}
                       onChange={(event) =>
-                        setBeatArrayWrapping(parseInt(event.target.value))
+                        setBeatArrayWrappingInput(parseInt(event.target.value))
                       }
                     />
                   </Grid>
@@ -548,7 +550,7 @@ const App = () => {
                   >
                     {index + 1}
                   </div>
-                  {(beatArrayWrapping &&
+                  {(beatArrayWrapping >= 0 &&
                     (index + 1) % beatArrayWrapping === 0 && <br />) ||
                     null}
                 </>
