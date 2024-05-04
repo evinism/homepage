@@ -402,7 +402,7 @@ const App = () => {
             <div className={styles.TitleLine}>
               <div>
                 <Typography variant="h5" className={styles.Title}>
-                  🌮🌮🌯
+                  🌮 🌮 🌯
                 </Typography>
                 <Typography variant="body1" className={styles.SubTitle}>
                   a simple metronome for not-so-simple times
@@ -470,7 +470,7 @@ const App = () => {
                       inputProps={{ min: 0, max: 32 }}
                       value={beatArrayWrappingInput}
                       onChange={(event) =>
-                        setBeatArrayWrappingInput(parseInt(event.target.value))
+                        setBeatArrayWrappingInput(event.target.value)
                       }
                     />
                   </Grid>
@@ -492,7 +492,7 @@ const App = () => {
                 </Grid>
               </div>
             </div>
-            <Divider />
+            <Divider className={settingsOpen ? styles.Invisible : ""} />
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={2}>
                 BPM

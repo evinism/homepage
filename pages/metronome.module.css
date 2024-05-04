@@ -51,6 +51,12 @@
 
 .App hr {
   margin: 1rem 0;
+  opacity: 1;
+  transition: 0.2s linear;
+}
+
+.App hr.Invisible {
+  opacity: 0;
 }
 
 .AppInner {
