@@ -5,6 +5,20 @@ const nextConfig = {
   // skipTrailingSlashRedirect: true,
   // Optional: Change the output directory `out` -> `dist`
   distDir: ".next",
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/metronome",
+        has: [
+          {
+            type: "host",
+            value: "tacotacoburrito.com",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
