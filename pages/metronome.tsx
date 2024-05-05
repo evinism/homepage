@@ -648,6 +648,16 @@ const App = () => {
               <div className={styles.Spacer} />
               <Button onClick={clear}>Clear</Button>
             </div>
+            <footer className={styles.Footer}>
+              <Typography variant="body2" color="textSecondary" align="center">
+                <a href="https://github.com/evinism/homepage">GitHub</a>
+              </Typography>
+              <Typography variant="body2" color="textSecondary" align="center">
+                <a href="https://github.com/evinism/homepage/issues">
+                  Report a bug
+                </a>
+              </Typography>
+            </footer>
           </Paper>
         </div>
       </ThemeProvider>
