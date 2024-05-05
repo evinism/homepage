@@ -30,11 +30,21 @@ const darkTheme = createTheme({
 
 type BeatStrength = "strong" | "weak" | "off";
 
+
+// Intentionally vague. Params passed to the generator.
+type GeneratorParameters = {
+  [key: string]: any;
+};
+
 type MetronomeSpec = {
   bpm: number;
   beats: BeatStrength[];
-  volume: number;
-  soundPack?: SoundPackId;
+  sound: {
+    volume: number;
+    soundPack: SoundPackId;
+    playbackRate: number;
+    generatorParameters: GeneratorParameters;
+  };
 };
 
 type FreqSampleFnOptions = {
@@ -47,9 +57,13 @@ type FreqSampleFnOptions = {
 };
 
 const makeFreqSampleFn =
-  (freqs: number[], options: Partial<FreqSampleFnOptions> = {}) =>
-  (audioCtx: AudioContext) => {
+  (freqSpec: number[], options: Partial<FreqSampleFnOptions> = {}) =>
+  (audioCtx: AudioContext, generatorsParams: GeneratorParameters) => {
     const { duration = 0.05, noise = 0 } = options;
+    const { freqMultiplier = 1 } = generatorsParams;
+
+    const freqs = freqSpec.map((freq) => freq * freqMultiplier);
+
     const myArrayBuffer = audioCtx.createBuffer(
       2,
       audioCtx.sampleRate * duration,
@@ -93,9 +107,14 @@ const cluster = (bottom, top, count) => {
     .map((_, index) => bottom + index * step);
 };
 
+type SoundConstructor = (
+  audioCtx: AudioContext,
+  audioGenParams?: any
+) => AudioScheduledSourceNode;
+
 type SoundPack = {
-  strong: (audioCtx: AudioContext) => AudioScheduledSourceNode;
-  weak: (audioCtx: AudioContext) => AudioScheduledSourceNode;
+  strong: SoundConstructor;
+  weak: SoundConstructor;
 };
 
 type SoundPackId = keyof typeof soundPacks;
@@ -144,7 +163,7 @@ class Metronome {
       latencyHint: "interactive",
     });
     const gainNode = audioContext.createGain();
-    gainNode.gain.value = spec.volume;
+    gainNode.gain.value = spec.sound.volume;
     gainNode.connect(audioContext.destination);
     return { audioContext, gainNode };
   }
@@ -164,7 +183,7 @@ class Metronome {
       this.reset();
     }
     this.spec = spec;
-    this._gainNode.gain.value = spec.volume;
+    this._gainNode.gain.value = spec.sound.volume;
   }
 
   getBeat() {
@@ -236,7 +255,10 @@ class Metronome {
     if (strength === "off") {
       return;
     }
-    const source = soundPacks[this.spec.soundPack][strength](this.audioContext);
+    const source = soundPacks[this.spec.sound.soundPack][strength](
+      this.audioContext,
+      this.spec.sound.generatorParameters
+    );
     source.start(time);
     source.connect(this._gainNode);
   };
@@ -292,6 +314,7 @@ const App = () => {
 
   const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
 
   let [beatArrayWrappingInput, setBeatArrayWrappingInput] = useState<
     string | void
@@ -311,8 +334,14 @@ const App = () => {
   const { metronome, beat: currentBeat } = useMetronome({
     bpm,
     beats,
-    volume,
-    soundPack,
+    sound: {
+      volume,
+      soundPack,
+      playbackRate: 1,
+      generatorParameters: {
+        freqMultiplier,
+      },
+    },
   });
 
   let beatArrayWrapping = parseInt(beatArrayWrappingInput || "");
@@ -497,6 +526,19 @@ const App = () => {
                         <MenuItem value="weak">Weak</MenuItem>
                         <MenuItem value="off">Off</MenuItem>
                       </Select>
+                    </Grid>
+                    <Grid item xs={3}>
+                      Frequency Multiplier
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Input
+                        type="number"
+                        inputProps={{ min: 0.1, max: 10, step: 0.01 }}
+                        value={freqMultiplier}
+                        onChange={(event) =>
+                          setFreqMultiplier(parseFloat(event.target.value))
+                        }
+                      />
                     </Grid>
                   </Grid>
                 </div>
