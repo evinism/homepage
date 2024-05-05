@@ -8,11 +8,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/tacotacoburrito",
-        destination: "/metronome",
-      },
-      {
-        source: "/blep",
+        source: "/",
         destination: "/metronome",
         has: [
           {
@@ -20,6 +16,10 @@ const nextConfig = {
             value: "tacotacoburrito.com",
           },
         ],
+      },
+      {
+        source: "/",
+        destination: "/evinos",
       },
     ];
   },
