@@ -120,8 +120,8 @@ type SoundPack = {
 type SoundPackId = keyof typeof soundPacks;
 
 const defaultSoundPack: SoundPack = {
-  strong: makeFreqSampleFn(cluster(2000, 2020, 6)),
-  weak: makeFreqSampleFn(cluster(1000, 1020, 6)),
+  strong: makeFreqSampleFn(cluster(2093, 2113, 6)),
+  weak: makeFreqSampleFn(cluster(1046, 1066, 6)),
 };
 
 // TODO: Make it so we might be able to adjust the base frequency
@@ -539,6 +539,30 @@ const App = () => {
                           setFreqMultiplier(parseFloat(event.target.value))
                         }
                       />
+                    </Grid>
+                    <Grid item xs={3}>
+                      Click Note
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Select
+                        value={freqMultiplier}
+                        onChange={(event) =>
+                          setFreqMultiplier(event.target.value as number)
+                        }
+                      >
+                        <MenuItem value={1}>C</MenuItem>
+                        <MenuItem value={1.0595}>C#</MenuItem>
+                        <MenuItem value={1.1225}>D</MenuItem>
+                        <MenuItem value={1.1892}>D#</MenuItem>
+                        <MenuItem value={1.2599}>E</MenuItem>
+                        <MenuItem value={1.3348}>F</MenuItem>
+                        <MenuItem value={1.4142}>F#</MenuItem>
+                        <MenuItem value={0.7491}>G</MenuItem>
+                        <MenuItem value={0.7937}>G#</MenuItem>
+                        <MenuItem value={0.8409}>A</MenuItem>
+                        <MenuItem value={0.8909}>A#</MenuItem>
+                        <MenuItem value={0.9439}>B</MenuItem>
+                      </Select>
                     </Grid>
                   </Grid>
                 </div>
