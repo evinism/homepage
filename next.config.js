@@ -21,8 +21,17 @@ const nextConfig = {
         source: "/",
         destination: "/evinos",
       },
+      {
+        source: "/oh-dear/",
+        destination: "/oh-dear/index.html",
+      },
+      {
+        source: "/oh-dear/sounds/:sound",
+        destination: "/hl-sounds/:sound",
+      },
     ];
   },
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;
