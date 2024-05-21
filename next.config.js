@@ -26,8 +26,8 @@ const nextConfig = {
         destination: "/oh-dear/index.html",
       },
       {
-        source: "/oh-dear/sounds/:sound",
-        destination: "/hl-sounds/:sound",
+        source: "/oh-dear/sounds/:sound*",
+        destination: "/hl-sounds/:sound*",
       },
     ];
   },
