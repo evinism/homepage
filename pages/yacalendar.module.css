@@ -1,0 +1,56 @@
+.month {
+  border: 1px solid gray;
+  display: inline-block;
+  margin: 16px;
+}
+
+.monthSubHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.month h2 {
+  text-align: center;
+  margin: 0;
+}
+
+.table td {
+  border: 1px solid gray;
+  padding: 4px 4px 0 4px;
+  position: relative;
+}
+
+.table .weekTitle {
+  border: none;
+  font-size: 10px;
+  color: gray;
+}
+
+.tdinner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-height: 150px;
+  min-width: 150px;
+}
+
+.tdinner h3 {
+  margin: 0;
+}
+
+.tdinner.silvered::after {
+  content: " ";
+  position: absolute;
+  border: 2px dashed blueviolet;
+  height: 100%;
+  top: -2px;
+  right: -4px;
+}
+
+.tdinner .footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
