@@ -136,6 +136,7 @@ const days = [
     cyclic: "Smithy's Cyclic",
     modality: "Order (+)",
     group: "Common",
+    moon: "🌓",
   },
   {
     number: 8,
@@ -178,6 +179,7 @@ const days = [
     cyclic: "Pauper's Cyclic",
     modality: "Chaos (-)",
     group: "Common",
+    moon: "🌕",
   },
   {
     number: 15,
@@ -220,6 +222,7 @@ const days = [
     cyclic: "Smithy's Cyclic",
     modality: "Order (+)",
     group: "Common",
+    moon: "🌗",
   },
   {
     number: 22,
@@ -262,6 +265,7 @@ const days = [
     cyclic: "Sovereign's Cyclic",
     modality: "Order (+)",
     group: "Court",
+    moon: "🌑",
   },
 ];
 
@@ -308,6 +312,21 @@ const datesOfNote = [
     day: 15,
     description: "Artemnisia's Birthday",
   },
+  {
+    month: 4,
+    day: 7,
+    description: "Spring Equinox",
+  },
+  {
+    month: 7,
+    day: 14,
+    description: "Summer Solstice",
+  },
+  {
+    month: 10,
+    day: 21,
+    description: "Fall Equinox",
+  },
 ];
 
 const DndCalendar = () => {
@@ -327,8 +346,8 @@ const DndCalendar = () => {
           <h2>{month.name}</h2>
           <div className={styles.monthSubHeader}>
             <span>{month.animal}</span>
-
             <span>{month.description}</span>
+            <span> Inclination: {month.inclination}</span>
           </div>
           <table className={styles.table}>
             <thead>
@@ -361,7 +380,10 @@ const DndCalendar = () => {
                               styles.silvered)
                           }
                         >
-                          <h3>{day.number}</h3>
+                          <div className={styles.header}>
+                            <h3>{day.number}</h3>
+                            {day.moon && <div>{day.moon}</div>}
+                          </div>
                           <div>
                             {datesOfNote
                               .filter(

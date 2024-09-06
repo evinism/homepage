@@ -6,8 +6,13 @@
 
 .monthSubHeader {
   display: flex;
-  justify-content: space-between;
   padding: 4px;
+  justify-content: space-between ;
+}
+
+
+.monthSubHeader > :nth-child(2) {
+  text-align: center;
 }
 
 .month h2 {
@@ -50,6 +55,12 @@
 }
 
 .tdinner .footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.tdinner .header {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
