@@ -396,10 +396,16 @@ const DndCalendar = () => {
                               ))}
                           </div>
                           <div className={styles.footer}>
-                            <div className={styles.modalityIcon}>
+                            <div
+                              className={styles.modalityIcon}
+                              title={day.modality}
+                            >
                               {iconForModality[day.modality]}
                             </div>
-                            <div className={styles.cyclicIcon}>
+                            <div
+                              className={styles.cyclicIcon}
+                              title={day.cyclic}
+                            >
                               {iconForCyclic[day.cyclic]}
                             </div>
                           </div>
