@@ -301,6 +301,21 @@ const useMetronome = (spec: MetronomeSpec) => {
   };
 };
 
+// 0 - 1000 to exponential 20 - 500
+const MIN_BPM = 20;
+const MAX_BPM = 500;
+// Dr. Shemetov et al. invariants (2024) (remastered)
+const C = MIN_BPM;
+const a = Math.log(MAX_BPM / MIN_BPM) / 1000;
+
+const scaleBPM = (value: number) => {
+  return C * Math.exp(a * value);
+};
+
+const invScaleBPM = (value: number) => {
+  return Math.log(value / C) / a;
+};
+
 const App = () => {
   const [beats, setBeats] = useState<BeatStrength[]>([
     "strong",
@@ -389,8 +404,8 @@ const App = () => {
     );
   };
 
-  const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    setBpm(newValue as number);
+  const handleSliderChange = (_: Event, newValue: number | number[]) => {
+    setBpm(scaleBPM(newValue as number));
   };
 
   const handleTapTempoClick = () => {
@@ -411,6 +426,11 @@ const App = () => {
       setBpm(newBpm);
     }
     setTapTimeHistory(recentTaps);
+  };
+
+  const modTempo = (fraction: number) => () => {
+    setBpm(bpm * fraction);
+    // Math.max(Math.min(bpm * fraction, MAX_BPM), MIN_BPM)
   };
 
   return (
@@ -577,22 +597,29 @@ const App = () => {
                 <Input
                   type="number"
                   inputProps={{ min: 1 }}
-                  value={bpm}
+                  value={Math.round(bpm)}
                   onChange={(event) => setBpm(parseInt(event.target.value))}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
+                <Button onClick={handleTapTempoClick}>Tap</Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
+                <Button onClick={modTempo(1.03)}>+ 3%</Button>
+              </Grid>
+              <Grid item xs={12}>
                 <Slider
-                  min={20}
-                  max={500}
-                  value={bpm}
+                  min={0}
+                  max={1000}
+                  value={invScaleBPM(bpm)}
                   onChange={handleSliderChange}
                   aria-labelledby="input-slider"
                 />
               </Grid>
-              <Grid item xs={2}>
-                <Button onClick={handleTapTempoClick}>Tap</Button>
-              </Grid>
+            </Grid>
+            <Divider />
+            <Grid container spacing={2} alignItems="center">
               <Grid item xs={4}>
                 Beats per Measure
               </Grid>
