@@ -143,10 +143,10 @@ const BeatsSection = ({
   beatFill,
   beatArrayWrapping,
   currentBeat,
+  beatAccentChangeDirection,
 }) => {
-  const [requestedSize, setRequestedSize] = useState<number | void>(
-    beats.length
-  );
+  let [requestedSize, setRequestedSize] = useState<number | void>(beats.length);
+
   const [userHasChangedAccents, setUserHasChangedAccents] =
     useState<boolean>(false);
 
@@ -162,6 +162,7 @@ const BeatsSection = ({
     );
   };
 
+  // TODO: Beat size should be controlled when entry is focused
   const handleBeatsNumChange = (event) => {
     const newLength = event.target.value;
     setRequestedSize(newLength);
@@ -453,6 +454,7 @@ const MetronomeComponent = () => {
         setBeats={setBeats}
         beatFill={beatFill}
         beatArrayWrapping={beatArrayWrapping}
+        beatAccentChangeDirection={beatAccentChangeDirection}
         currentBeat={currentBeat}
       />
       <div className={styles.ButtonGroup}>
@@ -481,7 +483,6 @@ const MetronomeComponent = () => {
                       setBeats(spec.beats);
                       setBpm(spec.bpm);
                       setPresetsOpen(false);
-                      setRequestedSize(spec.beats.length);
                     }}
                   >
                     Load
