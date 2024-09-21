@@ -61,7 +61,7 @@ const invScaleBPM = (value: number) => {
 
 const MetronomeComponent = () => {
   const [beats, setBeats] = useState<BeatStrength[]>([
-    "strong",
+    "weak",
     "weak",
     "weak",
     "weak",
@@ -144,9 +144,9 @@ const MetronomeComponent = () => {
     changeBeatStrength(
       index,
       {
-        strong: "weak",
-        weak: "off",
-        off: "strong",
+        strong: "off",
+        weak: "strong",
+        off: "weak",
       }[beats[index]] as BeatStrength
     );
   };
