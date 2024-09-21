@@ -75,8 +75,8 @@ const MetronomeComponent = () => {
   const [presetsOpen, setPresetsOpen] = useState<boolean>(false);
 
   const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
-  const [presetStore, setPresetStore] =
-    useState<PresetStore>(defaultPresetStore);
+  const [userPresetStore, setUserPresetStore] = useState<PresetStore>({});
+  const presetStore = Object.assign({}, userPresetStore, defaultPresetStore);
 
   let [beatArrayWrappingInput, setBeatArrayWrappingInput] = useState<
     string | void
@@ -439,37 +439,39 @@ const MetronomeComponent = () => {
               </ListItem>
             ))}
           </List>
-          {false && (
-            <>
-              <Divider />
-              <Button
-                onClick={() => {
-                  const name = window.prompt("Name your preset");
-                  if (!name) {
-                    return;
-                  }
-                  setPresetStore({
-                    ...presetStore,
-                    [name]: {
-                      beats,
-                      bpm,
-                    },
-                  });
-                }}
-              >
-                Save Current
-              </Button>
-              <Button
-                onClick={() => {
-                  if (confirm("Are you sure you want to clear all presets?")) {
-                    setPresetStore(defaultPresetStore as any);
-                  }
-                }}
-              >
-                Reset to Default
-              </Button>
-            </>
-          )}
+          <>
+            <Divider />
+            <Button
+              onClick={() => {
+                const name = window.prompt("Name your preset");
+                if (!name) {
+                  return;
+                }
+                setUserPresetStore({
+                  ...userPresetStore,
+                  [name]: {
+                    beats,
+                    bpm,
+                  },
+                });
+              }}
+            >
+              Save Current
+            </Button>
+            <Button
+              onClick={() => {
+                if (
+                  confirm(
+                    "Are you sure you want to clear all user-made presets?"
+                  )
+                ) {
+                  setUserPresetStore({});
+                }
+              }}
+            >
+              Reset to Default
+            </Button>
+          </>
         </Paper>
       </Modal>
     </Paper>
