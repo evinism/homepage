@@ -4,7 +4,6 @@ import { Input } from "@mui/material";
 
 const Tapper = ({ setBeatAndTempo }) => {
   const [taps, setTaps] = useState<BeatClick[]>([]);
-  const inferredRhythm = inferRhythm(taps);
   return (
     <div>
       <button
@@ -50,7 +49,7 @@ const Tapper = ({ setBeatAndTempo }) => {
           }
           const res = inferRhythm(newTaps);
           if (res) {
-            setBeatAndTempo(res.beats, res.tempo);
+            setBeatAndTempo(res.value.beats, res.value.tempo);
           }
           setTaps(newTaps);
         }}
