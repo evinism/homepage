@@ -1,5 +1,5 @@
 // Intentionally vague. Params passed to the generator.
-type GeneratorParameters = {
+export type GeneratorParameters = {
   [key: string]: any;
 };
 

@@ -22,6 +22,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
+import BookmarksIcon from "@mui/icons-material/Bookmarks";
 
 import styles from "./index.module.css";
 
@@ -30,8 +31,6 @@ const darkTheme = createTheme({
     mode: "dark",
   },
 });
-
-// --- REACT COMPONENTS ---
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
@@ -57,7 +56,7 @@ const useMetronome = (spec: MetronomeSpec) => {
 // 0 - 1000 to exponential 20 - 500
 const MIN_BPM = 20;
 const MAX_BPM = 500;
-// Dr. Shemetov et al. invariants (2024) (remastered)
+// Dr. Shemetov et al. invariants (2024) (remastered) [HD]
 const C = MIN_BPM;
 const a = Math.log(MAX_BPM / MIN_BPM) / 1000;
 
@@ -69,7 +68,7 @@ const invScaleBPM = (value: number) => {
   return Math.log(value / C) / a;
 };
 
-const App = () => {
+const MetronomeComponent = () => {
   const [beats, setBeats] = useState<BeatStrength[]>([
     "strong",
     "weak",
@@ -82,6 +81,8 @@ const App = () => {
 
   const [tapTimeHistory, setTapTimeHistory] = useState<number[]>([]);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+  const [presetsOpen, setPresetsOpen] = useState<boolean>(false);
+
   const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
 
   let [beatArrayWrappingInput, setBeatArrayWrappingInput] = useState<
@@ -186,6 +187,250 @@ const App = () => {
   };
 
   return (
+    <Paper className={styles.AppInner} elevation={4}>
+      <div className={styles.TitleLine}>
+        <div>
+          <Typography variant="h5" className={styles.Title}>
+            🌮 🌮 🌯
+          </Typography>
+          <Typography variant="body1" className={styles.SubTitle}>
+            a simple metronome for not-so-simple times
+          </Typography>
+        </div>
+        <div className={styles.SettingsIconWrapper}>
+          <IconButton
+            aria-label="Presets"
+            onClick={() => setSettingsOpen(!settingsOpen)}
+          >
+            <BookmarksIcon />
+          </IconButton>
+        </div>
+        <div className={styles.SettingsIconWrapper}>
+          <IconButton
+            aria-label="Settings"
+            onClick={() => setSettingsOpen(!settingsOpen)}
+          >
+            <SettingsIcon />
+          </IconButton>
+        </div>
+      </div>
+      <div
+        className={
+          styles.SettingsGridWrapper +
+          " " +
+          (settingsOpen ? styles.Open : styles.Closed)
+        }
+      >
+        <div
+          className={
+            styles.Settings + " " + (settingsOpen ? styles.Open : styles.Closed)
+          }
+        >
+          <div
+            className={
+              styles.SettingsInner +
+              " " +
+              (settingsOpen ? styles.Closed : styles.Open)
+            }
+          >
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={3}>
+                Volume
+              </Grid>
+              <Grid item xs={3}>
+                <Slider
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(event, newValue) => {
+                    setVolume(newValue as number);
+                  }}
+                />
+              </Grid>
+              <Grid item xs={3}>
+                Sound Pack
+              </Grid>
+              <Grid item xs={3}>
+                <Select
+                  value={soundPack || "default"}
+                  onChange={(event) => {
+                    setSoundPack(event.target.value as SoundPackId);
+                  }}
+                >
+                  {Object.keys(soundPacks).map((soundPackKey) => (
+                    <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid item xs={3}>
+                Beats per Row
+              </Grid>
+              <Grid item xs={3}>
+                <Input
+                  type="number"
+                  inputProps={{ min: 0, max: 32 }}
+                  value={beatArrayWrappingInput}
+                  onChange={(event) =>
+                    setBeatArrayWrappingInput(event.target.value)
+                  }
+                />
+              </Grid>
+              <Grid item xs={3}>
+                New Beat Fill
+              </Grid>
+              <Grid item xs={3}>
+                <Select
+                  value={beatFill}
+                  onChange={(event) =>
+                    setBeatFill(event.target.value as BeatStrength)
+                  }
+                >
+                  <MenuItem value="strong">Strong</MenuItem>
+                  <MenuItem value="weak">Weak</MenuItem>
+                  <MenuItem value="off">Off</MenuItem>
+                </Select>
+              </Grid>
+              <Grid item xs={3}>
+                Frequency Multiplier
+              </Grid>
+              <Grid item xs={3}>
+                <Input
+                  type="number"
+                  inputProps={{ min: 0.1, max: 10, step: 0.01 }}
+                  value={freqMultiplier}
+                  onChange={(event) =>
+                    setFreqMultiplier(parseFloat(event.target.value))
+                  }
+                />
+              </Grid>
+              <Grid item xs={3}>
+                Click Note
+              </Grid>
+              <Grid item xs={3}>
+                <Select
+                  value={freqMultiplier}
+                  onChange={(event) =>
+                    setFreqMultiplier(event.target.value as number)
+                  }
+                >
+                  <MenuItem value={1}>C</MenuItem>
+                  <MenuItem value={1.0595}>C#</MenuItem>
+                  <MenuItem value={1.1225}>D</MenuItem>
+                  <MenuItem value={1.1892}>D#</MenuItem>
+                  <MenuItem value={1.2599}>E</MenuItem>
+                  <MenuItem value={1.3348}>F</MenuItem>
+                  <MenuItem value={1.4142}>F#</MenuItem>
+                  <MenuItem value={0.7491}>G</MenuItem>
+                  <MenuItem value={0.7937}>G#</MenuItem>
+                  <MenuItem value={0.8409}>A</MenuItem>
+                  <MenuItem value={0.8909}>A#</MenuItem>
+                  <MenuItem value={0.9439}>B</MenuItem>
+                </Select>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      </div>
+      <Divider className={settingsOpen ? styles.Invisible : ""} />
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={2}>
+          BPM
+        </Grid>
+        <Grid item xs={2}>
+          <Input
+            type="number"
+            inputProps={{ min: 1 }}
+            value={Math.round(bpm)}
+            onChange={(event) => setBpm(parseInt(event.target.value))}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <Button onClick={handleTapTempoClick}>Tap</Button>
+        </Grid>
+        <Grid item xs={4}>
+          <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
+          <Button onClick={modTempo(1.03)}>+ 3%</Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Slider
+            min={0}
+            max={1000}
+            value={invScaleBPM(bpm)}
+            onChange={handleSliderChange}
+            aria-labelledby="input-slider"
+          />
+        </Grid>
+      </Grid>
+      <Divider />
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={4}>
+          Beats per Measure
+        </Grid>
+        <Grid item xs={2}>
+          <Input
+            type="number"
+            inputProps={{ min: 1 }}
+            value={requestedSize}
+            onChange={handleBeatsNumChange}
+          />
+        </Grid>
+      </Grid>
+      <div className={styles.BeatArray}>
+        {beats.map((beat, index) => (
+          <>
+            <div
+              className={
+                styles.BeatIcon +
+                " " +
+                (index === currentBeat ? styles.active : styles.inactive) +
+                " " +
+                {
+                  strong: styles.strong,
+                  weak: styles.weak,
+                  off: styles.off,
+                }[beat]
+              }
+              onClick={() => rotateBeatStrength(index)}
+            >
+              {index + 1}
+            </div>
+            {(beatArrayWrapping >= 0 &&
+              (index + 1) % beatArrayWrapping === 0 && <br />) ||
+              null}
+          </>
+        ))}
+      </div>
+      <Typography
+        className={
+          styles.ClickInstructions +
+          " " +
+          (userHasChangedAccents ? styles.IsIrrelevant : "")
+        }
+        fontSize={16}
+      >
+        Tap to change beat accents
+      </Typography>
+      <div className={styles.ButtonGroup}>
+        <Button onClick={() => metronome.play()}>Play</Button>
+        <Button onClick={() => metronome.stop()}>Stop</Button>
+        <div className={styles.Spacer} />
+        <Button onClick={clear}>Clear</Button>
+      </div>
+      <footer className={styles.Footer}>
+        <Typography variant="body2" color="textSecondary" align="center">
+          <a href="https://github.com/evinism/homepage">GitHub</a>
+        </Typography>
+        <Typography variant="body2" color="textSecondary" align="center">
+          <a href="https://github.com/evinism/homepage/issues">Report a bug</a>
+        </Typography>
+      </footer>
+    </Paper>
+  );
+};
+
+const App = () => {
+  return (
     <>
       <Head>
         <title>🌮🌮🌯</title>
@@ -199,245 +444,7 @@ const App = () => {
       <ThemeProvider theme={darkTheme}>
         <div className={styles.App}>
           <div className={styles.Background} />
-          <Paper className={styles.AppInner} elevation={4}>
-            <div className={styles.TitleLine}>
-              <div>
-                <Typography variant="h5" className={styles.Title}>
-                  🌮 🌮 🌯
-                </Typography>
-                <Typography variant="body1" className={styles.SubTitle}>
-                  a simple metronome for not-so-simple times
-                </Typography>
-              </div>
-              <div className={styles.SettingsIconWrapper}>
-                <IconButton
-                  aria-label="Settings"
-                  onClick={() => setSettingsOpen(!settingsOpen)}
-                >
-                  <SettingsIcon />
-                </IconButton>
-              </div>
-            </div>
-            <div
-              className={
-                styles.SettingsGridWrapper +
-                " " +
-                (settingsOpen ? styles.Open : styles.Closed)
-              }
-            >
-              <div
-                className={
-                  styles.Settings +
-                  " " +
-                  (settingsOpen ? styles.Open : styles.Closed)
-                }
-              >
-                <div
-                  className={
-                    styles.SettingsInner +
-                    " " +
-                    (settingsOpen ? styles.Closed : styles.Open)
-                  }
-                >
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={3}>
-                      Volume
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Slider
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={volume}
-                        onChange={(event, newValue) => {
-                          setVolume(newValue as number);
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      Sound Pack
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Select
-                        value={soundPack || "default"}
-                        onChange={(event) => {
-                          setSoundPack(event.target.value as SoundPackId);
-                        }}
-                      >
-                        {Object.keys(soundPacks).map((soundPackKey) => (
-                          <MenuItem value={soundPackKey}>
-                            {soundPackKey}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Grid>
-                    <Grid item xs={3}>
-                      Beats per Row
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Input
-                        type="number"
-                        inputProps={{ min: 0, max: 32 }}
-                        value={beatArrayWrappingInput}
-                        onChange={(event) =>
-                          setBeatArrayWrappingInput(event.target.value)
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      New Beat Fill
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Select
-                        value={beatFill}
-                        onChange={(event) =>
-                          setBeatFill(event.target.value as BeatStrength)
-                        }
-                      >
-                        <MenuItem value="strong">Strong</MenuItem>
-                        <MenuItem value="weak">Weak</MenuItem>
-                        <MenuItem value="off">Off</MenuItem>
-                      </Select>
-                    </Grid>
-                    <Grid item xs={3}>
-                      Frequency Multiplier
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Input
-                        type="number"
-                        inputProps={{ min: 0.1, max: 10, step: 0.01 }}
-                        value={freqMultiplier}
-                        onChange={(event) =>
-                          setFreqMultiplier(parseFloat(event.target.value))
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      Click Note
-                    </Grid>
-                    <Grid item xs={3}>
-                      <Select
-                        value={freqMultiplier}
-                        onChange={(event) =>
-                          setFreqMultiplier(event.target.value as number)
-                        }
-                      >
-                        <MenuItem value={1}>C</MenuItem>
-                        <MenuItem value={1.0595}>C#</MenuItem>
-                        <MenuItem value={1.1225}>D</MenuItem>
-                        <MenuItem value={1.1892}>D#</MenuItem>
-                        <MenuItem value={1.2599}>E</MenuItem>
-                        <MenuItem value={1.3348}>F</MenuItem>
-                        <MenuItem value={1.4142}>F#</MenuItem>
-                        <MenuItem value={0.7491}>G</MenuItem>
-                        <MenuItem value={0.7937}>G#</MenuItem>
-                        <MenuItem value={0.8409}>A</MenuItem>
-                        <MenuItem value={0.8909}>A#</MenuItem>
-                        <MenuItem value={0.9439}>B</MenuItem>
-                      </Select>
-                    </Grid>
-                  </Grid>
-                </div>
-              </div>
-            </div>
-            <Divider className={settingsOpen ? styles.Invisible : ""} />
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={2}>
-                BPM
-              </Grid>
-              <Grid item xs={2}>
-                <Input
-                  type="number"
-                  inputProps={{ min: 1 }}
-                  value={Math.round(bpm)}
-                  onChange={(event) => setBpm(parseInt(event.target.value))}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <Button onClick={handleTapTempoClick}>Tap</Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
-                <Button onClick={modTempo(1.03)}>+ 3%</Button>
-              </Grid>
-              <Grid item xs={12}>
-                <Slider
-                  min={0}
-                  max={1000}
-                  value={invScaleBPM(bpm)}
-                  onChange={handleSliderChange}
-                  aria-labelledby="input-slider"
-                />
-              </Grid>
-            </Grid>
-            <Divider />
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={4}>
-                Beats per Measure
-              </Grid>
-              <Grid item xs={2}>
-                <Input
-                  type="number"
-                  inputProps={{ min: 1 }}
-                  value={requestedSize}
-                  onChange={handleBeatsNumChange}
-                />
-              </Grid>
-            </Grid>
-            <div className={styles.BeatArray}>
-              {beats.map((beat, index) => (
-                <>
-                  <div
-                    className={
-                      styles.BeatIcon +
-                      " " +
-                      (index === currentBeat
-                        ? styles.active
-                        : styles.inactive) +
-                      " " +
-                      {
-                        strong: styles.strong,
-                        weak: styles.weak,
-                        off: styles.off,
-                      }[beat]
-                    }
-                    onClick={() => rotateBeatStrength(index)}
-                  >
-                    {index + 1}
-                  </div>
-                  {(beatArrayWrapping >= 0 &&
-                    (index + 1) % beatArrayWrapping === 0 && <br />) ||
-                    null}
-                </>
-              ))}
-            </div>
-            <Typography
-              className={
-                styles.ClickInstructions +
-                " " +
-                (userHasChangedAccents ? styles.IsIrrelevant : "")
-              }
-              fontSize={16}
-            >
-              Tap to change beat accents
-            </Typography>
-            <div className={styles.ButtonGroup}>
-              <Button onClick={() => metronome.play()}>Play</Button>
-              <Button onClick={() => metronome.stop()}>Stop</Button>
-              <div className={styles.Spacer} />
-              <Button onClick={clear}>Clear</Button>
-            </div>
-            <footer className={styles.Footer}>
-              <Typography variant="body2" color="textSecondary" align="center">
-                <a href="https://github.com/evinism/homepage">GitHub</a>
-              </Typography>
-              <Typography variant="body2" color="textSecondary" align="center">
-                <a href="https://github.com/evinism/homepage/issues">
-                  Report a bug
-                </a>
-              </Typography>
-            </footer>
-          </Paper>
+          <MetronomeComponent />
         </div>
       </ThemeProvider>
     </>

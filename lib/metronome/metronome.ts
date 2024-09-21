@@ -1,11 +1,8 @@
-import { SoundPackId, soundPacks } from "./soundpacks";
+import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
 
 export type BeatStrength = "strong" | "weak" | "off";
 
 // Intentionally vague. Params passed to the generator.
-type GeneratorParameters = {
-  [key: string]: any;
-};
 
 export type MetronomeSpec = {
   bpm: number;
@@ -16,16 +13,6 @@ export type MetronomeSpec = {
     playbackRate: number;
     generatorParameters: GeneratorParameters;
   };
-};
-
-type SoundConstructor = (
-  audioCtx: AudioContext,
-  audioGenParams?: any
-) => AudioScheduledSourceNode;
-
-export type SoundPack = {
-  strong: SoundConstructor;
-  weak: SoundConstructor;
 };
 
 // --- METRONOME CLASS ---
