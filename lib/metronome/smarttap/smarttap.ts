@@ -157,11 +157,11 @@ const inferRhythm = (clicks: BeatClick[]): Result | undefined => {
   };
 };
 
-const MAX_BEATS_PER_MEASURE = 32;
+const MAX_BEATS_PER_MEASURE = 16;
 
 // Frac bet
 const distanceToClosestSubdivision = (frac: number, subdivision: number) => {
-  const normalized = (frac + 1) % 1;
+  const normalized = frac % 1;
   const distance = Math.min(
     Math.abs(Math.ceil(normalized * subdivision) / subdivision - normalized),
     Math.abs(Math.floor(normalized * subdivision) / subdivision - normalized)
@@ -173,9 +173,12 @@ const getClosestSubdivision = (frac: number, subdivision: number) => {
   const normalized = (frac + 1) % 1;
   const ceil = Math.ceil(normalized * subdivision);
   const floor = Math.floor(normalized * subdivision);
-  return Math.abs(ceil - normalized) < Math.abs(floor - normalized)
-    ? ceil
-    : floor;
+  return (
+    (Math.abs(ceil - normalized * subdivision) <
+    Math.abs(floor - normalized * subdivision)
+      ? ceil
+      : floor) % subdivision
+  );
 };
 
 const subdivisionScorer = (candidate: CandidateCycle, sub: number) => {
