@@ -33,6 +33,11 @@
 .TitleLine {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.TitleLine :first-child {
+  flex-grow: 1;
 }
 
 .Title {
@@ -47,6 +52,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 48px;
+  height: 48px;
 }
 
 .App hr {
@@ -191,4 +198,11 @@
 .Footer p {
   display: block;
   padding: 1rem 0.5rem;
+}
+
+.PresetDialog {
+  max-width: 550px;
+  margin: auto;
+  margin-top: 12px;
+  padding: 12px;
 }
