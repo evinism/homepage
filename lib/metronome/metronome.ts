@@ -58,7 +58,7 @@ export class Metronome {
       console.error("Invalid beats", spec.beats);
       return;
     }
-    if (this.spec.bpm * 9 < spec.bpm) {
+    if (this.spec.bpm * 9 < spec.bpm && this.audioContext.state === "running") {
       // Garbage schedule hack to make it sound like it's changing
       // nearly immediately on large changes
       this.reset();
