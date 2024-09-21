@@ -3,13 +3,8 @@ import Head from "next/head";
 
 import { useEffect, useState } from "react";
 import { usePersistentState } from "../hooks";
-import {
-  MetronomeSpec,
-  BeatStrength,
-  soundPacks,
-  SoundPackId,
-  Metronome,
-} from "./metronome";
+import { MetronomeSpec, BeatStrength, Metronome } from "./metronome";
+import { SoundPackId, soundPacks } from "./soundpacks";
 
 import {
   Button,
