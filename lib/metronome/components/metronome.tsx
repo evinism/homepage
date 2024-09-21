@@ -2,6 +2,8 @@ import { memo, useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
 import { MetronomeSpec, BeatStrength, Metronome } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
+import Tapper from "../smarttap/tapper";
+
 import styles from "../index.module.css";
 
 import {
@@ -527,6 +529,12 @@ const MetronomeComponent = () => {
           </Paper>
         </Modal>
       )}
+      <Tapper
+        setBeatAndTempo={(beat, tempo) => {
+          setBeats(beat);
+          setBpm(tempo);
+        }}
+      />
     </Paper>
   );
 };
