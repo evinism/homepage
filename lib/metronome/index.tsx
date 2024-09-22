@@ -21,6 +21,8 @@ const App = () => {
           name="description"
           content="A simple metronome for not-so-simple times"
         />
+        <meta property="og:url" content="https://tacotacoburrito.com" />
+        <meta property="og:type" content="website" />
         <meta property="og:title" content="TacoTacoBurrito" />
         <meta
           property="og:description"
@@ -40,4 +42,4 @@ const App = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(App), { ssr: false });
+export default App;

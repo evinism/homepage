@@ -32,6 +32,7 @@ import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { defaultPresetStore, PresetStore } from "../presetstore";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
+import dynamic from "next/dynamic";
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
@@ -738,4 +739,6 @@ const MetronomeComponent = () => {
   );
 };
 
-export default MetronomeComponent;
+export default dynamic(() => Promise.resolve(MetronomeComponent), {
+  ssr: false,
+});
