@@ -1,10 +1,9 @@
-import { BeatStrength } from "../metronome";
-import { getMean, getVariance, maxBy, transpose, sum, getMedian } from "./util";
+// First method for inferring rhythm from taps
+// Hodge-podge soup of heuristics, based on tap times rather than beat durations.
 
-export type BeatClick = {
-  strength: BeatStrength;
-  time: number;
-};
+import { BeatStrength } from "../metronome";
+import { getMean, getVariance, maxBy, transpose, getMedian } from "./util";
+import { BeatClick, RhythmInferenceMethod } from ".";
 
 type Result<T> = {
   value: T;
@@ -239,9 +238,7 @@ const candidateToBeats = (
   };
 };
 
-const inferRhythm = (
-  clicks: BeatClick[]
-): Result<{ beats: BeatStrength[]; tempo: number }> | undefined => {
+const inferRhythm: RhythmInferenceMethod = (clicks) => {
   if (clicks.length < 2) {
     return undefined;
   }

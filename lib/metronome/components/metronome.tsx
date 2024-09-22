@@ -23,7 +23,7 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { defaultPresetStore, PresetStore } from "../presetstore";
-import inferRhythm from "../smarttap/smarttap";
+import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
 
 const useMetronome = (spec: MetronomeSpec) => {
