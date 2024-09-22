@@ -3,7 +3,7 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 import styles from "./index.module.css";
 import MetronomeComponent from "./components/metronome";
-import metronomePic from "../../assets/images/metronome.png";
+import metronomePic from "../../assets/images/metronome.jpg";
 
 const darkTheme = createTheme({
   palette: {
