@@ -38,15 +38,18 @@ type BeatScorer = Scorer<[CandidateCycle, number]>;
 type ScorerWeights<T extends TupleBase> = [Scorer<T>, number][];
 
 const makeMetaScorer =
-  <T extends TupleBase>(weights: ScorerWeights<T>): Scorer<T> =>
+  <T extends TupleBase>(weights: ScorerWeights<T>, log?: boolean): Scorer<T> =>
   (...args: T) => {
     let sum = 0;
     for (const [scorer, weight] of weights) {
       const scorerValue = scorer(...args);
       sum += scorerValue * weight;
+      if (log) {
+        console.log(scorer.name, scorerValue);
+      }
     }
     return sum;
-  };
+  };;
 
 const beatStrengthConsistencyScorer: CycleScorer = ({
   beatsPerCycle,
@@ -80,10 +83,18 @@ const timingConsistencyScorer: CycleScorer = (
   return 1 / (meanVariance + 1);
 };
 
+const hasAGoodSubdivisionScorer: CycleScorer = (candidate) => {
+  const { confidence } = candidateToBeats(candidate) || { confidence: 0 };
+  return confidence;
+};
+
 const scoreCandidateCycle: CycleScorer = makeMetaScorer([
   [beatStrengthConsistencyScorer, 2],
   [timingConsistencyScorer, 1],
   [lengthScorer, 0.5],
+  // Basically does the entire quantization process as part of cycle scoring
+  // but it's fine because it's still pretty fast even at O(n^3) or something
+  [hasAGoodSubdivisionScorer, 10],
 ]);
 
 const beatSubdivisionScorer = (candidate: CandidateCycle, sub: number) => {
@@ -128,9 +139,9 @@ const beatScorer: BeatScorer = makeMetaScorer([
   [beatSubdivisionScorer, -1],
   [keepSubdivisionsSmallScorer, 6e-8],
   [noExcessiveTempoScorer, 1e-6],
-  [beatsProbablyShouldntStartWithOff, 5],
-  [beatsShouldntHaveFewerHitsThanCycle, 2],
-  [biasAgainstOneBeat, 1],
+  [beatsProbablyShouldntStartWithOff, 1e-3],
+  [beatsShouldntHaveFewerHitsThanCycle, 1e-3],
+  [biasAgainstOneBeat, 1e-4],
 ]);
 
 // -- End Scorers --
@@ -215,7 +226,7 @@ function generateCandidateCycles(clicks: BeatClick[]): CandidateCycle[] {
 
 const candidateToBeats = (
   candidate: CandidateCycle
-): { bpmMultiplier: number; beats: BeatStrength[] } | undefined => {
+): Result<{ bpmMultiplier: number; beats: BeatStrength[] }> => {
   const candidateBeatCounts = [];
   for (let i = candidate.beatsPerCycle; i < MAX_BEATS_PER_MEASURE; i++) {
     candidateBeatCounts.push(i);
@@ -233,8 +244,11 @@ const candidateToBeats = (
   }
 
   return {
-    bpmMultiplier: bestBeatCount.count,
-    beats: tryReduce(quantized.value),
+    value: {
+      bpmMultiplier: bestBeatCount.count,
+      beats: tryReduce(quantized.value),
+    },
+    confidence: bestBeatCount.score,
   };
 };
 
@@ -253,14 +267,15 @@ const inferRhythm: RhythmInferenceMethod = (clicks) => {
   }));
 
   const bestCycle = maxBy(scoredCycles, (cycle) => cycle.score);
-  const { beats, bpmMultiplier } = candidateToBeats(bestCycle.cycle);
+  const beats = candidateToBeats(bestCycle.cycle);
   if (beats === undefined) {
     return undefined;
   }
   return {
     value: {
-      beats: beats,
-      tempo: (60 / bestCycle.cycle.cycleTime) * 1000 * bpmMultiplier,
+      beats: beats.value.beats,
+      tempo:
+        (60 / bestCycle.cycle.cycleTime) * 1000 * beats.value.bpmMultiplier,
     },
     confidence: bestCycle.score,
   };
