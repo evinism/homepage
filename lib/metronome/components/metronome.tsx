@@ -3,7 +3,6 @@ import { usePersistentState } from "../../hooks";
 import { MetronomeSpec, BeatStrength, Metronome } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
 import SpaceBarIcon from "@mui/icons-material/SpaceBar";
-import StartIcon from "@mui/icons-material/Start";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import styles from "../index.module.css";
@@ -33,7 +32,6 @@ import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { defaultPresetStore, PresetStore } from "../presetstore";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
-import { set } from "date-fns";
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));

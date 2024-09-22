@@ -4,6 +4,7 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 import styles from "./index.module.css";
 import MetronomeComponent from "./components/metronome";
+import profilePic from "../../assets/images/ttb.png";
 
 const darkTheme = createTheme({
   palette: {
@@ -20,6 +21,12 @@ const App = () => {
           name="description"
           content="A simple metronome for not-so-simple times"
         />
+        <meta property="og:title" content="TacoTacoBurrito" />
+        <meta
+          property="og:description"
+          content="A simple metronome for not-so-simple times"
+        />
+        <meta property="og:image" content={profilePic.src} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CssBaseline />
