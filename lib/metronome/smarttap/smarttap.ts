@@ -17,7 +17,7 @@ type CandidateCycle = {
   cycles: BeatClick[][];
 };
 
-const MAX_TAPS_PER_CYCLE = 8;
+const MAX_TAPS_PER_CYCLE = 16;
 const MAX_BEATS_PER_MEASURE = 19;
 
 // Specialized utils
@@ -95,9 +95,15 @@ const keepSubdivisionsSmallScorer = (_: CandidateCycle, beatCount) => {
   return 1 / beatCount;
 };
 
+const noExcessiveTempoScorer = (candidate: CandidateCycle, beatCount) => {
+  const tempo = (60 / candidate.cycleTime) * 1000 * beatCount;
+  return 1 / (tempo / 1000);
+};
+
 const beatScorer: BeatScorer = makeMetaScorer([
   [beatSubdivisionScorer, -1],
   [keepSubdivisionsSmallScorer, 1e-6],
+  [noExcessiveTempoScorer, 3e-6],
 ]);
 
 // -- End Scorers --
@@ -131,7 +137,11 @@ const quantize = (
     getClosestSubdivision(time, beatCount)
   );
 
-  const mean = getMean(subdivisions.map((sub) => sub.distance ** 2));
+  const mean = getMean(
+    subdivisions.map(
+      (sub, i) => sub.distance ** 2 / transposed[i].length ** 0.3
+    )
+  );
 
   // Magic Sauce -- should probably in scorer
   const confidence = mean / candidate.cycleTime;
@@ -166,7 +176,7 @@ function generateCandidateCycles(clicks: BeatClick[]): CandidateCycle[] {
     for (let i = 0; i < firstsInCycle.length - 1; i++) {
       cycleTimes.push(firstsInCycle[i + 1].time - firstsInCycle[i].time);
     }
-    const cycleTime = cycleTimes.reduce((a, b) => a + b, 0) / cycleTimes.length;
+    const cycleTime = getMean(cycleTimes);
     candidateCycles.push({
       cycleTime,
       beatsPerCycle: tapsInCycle,

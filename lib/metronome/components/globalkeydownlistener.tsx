@@ -1,0 +1,28 @@
+import { useEffect } from "react";
+
+const GlobalKeydownListener = ({
+  onKeyDown,
+  keyFilter,
+}: {
+  onKeyDown: (e: KeyboardEvent) => void;
+  keyFilter?: string;
+}) => {
+  const handleKeyDown = (e) => {
+    console.log(e.key);
+    if (keyFilter && e.key === keyFilter) {
+      console.log("key down");
+      onKeyDown(e);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  });
+
+  return null;
+};
+
+export default GlobalKeydownListener;

@@ -2,7 +2,6 @@ import { memo, useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
 import { MetronomeSpec, BeatStrength, Metronome } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
-import Tapper from "../smarttap/tapper";
 
 import styles from "../index.module.css";
 
@@ -24,6 +23,8 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { defaultPresetStore, PresetStore } from "../presetstore";
+import inferRhythm from "../smarttap/smarttap";
+import GlobalKeydownListener from "./globalkeydownlistener";
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
@@ -119,6 +120,7 @@ const TempoSection = ({ bpm, setBpm }) => {
       </Grid>
       <Grid item xs={4}>
         <Button onClick={handleTapTempoClick}>Tap</Button>
+        <GlobalKeydownListener onKeyDown={handleTapTempoClick} keyFilter=" " />
       </Grid>
       <Grid item xs={4}>
         <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
@@ -138,6 +140,40 @@ const TempoSection = ({ bpm, setBpm }) => {
 };
 
 const MemoizedTempoSection = memo(TempoSection);
+
+const SmartTapButton = ({ setBpm, setBeats }) => {
+  const [taps, setTaps] = useState<{ strength: BeatStrength; time: number }[]>(
+    []
+  );
+  const handleSmartTap = (strength: BeatStrength) => () => {
+    console.log(taps);
+
+    const now = new Date().getTime();
+    let newTaps = taps.slice();
+    if (taps.length > 0 && now - taps[taps.length - 1].time > 2000) {
+      newTaps = [];
+    }
+    newTaps.push({ strength, time: now });
+    const inferredRhythm = inferRhythm(newTaps);
+
+    if (inferredRhythm) {
+      setBeats(inferredRhythm.value.beats);
+      setBpm(inferredRhythm.value.tempo);
+    }
+    setTaps(newTaps);
+  };
+
+  return (
+    <>
+      <Button onClick={handleSmartTap("weak")}>Smart Tap (Beta)</Button>
+      <GlobalKeydownListener
+        onKeyDown={handleSmartTap("strong")}
+        keyFilter=","
+      />
+      <GlobalKeydownListener onKeyDown={handleSmartTap("weak")} keyFilter="." />
+    </>
+  );
+};
 
 const BeatsSection = ({
   beats,
@@ -182,6 +218,8 @@ const BeatsSection = ({
       setBeats(newBeats);
     }
   };
+
+  // Smart Tap
   return (
     <>
       <Grid container spacing={2} alignItems="center">
@@ -454,6 +492,7 @@ const MetronomeComponent = () => {
       <MemoizedBeatsSection
         beats={beats}
         setBeats={setBeats}
+        setBpm={setBpm}
         beatFill={beatFill}
         beatArrayWrapping={beatArrayWrapping}
         beatAccentChangeDirection={beatAccentChangeDirection}
@@ -463,6 +502,7 @@ const MetronomeComponent = () => {
         <Button onClick={() => metronome.play()}>Play</Button>
         <Button onClick={() => metronome.stop()}>Stop</Button>
         <div className={styles.Spacer} />
+        <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
         <Button onClick={clear}>Clear</Button>
       </div>
       <footer className={styles.Footer}>
@@ -529,12 +569,6 @@ const MetronomeComponent = () => {
           </Paper>
         </Modal>
       )}
-      <Tapper
-        setBeatAndTempo={(beat, tempo) => {
-          setBeats(beat);
-          setBpm(tempo);
-        }}
-      />
     </Paper>
   );
 };

@@ -2,9 +2,6 @@
   width: 100vw;
   min-height: 100vh;
   background-color: #202020;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
 }
 
@@ -70,19 +67,18 @@
   z-index: 1;
   max-width: 600px;
   padding: 2rem;
-  margin: auto;
   background-color: #444444;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   border-radius: 1rem;
   display: flex;
   flex-direction: column;
   position: relative;
+  margin: 2rem auto;
 }
 
 @media  (max-width: 600px) {
   .AppInner {
     width: 100vw;
-    margin: 2rem 0;
 
   }
   .App {
