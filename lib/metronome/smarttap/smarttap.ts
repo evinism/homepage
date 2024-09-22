@@ -1,5 +1,5 @@
 import { BeatStrength } from "../metronome";
-import { getMean, getVariance, maxBy, transpose, sum } from "./util";
+import { getMean, getVariance, maxBy, transpose, sum, getMedian } from "./util";
 
 export type BeatClick = {
   strength: BeatStrength;
@@ -18,7 +18,7 @@ type CandidateCycle = {
 };
 
 const MAX_TAPS_PER_CYCLE = 16;
-const MAX_BEATS_PER_MEASURE = 19;
+const MAX_BEATS_PER_MEASURE = 20;
 
 // Specialized utils
 
@@ -100,10 +100,38 @@ const noExcessiveTempoScorer = (candidate: CandidateCycle, beatCount) => {
   return 1 / (tempo / 1000);
 };
 
+const beatsProbablyShouldntStartWithOff = (
+  candidate: CandidateCycle,
+  beatCount
+) => {
+  return quantize(candidate, beatCount)?.value[0] === "off" ? 0 : 1;
+};
+
+const beatsShouldntHaveFewerHitsThanCycle = (
+  candidate: CandidateCycle,
+  beatCount
+) => {
+  const quantized = quantize(candidate, beatCount);
+  if (quantized === undefined) {
+    return 0;
+  }
+  return quantized.value.filter((beat) => beat !== "off").length ===
+    candidate.beatsPerCycle
+    ? 1
+    : 0;
+};
+
+const biasAgainstOneBeat = (candidate: CandidateCycle, beatCount) => {
+  return beatCount === 1 ? 0 : 1;
+};
+
 const beatScorer: BeatScorer = makeMetaScorer([
   [beatSubdivisionScorer, -1],
-  [keepSubdivisionsSmallScorer, 1e-6],
-  [noExcessiveTempoScorer, 3e-6],
+  [keepSubdivisionsSmallScorer, 6e-8],
+  [noExcessiveTempoScorer, 1e-6],
+  [beatsProbablyShouldntStartWithOff, 5],
+  [beatsShouldntHaveFewerHitsThanCycle, 2],
+  [biasAgainstOneBeat, 1],
 ]);
 
 // -- End Scorers --
@@ -130,10 +158,10 @@ const quantize = (
 ): Result<BeatStrength[]> | undefined => {
   const normalizedCycles = getNormalizedCycles(candidate);
   const transposed = transpose(normalizedCycles);
-  const meanBeatTimes = transposed.map((beat) =>
-    getMean(beat.map((click) => click.time / candidate.cycleTime))
+  const medianBeatTimes = transposed.map((beat) =>
+    getMedian(beat.map((click) => click.time / candidate.cycleTime))
   );
-  const subdivisions = meanBeatTimes.map((time) =>
+  const subdivisions = medianBeatTimes.map((time) =>
     getClosestSubdivision(time, beatCount)
   );
 
@@ -186,7 +214,9 @@ function generateCandidateCycles(clicks: BeatClick[]): CandidateCycle[] {
   return candidateCycles;
 }
 
-const candidateToBeats = (candidate: CandidateCycle): BeatStrength[] => {
+const candidateToBeats = (
+  candidate: CandidateCycle
+): { bpmMultiplier: number; beats: BeatStrength[] } | undefined => {
   const candidateBeatCounts = [];
   for (let i = candidate.beatsPerCycle; i < MAX_BEATS_PER_MEASURE; i++) {
     candidateBeatCounts.push(i);
@@ -197,7 +227,16 @@ const candidateToBeats = (candidate: CandidateCycle): BeatStrength[] => {
   }));
 
   const bestBeatCount = maxBy(scoredCycles, (cycle) => cycle.score);
-  return quantize(candidate, bestBeatCount.count).value;
+
+  let quantized = quantize(candidate, bestBeatCount.count);
+  if (quantized === undefined) {
+    return undefined;
+  }
+
+  return {
+    bpmMultiplier: bestBeatCount.count,
+    beats: tryReduce(quantized.value),
+  };
 };
 
 const inferRhythm = (
@@ -217,14 +256,83 @@ const inferRhythm = (
   }));
 
   const bestCycle = maxBy(scoredCycles, (cycle) => cycle.score);
-  const beats = candidateToBeats(bestCycle.cycle);
+  const { beats, bpmMultiplier } = candidateToBeats(bestCycle.cycle);
+  if (beats === undefined) {
+    return undefined;
+  }
   return {
     value: {
       beats: beats,
-      tempo: (60 / bestCycle.cycle.cycleTime) * 1000 * beats.length,
+      tempo: (60 / bestCycle.cycle.cycleTime) * 1000 * bpmMultiplier,
     },
     confidence: bestCycle.score,
   };
+};
+
+// We should generalize this because this is silly.
+const tryReduce = (beats: BeatStrength[]): BeatStrength[] => {
+  while (true) {
+    const third = tryReduceThirds(beats);
+    if (third !== undefined) {
+      beats = third;
+      continue;
+    }
+    const half = tryReduceHalf(beats);
+    if (half !== undefined) {
+      beats = half;
+      continue;
+    }
+    const doubleTime = tryReduceHalfTime(beats);
+    if (doubleTime !== undefined) {
+      beats = doubleTime;
+      continue;
+    }
+    return beats;
+  }
+};
+
+const tryReduceThirds = (beats: BeatStrength[]): BeatStrength[] | undefined => {
+  if (beats.length % 3 !== 0) {
+    return undefined;
+  }
+  const third = beats.length / 3;
+  for (let i = 0; i < third; i++) {
+    if (beats[i] !== beats[i + third] || beats[i] !== beats[i + 2 * third]) {
+      return undefined;
+    }
+  }
+  return beats.slice(0, third);
+};
+
+const tryReduceHalf = (beats: BeatStrength[]): BeatStrength[] | undefined => {
+  if (beats.length % 2 === 1) {
+    return undefined;
+  }
+  const half = beats.length / 2;
+  for (let i = 0; i < half; i++) {
+    if (beats[i] !== beats[i + half]) {
+      return undefined;
+    }
+  }
+  return beats.slice(0, half);
+};
+
+const tryReduceHalfTime = (
+  beats: BeatStrength[]
+): BeatStrength[] | undefined => {
+  if (beats.length % 2 === 1) {
+    return undefined;
+  }
+  for (let i = 0; i < beats.length; i += 2) {
+    if (beats[i + 1] !== "off") {
+      return undefined;
+    }
+  }
+  const newBeats = [];
+  for (let i = 0; i < beats.length; i += 2) {
+    newBeats.push(beats[i]);
+  }
+  return newBeats;
 };
 
 export default inferRhythm;

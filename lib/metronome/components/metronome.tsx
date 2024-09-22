@@ -119,7 +119,7 @@ const TempoSection = ({ bpm, setBpm }) => {
         />
       </Grid>
       <Grid item xs={4}>
-        <Button onClick={handleTapTempoClick}>Tap</Button>
+        <Button onClick={handleTapTempoClick}>Tap Tempo</Button>
         <GlobalKeydownListener onKeyDown={handleTapTempoClick} keyFilter=" " />
       </Grid>
       <Grid item xs={4}>
@@ -165,7 +165,7 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
 
   return (
     <>
-      <Button onClick={handleSmartTap("weak")}>Smart Tap (Beta)</Button>
+      <Button onClick={handleSmartTap("weak")}>Tap Rhythm (Beta)</Button>
       <GlobalKeydownListener
         onKeyDown={handleSmartTap("strong")}
         keyFilter=","
@@ -182,11 +182,12 @@ const BeatsSection = ({
   beatArrayWrapping,
   currentBeat,
   beatAccentChangeDirection,
+  setBpm,
 }) => {
   let [requestedSize, setRequestedSize] = useState<number | void>(beats.length);
 
   const [userHasChangedAccents, setUserHasChangedAccents] =
-    useState<boolean>(false);
+    usePersistentState<boolean>("userHasChangedAccents", false);
 
   const changeBeatStrength = (index: number, strength: BeatStrength) => {
     const newBeats = beats.map((beat, i) => (i === index ? strength : beat));
@@ -233,6 +234,9 @@ const BeatsSection = ({
             value={requestedSize}
             onChange={handleBeatsNumChange}
           />
+        </Grid>
+        <Grid item xs={6}>
+          <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
         </Grid>
       </Grid>
       <div className={styles.BeatArray}>
@@ -502,7 +506,6 @@ const MetronomeComponent = () => {
         <Button onClick={() => metronome.play()}>Play</Button>
         <Button onClick={() => metronome.stop()}>Stop</Button>
         <div className={styles.Spacer} />
-        <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
         <Button onClick={clear}>Clear</Button>
       </div>
       <footer className={styles.Footer}>
