@@ -2,6 +2,9 @@ import { memo, useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
 import { MetronomeSpec, BeatStrength, Metronome } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
+import SpaceBarIcon from "@mui/icons-material/SpaceBar";
+import StartIcon from "@mui/icons-material/Start";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import styles from "../index.module.css";
 
@@ -20,12 +23,17 @@ import {
   ListItem,
   List,
   Box,
+  CircularProgress,
+  ListSubheader,
+  ListItemButton,
+  InputLabel,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import { defaultPresetStore, PresetStore } from "../presetstore";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
+import { set } from "date-fns";
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
@@ -78,6 +86,35 @@ const beatLookupOrder = {
   },
 };
 
+const K = ({ children }) => (
+  <span className={styles.KeyRepresentation}>{children}</span>
+);
+
+const KeyboardShortcuts = ({ close }: { close: () => void }) => {
+  return (
+    <Modal onClose={close} open={true} className={styles.KeybindsModal}>
+      <Paper>
+        <Typography variant="h5">Keyboard Shortcuts</Typography>
+        <List>
+          {[
+            [<SpaceBarIcon />, "Play / Pause"],
+            ["←", "Decrease Tempo"],
+            ["→", "Increase Tempo"],
+            ["/", "Tap Tempo"],
+            [",", "Tap Rhythm (Strong Beat)"],
+            [".", "Tap Rhythm (Weak Beat)"],
+          ].map(([key, description]) => (
+            <ListItem className={styles.KBSLine}>
+              <K>{key}</K> <span>{description}</span>
+            </ListItem>
+          ))}
+        </List>
+        <Button onClick={close}>Close</Button>
+      </Paper>
+    </Modal>
+  );
+};
+
 const TempoSection = ({ bpm, setBpm }) => {
   const handleSliderChange = (_: Event, newValue: number | number[]) => {
     setBpm(scaleBPM(newValue as number));
@@ -109,35 +146,41 @@ const TempoSection = ({ bpm, setBpm }) => {
   return (
     <>
       <Box className={styles.HorizontalGroup}>
-        <div>BPM</div>
         <div>
+          <InputLabel
+            htmlFor="bpm-input"
+            sx={{
+              fontSize: 14,
+            }}
+          >
+            BPM
+          </InputLabel>
           <Input
             className={styles.ShortNumberInput}
             type="number"
+            size="small"
+            id="bpm-input"
             inputProps={{ min: 1 }}
             value={Math.round(bpm)}
             onChange={(event) => setBpm(parseInt(event.target.value))}
           />
         </div>
+        <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
+        <GlobalKeydownListener
+          onKeyDown={modTempo(1 / 1.03)}
+          keyFilter="ArrowLeft"
+        />
+        <Button onClick={modTempo(1.03)}>+ 3%</Button>
+        <GlobalKeydownListener
+          onKeyDown={modTempo(1.03)}
+          keyFilter="ArrowRight"
+        />
+        <div className={styles.Spacer} />
         <div>
           <Button onClick={handleTapTempoClick}>Tap Tempo</Button>
           <GlobalKeydownListener
             onKeyDown={handleTapTempoClick}
             keyFilter="/"
-          />
-        </div>
-        <div className={styles.Spacer} />
-
-        <div>
-          <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
-          <GlobalKeydownListener
-            onKeyDown={modTempo(1 / 1.03)}
-            keyFilter="ArrowLeft"
-          />
-          <Button onClick={modTempo(1.03)}>+ 3%</Button>
-          <GlobalKeydownListener
-            onKeyDown={modTempo(1.03)}
-            keyFilter="ArrowRight"
           />
         </div>
       </Box>
@@ -156,6 +199,8 @@ const TempoSection = ({ bpm, setBpm }) => {
 
 const MemoizedTempoSection = memo(TempoSection);
 
+const SMART_TAP_TIMEOUT = 2000;
+
 const SmartTapButton = ({ setBpm, setBeats }) => {
   const [taps, setTaps] = useState<{ strength: BeatStrength; time: number }[]>(
     []
@@ -165,7 +210,10 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
 
     const now = new Date().getTime();
     let newTaps = taps.slice();
-    if (taps.length > 0 && now - taps[taps.length - 1].time > 2000) {
+    if (
+      taps.length > 0 &&
+      now - taps[taps.length - 1].time > SMART_TAP_TIMEOUT
+    ) {
       newTaps = [];
     }
     newTaps.push({ strength, time: now });
@@ -176,10 +224,43 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
       setBpm(inferredRhythm.value.tempo);
     }
     setTaps(newTaps);
+
+    // And also update the visuals, but don't mix the two concerns
+    setDisplayTimerAmount(100);
   };
+
+  const [displayTimerAmount, setDisplayTimerAmount] = useState<number>(0);
+
+  useEffect(() => {
+    if (taps.length === 0) {
+      return () => {};
+    }
+    const intervalId = setInterval(() => {
+      const now = new Date().getTime();
+      const lastTapTime = taps[taps.length - 1].time;
+      const timeSinceLastTap = now - lastTapTime;
+      setDisplayTimerAmount(
+        Math.max(
+          0,
+          Math.round(
+            ((SMART_TAP_TIMEOUT - timeSinceLastTap) / SMART_TAP_TIMEOUT) * 100
+          )
+        )
+      );
+    }, 10);
+    return () => clearInterval(intervalId);
+  });
 
   return (
     <>
+      {displayTimerAmount > 0 && (
+        <CircularProgress
+          size={20}
+          variant="determinate"
+          value={displayTimerAmount}
+          thickness={5}
+        />
+      )}
       <Button onClick={handleSmartTap("weak")}>Tap Rhythm (Beta)</Button>
       <GlobalKeydownListener
         onKeyDown={handleSmartTap("strong")}
@@ -242,15 +323,26 @@ const BeatsSection = ({
   return (
     <>
       <Box className={styles.HorizontalGroup}>
-        <div># of Beats</div>
-        <Input
-          className={styles.ShortNumberInput}
-          type="number"
-          inputProps={{ min: 1 }}
-          value={requestedSize}
-          onChange={handleBeatsNumChange}
-          onBlur={() => setRequestedSize(undefined)}
-        />
+        <div>
+          <InputLabel
+            htmlFor="beats-number-input"
+            sx={{
+              fontSize: 14,
+            }}
+          >
+            Beats / Measure
+          </InputLabel>
+          <Input
+            type="number"
+            size="small"
+            inputProps={{ min: 1 }}
+            className={styles.ShortNumberInput}
+            value={requestedSize}
+            id="beats-number-input"
+            onChange={handleBeatsNumChange}
+            onBlur={() => setRequestedSize(undefined)}
+          />
+        </div>
         <div className={styles.Spacer} />
         <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
       </Box>
@@ -305,12 +397,19 @@ const MetronomeComponent = () => {
   const [beatAccentChangeDirection, setBeatAccentChangeDirection] =
     usePersistentState<"up" | "down">("beatAccentChangeDirection", "up");
 
+  // Visual Sliders and Modals
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [presetsOpen, setPresetsOpen] = useState<boolean>(false);
+  const [keybindsOpen, setKeybindsOpen] = useState<boolean>(false);
 
   const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
-  const [userPresetStore, setUserPresetStore] = useState<PresetStore>({});
-  const presetStore = Object.assign({}, userPresetStore, defaultPresetStore);
+  const [userPresetStore, setUserPresetStore] = useState<PresetStore[string]>(
+    {}
+  );
+  const presetStore = Object.assign(
+    { "User Presets": userPresetStore },
+    defaultPresetStore
+  );
 
   let [beatArrayWrappingInput, setBeatArrayWrappingInput] = useState<
     string | void
@@ -352,7 +451,7 @@ const MetronomeComponent = () => {
       <div className={styles.TitleLine}>
         <div>
           <Typography variant="h5" className={styles.Title}>
-            🌮 🌮 🌯
+            TacoTacoBurrito
           </Typography>
           <Typography variant="body1" className={styles.SubTitle}>
             a simple metronome for not-so-simple times
@@ -395,6 +494,11 @@ const MetronomeComponent = () => {
             }
           >
             <Grid container spacing={2} alignItems="center">
+              <Grid item xs={6}>
+                <Button onClick={() => setKeybindsOpen(true)}>
+                  Show Keybinds
+                </Button>
+              </Grid>
               <Grid item xs={3}>
                 Volume
               </Grid>
@@ -409,19 +513,36 @@ const MetronomeComponent = () => {
                   }}
                 />
               </Grid>
+
               <Grid item xs={3}>
-                Sound Pack
+                New Beat Fill
               </Grid>
               <Grid item xs={3}>
                 <Select
-                  value={soundPack || "default"}
-                  onChange={(event) => {
-                    setSoundPack(event.target.value as SoundPackId);
-                  }}
+                  value={beatFill}
+                  onChange={(event) =>
+                    setBeatFill(event.target.value as BeatStrength)
+                  }
                 >
-                  {Object.keys(soundPacks).map((soundPackKey) => (
-                    <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
-                  ))}
+                  <MenuItem value="strong">Strong</MenuItem>
+                  <MenuItem value="weak">Weak</MenuItem>
+                  <MenuItem value="off">Off</MenuItem>
+                </Select>
+              </Grid>
+              <Grid item xs={3}>
+                Beat Accent Change Direction
+              </Grid>
+              <Grid item xs={3}>
+                <Select
+                  value={beatAccentChangeDirection}
+                  onChange={(event) =>
+                    setBeatAccentChangeDirection(
+                      event.target.value as "up" | "down"
+                    )
+                  }
+                >
+                  <MenuItem value="up">Up</MenuItem>
+                  <MenuItem value="down">Down</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={3}>
@@ -439,18 +560,18 @@ const MetronomeComponent = () => {
                 />
               </Grid>
               <Grid item xs={3}>
-                New Beat Fill
+                Sound Pack
               </Grid>
               <Grid item xs={3}>
                 <Select
-                  value={beatFill}
-                  onChange={(event) =>
-                    setBeatFill(event.target.value as BeatStrength)
-                  }
+                  value={soundPack || "default"}
+                  onChange={(event) => {
+                    setSoundPack(event.target.value as SoundPackId);
+                  }}
                 >
-                  <MenuItem value="strong">Strong</MenuItem>
-                  <MenuItem value="weak">Weak</MenuItem>
-                  <MenuItem value="off">Off</MenuItem>
+                  {Object.keys(soundPacks).map((soundPackKey) => (
+                    <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
+                  ))}
                 </Select>
               </Grid>
               <Grid item xs={3}>
@@ -489,22 +610,6 @@ const MetronomeComponent = () => {
                   <MenuItem value={0.8409}>A</MenuItem>
                   <MenuItem value={0.8909}>A#</MenuItem>
                   <MenuItem value={0.9439}>B</MenuItem>
-                </Select>
-              </Grid>
-              <Grid item xs={3}>
-                Beat Accent Change Direction
-              </Grid>
-              <Grid item xs={3}>
-                <Select
-                  value={beatAccentChangeDirection}
-                  onChange={(event) =>
-                    setBeatAccentChangeDirection(
-                      event.target.value as "up" | "down"
-                    )
-                  }
-                >
-                  <MenuItem value="up">Up</MenuItem>
-                  <MenuItem value="down">Down</MenuItem>
                 </Select>
               </Grid>
             </Grid>
@@ -555,24 +660,56 @@ const MetronomeComponent = () => {
         <Modal open={presetsOpen} onClose={() => setPresetsOpen(false)}>
           <Paper className={styles.PresetDialog}>
             <Typography variant="h5">Presets</Typography>
-            <List>
-              {Object.entries(presetStore).map(([name, spec]) => (
-                <ListItem>
-                  <Button
-                    onClick={() => {
-                      setBeats(spec.beats);
-                      setBpm(spec.bpm);
-                      setPresetsOpen(false);
-                    }}
-                  >
-                    Load
-                  </Button>
-                  <Typography>{name}</Typography>
-                </ListItem>
-              ))}
+            <List className={styles.PresetList} disablePadding>
+              {Object.entries(presetStore).map(([groupName, group]) => {
+                const entries = Object.entries(group);
+                if (entries.length === 0) {
+                  return null;
+                }
+                return (
+                  <>
+                    <ListSubheader>{groupName}</ListSubheader>
+                    {entries.map(([name, spec]) => (
+                      <ListItem
+                        secondaryAction={
+                          groupName === "User Presets" && (
+                            <IconButton
+                              edge="end"
+                              aria-label="Delete"
+                              onClick={() => {
+                                if (
+                                  confirm(
+                                    `Are you sure you want to delete preset ${name}?`
+                                  )
+                                ) {
+                                  const next = { ...userPresetStore };
+                                  delete next[name];
+                                  setUserPresetStore(next);
+                                }
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          )
+                        }
+                      >
+                        <ListItemButton
+                          onClick={() => {
+                            setBeats(spec.beats);
+                            setBpm(spec.bpm);
+                            setPresetsOpen(false);
+                          }}
+                        >
+                          <Typography>{name}</Typography>
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </>
+                );
+              })}
             </List>
-            <>
-              <Divider />
+            <Divider />
+            <Box className={styles.HorizontalGroup}>
               <Button
                 onClick={() => {
                   const name = window.prompt("Name your preset");
@@ -590,22 +727,14 @@ const MetronomeComponent = () => {
               >
                 Save Current
               </Button>
-              <Button
-                onClick={() => {
-                  if (
-                    confirm(
-                      "Are you sure you want to clear all user-made presets?"
-                    )
-                  ) {
-                    setUserPresetStore({});
-                  }
-                }}
-              >
-                Reset to Default
-              </Button>
-            </>
+              <div className={styles.Spacer} />
+              <Button onClick={() => setPresetsOpen(false)}>Close</Button>
+            </Box>
           </Paper>
         </Modal>
+      )}
+      {keybindsOpen && (
+        <KeyboardShortcuts close={() => setKeybindsOpen(false)} />
       )}
     </Paper>
   );

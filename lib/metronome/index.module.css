@@ -2,7 +2,7 @@
   width: 100vw;
   min-height: 100vh;
   background-color: #202020;
-  overflow: hidden;
+  padding-top: 2rem;
 }
 
 .Background {
@@ -73,16 +73,23 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  margin: 2rem auto;
+  margin: auto;
 }
 
-@media  (max-width: 600px) {
-  .AppInner {
-    width: 100vw;
+.ShowWhenTiny {
+  display: none;
+}
 
-  }
+
+@media  (max-width: 600px) {
   .App {
-    min-height: unset;
+    padding-top: 0;
+  }
+  .HideWhenTiny {
+    display: none;
+  }
+  .ShowWhenTiny {
+    display: block;
   }
 }
 
@@ -199,8 +206,18 @@
 .PresetDialog {
   max-width: 550px;
   margin: auto;
-  margin-top: 12px;
+  margin-top: 10vh;
   padding: 12px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.PresetList.PresetList {
+  flex-shrink: 1;
+  overflow: auto;
+  padding-right: 8px;
+  margin-top: 8px;
 }
 
 /*
@@ -221,5 +238,32 @@
 }
 
 .ShortNumberInput {
-  max-width: 64px;
+  max-width: 110px;
+}
+
+.App :global(.MuiCircularProgress-circle) {
+  transition: none;
+}
+
+.KeybindsModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+
+.KeybindsModal > * {
+  padding: 32px;
+}
+
+.KeyRepresentation {
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  border-radius: 8px;
+  border: 4px solid #ccc;
+  text-align: center;
+  padding-top: 6px;
+  margin-right: 16px;
 }
