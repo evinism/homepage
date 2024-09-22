@@ -19,6 +19,7 @@ import {
   Modal,
   ListItem,
   List,
+  Box,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
@@ -106,27 +107,41 @@ const TempoSection = ({ bpm, setBpm }) => {
     setBpm(bpm * fraction);
   };
   return (
-    <Grid container spacing={2} alignItems="center">
-      <Grid item xs={2}>
-        BPM
-      </Grid>
-      <Grid item xs={2}>
-        <Input
-          type="number"
-          inputProps={{ min: 1 }}
-          value={Math.round(bpm)}
-          onChange={(event) => setBpm(parseInt(event.target.value))}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <Button onClick={handleTapTempoClick}>Tap Tempo</Button>
-        <GlobalKeydownListener onKeyDown={handleTapTempoClick} keyFilter=" " />
-      </Grid>
-      <Grid item xs={4}>
-        <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
-        <Button onClick={modTempo(1.03)}>+ 3%</Button>
-      </Grid>
-      <Grid item xs={12}>
+    <>
+      <Box className={styles.HorizontalGroup}>
+        <div>BPM</div>
+        <div>
+          <Input
+            className={styles.ShortNumberInput}
+            type="number"
+            inputProps={{ min: 1 }}
+            value={Math.round(bpm)}
+            onChange={(event) => setBpm(parseInt(event.target.value))}
+          />
+        </div>
+        <div>
+          <Button onClick={handleTapTempoClick}>Tap Tempo</Button>
+          <GlobalKeydownListener
+            onKeyDown={handleTapTempoClick}
+            keyFilter="/"
+          />
+        </div>
+        <div className={styles.Spacer} />
+
+        <div>
+          <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
+          <GlobalKeydownListener
+            onKeyDown={modTempo(1 / 1.03)}
+            keyFilter="ArrowLeft"
+          />
+          <Button onClick={modTempo(1.03)}>+ 3%</Button>
+          <GlobalKeydownListener
+            onKeyDown={modTempo(1.03)}
+            keyFilter="ArrowRight"
+          />
+        </div>
+      </Box>
+      <Box className={styles.HorizontalGroup}>
         <Slider
           min={0}
           max={1000}
@@ -134,8 +149,8 @@ const TempoSection = ({ bpm, setBpm }) => {
           onChange={handleSliderChange}
           aria-labelledby="input-slider"
         />
-      </Grid>
-    </Grid>
+      </Box>
+    </>
   );
 };
 
@@ -184,7 +199,11 @@ const BeatsSection = ({
   beatAccentChangeDirection,
   setBpm,
 }) => {
-  let [requestedSize, setRequestedSize] = useState<number | void>(beats.length);
+  // On blur, requested size defaults back to whatever the underlying beats array says.
+  let [requestedSize, setRequestedSize] = useState<number | void>();
+  if (requestedSize === undefined) {
+    requestedSize = beats.length;
+  }
 
   const [userHasChangedAccents, setUserHasChangedAccents] =
     usePersistentState<boolean>("userHasChangedAccents", false);
@@ -220,25 +239,21 @@ const BeatsSection = ({
     }
   };
 
-  // Smart Tap
   return (
     <>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={4}>
-          Beats per Measure
-        </Grid>
-        <Grid item xs={2}>
-          <Input
-            type="number"
-            inputProps={{ min: 1 }}
-            value={requestedSize}
-            onChange={handleBeatsNumChange}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
-        </Grid>
-      </Grid>
+      <Box className={styles.HorizontalGroup}>
+        <div># of Beats</div>
+        <Input
+          className={styles.ShortNumberInput}
+          type="number"
+          inputProps={{ min: 1 }}
+          value={requestedSize}
+          onChange={handleBeatsNumChange}
+          onBlur={() => setRequestedSize(undefined)}
+        />
+        <div className={styles.Spacer} />
+        <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
+      </Box>
       <div className={styles.BeatArray}>
         {beats.map((beat, index) => (
           <>
@@ -323,7 +338,11 @@ const MetronomeComponent = () => {
     beatArrayWrapping = 0;
   }
   const clear = () => {
-    if (window.confirm("Are you sure you want to clear all beats?")) {
+    if (
+      window.confirm(
+        "Are you sure you want to clear the emphasis on all beats?"
+      )
+    ) {
       setBeats(Array(beats.length).fill("off"));
     }
   };
@@ -410,6 +429,7 @@ const MetronomeComponent = () => {
               </Grid>
               <Grid item xs={3}>
                 <Input
+                  className={styles.ShortNumberInput}
                   type="number"
                   inputProps={{ min: 0, max: 32 }}
                   value={beatArrayWrappingInput}
@@ -439,6 +459,7 @@ const MetronomeComponent = () => {
               <Grid item xs={3}>
                 <Input
                   type="number"
+                  className={styles.ShortNumberInput}
                   inputProps={{ min: 0.1, max: 10, step: 0.01 }}
                   value={freqMultiplier}
                   onChange={(event) =>
@@ -503,8 +524,22 @@ const MetronomeComponent = () => {
         currentBeat={currentBeat}
       />
       <div className={styles.ButtonGroup}>
-        <Button onClick={() => metronome.play()}>Play</Button>
-        <Button onClick={() => metronome.stop()}>Stop</Button>
+        {!metronome.isPlaying() && (
+          <Button onClick={() => metronome.play()}>Play</Button>
+        )}
+        {metronome.isPlaying() && (
+          <Button onClick={() => metronome.stop()}>Stop</Button>
+        )}
+        <GlobalKeydownListener
+          onKeyDown={() => {
+            if (!metronome.isPlaying()) {
+              metronome.play();
+            } else {
+              metronome.stop();
+            }
+          }}
+          keyFilter=" "
+        />
         <div className={styles.Spacer} />
         <Button onClick={clear}>Clear</Button>
       </div>

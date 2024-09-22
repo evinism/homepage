@@ -152,7 +152,7 @@
   display: flex;
 }
 
-.ButtonGroup .Spacer {
+.Spacer {
   flex-grow: 1;
 }
 
@@ -201,4 +201,25 @@
   margin: auto;
   margin-top: 12px;
   padding: 12px;
+}
+
+/*
+  Kinda Special group that replaces the annoyances of grid everywhere 
+  Expects a margin-able thing beneath it.
+*/
+.HorizontalGroup {
+  display: flex;
+  align-items: center;
+}
+
+.HorizontalGroup > * {
+  margin: 8px;
+}
+
+.Spacer {
+  flex-grow: 1;
+}
+
+.ShortNumberInput {
+  max-width: 64px;
 }
