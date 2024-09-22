@@ -1,10 +1,9 @@
-import dynamic from "next/dynamic";
 import Head from "next/head";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 import styles from "./index.module.css";
 import MetronomeComponent from "./components/metronome";
-import profilePic from "../../assets/images/ttb.png";
+import metronomePic from "../../assets/images/metronome.png";
 
 const darkTheme = createTheme({
   palette: {
@@ -28,7 +27,7 @@ const App = () => {
           property="og:description"
           content="A simple metronome for not-so-simple times"
         />
-        <meta property="og:image" content={profilePic.src} />
+        <meta property="og:image" content={metronomePic.src} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CssBaseline />
