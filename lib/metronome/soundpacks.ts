@@ -85,7 +85,7 @@ export const defaultSoundPack: SoundPack = {
 export const soundPacks = {
   default: defaultSoundPack,
   inverted: {
-    strong: makeFreqSampleFn(cluster(1000, 1020, 6)),
-    weak: makeFreqSampleFn(cluster(2000, 2020, 6)),
+    strong: defaultSoundPack.weak,
+    weak: defaultSoundPack.strong,
   },
 };
