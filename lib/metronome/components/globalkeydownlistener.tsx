@@ -8,7 +8,6 @@ const GlobalKeydownListener = ({
   keyFilter?: string;
 }) => {
   const handleKeyDown = (e) => {
-    console.log(e.key);
     if (keyFilter && e.key === keyFilter) {
       console.log("key down");
       onKeyDown(e);

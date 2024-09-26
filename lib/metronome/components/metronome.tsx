@@ -36,6 +36,8 @@ import { defaultPresetStore, PresetStore } from "../presetstore";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
 import dynamic from "next/dynamic";
+import { toSplitIndex } from "../util";
+import { set } from "date-fns";
 
 const useMetronome = (spec: MetronomeSpec) => {
   const [metronome] = useState<Metronome>(() => new Metronome(spec));
@@ -74,7 +76,7 @@ const invScaleBPM = (value: number) => {
 };
 // Okay let's rip stuff out of the render step.
 
-const defaultBeats: BeatStrength[] = ["weak", "weak", "weak", "weak"];
+const defaultBeats: BeatStrength[][] = [["weak", "weak", "weak", "weak"]];
 const beatLookupOrder = {
   up: {
     strong: "off",
@@ -283,15 +285,23 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
   );
 };
 
+interface BeatsSectionProps {
+  beats: BeatStrength[];
+  setBeats: (beats: BeatStrength[]) => void;
+  beatFill: BeatStrength;
+  currentBeat: number;
+  beatAccentChangeDirection: "up" | "down";
+  setBpm: (bpm: number) => void;
+}
+
 const BeatsSection = ({
   beats,
   setBeats,
   beatFill,
-  beatArrayWrapping,
   currentBeat,
   beatAccentChangeDirection,
   setBpm,
-}) => {
+}: BeatsSectionProps) => {
   // On blur, requested size defaults back to whatever the underlying beats array says.
   let [requestedSize, setRequestedSize] = useState<number | void>();
   if (requestedSize === undefined) {
@@ -379,9 +389,6 @@ const BeatsSection = ({
             >
               {index + 1}
             </div>
-            {(beatArrayWrapping >= 0 &&
-              (index + 1) % beatArrayWrapping === 0 && <br />) ||
-              null}
           </>
         ))}
       </div>
@@ -402,7 +409,7 @@ const BeatsSection = ({
 const MemoizedBeatsSection = memo(BeatsSection);
 
 const MetronomeComponent = () => {
-  const [beats, setBeats] = useState<BeatStrength[]>(defaultBeats);
+  const [beats, setBeats] = useState<BeatStrength[][]>(defaultBeats);
   const [bpm, setBpm] = useState<number>(120);
   const [volume, setVolume] = usePersistentState<number>("volume", 1);
   const [soundPack, setSoundPack] = useState<SoundPackId>("default");
@@ -422,10 +429,6 @@ const MetronomeComponent = () => {
     { "User Presets": userPresetStore },
     defaultPresetStore
   );
-
-  let [beatArrayWrappingInput, setBeatArrayWrappingInput] = useState<
-    string | void
-  >();
   const [beatFill, setBeatFill] = usePersistentState<BeatStrength>(
     "beatStrength",
     "weak"
@@ -433,7 +436,7 @@ const MetronomeComponent = () => {
 
   const { metronome, beat: currentBeat } = useMetronome({
     bpm,
-    beats: [beats], // TODO: Support 2d beats
+    beats: beats, // TODO: Support 2d beats
     sound: {
       volume,
       soundPack,
@@ -444,17 +447,27 @@ const MetronomeComponent = () => {
     },
   });
 
-  let beatArrayWrapping = parseInt(beatArrayWrappingInput || "");
-  if (isNaN(beatArrayWrapping) || beatArrayWrapping < 0) {
-    beatArrayWrapping = 0;
-  }
+  const setNumberOfMeasures = (newLength: number) => {
+    console.log("newLength", newLength);
+    if (newLength < 1 || newLength > 10 || isNaN(newLength)) {
+      return;
+    }
+    const newBeats = beats.slice(0, newLength);
+    if (newLength > newBeats.length) {
+      for (let i = beats.length; i < newLength; i++) {
+        newBeats.push(beats[beats.length - 1].slice());
+      }
+    }
+    setBeats(newBeats);
+  };
+
   const clear = () => {
     if (
       window.confirm(
         "Are you sure you want to clear the emphasis on all beats?"
       )
     ) {
-      setBeats(Array(beats.length).fill("off"));
+      setBeats(beats.map((subBeats) => Array(subBeats.length).fill("off")));
     }
   };
 
@@ -558,18 +571,19 @@ const MetronomeComponent = () => {
                 </Select>
               </Grid>
               <Grid item xs={3}>
-                Beats per Row
+                Number of Measures
               </Grid>
               <Grid item xs={3}>
                 <Input
                   className={styles.ShortNumberInput}
                   type="number"
-                  inputProps={{ min: 0, max: 32 }}
-                  value={beatArrayWrappingInput}
-                  onChange={(event) =>
-                    setBeatArrayWrappingInput(event.target.value)
-                  }
+                  inputProps={{ min: 1, max: 10 }}
+                  value={beats.length}
+                  onChange={(event) => {
+                    setNumberOfMeasures(parseInt(event.target.value, 10));
+                  }}
                 />
+                <ScienceIcon />
               </Grid>
               <Grid item xs={3}>
                 Sound Pack
@@ -631,15 +645,31 @@ const MetronomeComponent = () => {
       <Divider className={settingsOpen ? styles.Invisible : ""} />
       <MemoizedTempoSection bpm={bpm} setBpm={setBpm} />
       <Divider />
-      <MemoizedBeatsSection
-        beats={beats}
-        setBeats={setBeats}
-        setBpm={setBpm}
-        beatFill={beatFill}
-        beatArrayWrapping={beatArrayWrapping}
-        beatAccentChangeDirection={beatAccentChangeDirection}
-        currentBeat={currentBeat}
-      />
+
+      {beats.map((_, index) => {
+        const [measureNum, beatNum] = toSplitIndex(beats, currentBeat);
+        let innerCurrentBeat = -1;
+        if (measureNum === index) {
+          innerCurrentBeat = beatNum;
+        }
+        return (
+          <>
+            <MemoizedBeatsSection
+              beats={beats[index]}
+              setBeats={(innerBeats: BeatStrength[]) => {
+                const newBeats = beats.slice();
+                newBeats[index] = innerBeats;
+                setBeats(newBeats);
+              }}
+              setBpm={setBpm}
+              beatFill={beatFill}
+              beatAccentChangeDirection={beatAccentChangeDirection}
+              currentBeat={innerCurrentBeat}
+            />
+          </>
+        );
+      })}
+
       <div className={styles.ButtonGroup}>
         {!metronome.isPlaying() && (
           <Button onClick={() => metronome.play()}>Play</Button>
