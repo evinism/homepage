@@ -81,7 +81,7 @@ export class Metronome {
   }
 
   play() {
-    if (this.audioContext.state === "running") {
+    if (this.isPlaying()) {
       return;
     }
     const { audioContext, gainNode } = this.makeAudioContext(this.spec);
@@ -104,6 +104,9 @@ export class Metronome {
   }
 
   stop() {
+    if (!this.isPlaying()) {
+      return;
+    }
     if (this._schedulerId) {
       clearInterval(this._schedulerId);
       this._schedulerId = null;

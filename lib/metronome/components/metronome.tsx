@@ -4,6 +4,9 @@ import { MetronomeSpec, BeatStrength, Metronome } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
 import SpaceBarIcon from "@mui/icons-material/SpaceBar";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ScienceIcon from "@mui/icons-material/Science";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 import styles from "../index.module.css";
 
@@ -56,7 +59,7 @@ const useMetronome = (spec: MetronomeSpec) => {
 };
 
 // 0 - 1000 to exponential 20 - 500
-const MIN_BPM = 20;
+const MIN_BPM = 40;
 const MAX_BPM = 500;
 // Dr. Shemetov et al. invariants (2024) (remastered) [HD]
 const C = MIN_BPM;
@@ -155,7 +158,7 @@ const TempoSection = ({ bpm, setBpm }) => {
             BPM
           </InputLabel>
           <Input
-            className={styles.ShortNumberInput}
+            className={styles.BPMNumberInput}
             type="number"
             size="small"
             id="bpm-input"
@@ -164,12 +167,20 @@ const TempoSection = ({ bpm, setBpm }) => {
             onChange={(event) => setBpm(parseInt(event.target.value))}
           />
         </div>
-        <Button onClick={modTempo(1 / 1.03)}>- 3%</Button>
+
+        <IconButton
+          onClick={modTempo(1 / 1.03)}
+          aria-label="Decrease Tempo by 3%"
+        >
+          <RemoveIcon />
+        </IconButton>
         <GlobalKeydownListener
           onKeyDown={modTempo(1 / 1.03)}
           keyFilter="ArrowLeft"
         />
-        <Button onClick={modTempo(1.03)}>+ 3%</Button>
+        <IconButton onClick={modTempo(1.03)} aria-label="Increase Tempo by 3%">
+          <AddIcon />
+        </IconButton>
         <GlobalKeydownListener
           onKeyDown={modTempo(1.03)}
           keyFilter="ArrowRight"
@@ -260,7 +271,9 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
           thickness={5}
         />
       )}
-      <Button onClick={handleSmartTap("weak")}>Tap Rhythm (Beta)</Button>
+      <Button startIcon={<ScienceIcon />} onClick={handleSmartTap("weak")}>
+        Tap Rhythm
+      </Button>
       <GlobalKeydownListener
         onKeyDown={handleSmartTap("strong")}
         keyFilter=","

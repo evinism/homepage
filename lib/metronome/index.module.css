@@ -241,6 +241,11 @@
   max-width: 110px;
 }
 
+.BPMNumberInput {
+  max-width: 60px;
+}
+
+
 .App :global(.MuiCircularProgress-circle) {
   transition: none;
 }
