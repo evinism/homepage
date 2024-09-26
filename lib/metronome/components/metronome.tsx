@@ -433,7 +433,7 @@ const MetronomeComponent = () => {
 
   const { metronome, beat: currentBeat } = useMetronome({
     bpm,
-    beats,
+    beats: [beats], // TODO: Support 2d beats
     sound: {
       volume,
       soundPack,

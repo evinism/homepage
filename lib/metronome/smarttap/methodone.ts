@@ -2,7 +2,7 @@
 // Hodge-podge soup of heuristics, based on tap times rather than beat durations.
 
 import { BeatStrength } from "../metronome";
-import { getMean, getVariance, maxBy, transpose, getMedian } from "./util";
+import { getMean, getVariance, maxBy, transpose, getMedian } from "../util";
 import { BeatClick, RhythmInferenceMethod } from ".";
 
 type Result<T> = {

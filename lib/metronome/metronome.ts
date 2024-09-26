@@ -1,12 +1,12 @@
 import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
-
+import { multiLength, multiIndex } from "./util";
 export type BeatStrength = "strong" | "weak" | "off";
 
 // Intentionally vague. Params passed to the generator.
 
 export type MetronomeSpec = {
   bpm: number;
-  beats: BeatStrength[];
+  beats: BeatStrength[][];
   sound: {
     volume: number;
     soundPack: SoundPackId;
@@ -54,7 +54,7 @@ export class Metronome {
       console.error("Invalid BPM", spec.bpm);
       return;
     }
-    if (spec.beats.length < 1) {
+    if (multiLength(spec.beats) < 1) {
       console.error("Invalid beats", spec.beats);
       return;
     }
@@ -125,7 +125,10 @@ export class Metronome {
     if (this._nextScheduledBeatTime < currentTime) {
       this._nextScheduledBeatTime += 60 / this.spec.bpm;
       this.scheduleClick(
-        this.spec.beats[this._currentBeatIndex % this.spec.beats.length],
+        multiIndex(
+          this.spec.beats,
+          this._currentBeatIndex % multiLength(this.spec.beats)
+        ),
         this._nextScheduledBeatTime
       );
       const beatToNotify = this._currentBeatIndex;
@@ -135,7 +138,7 @@ export class Metronome {
       );
 
       this._currentBeatIndex =
-        (this._currentBeatIndex + 1) % this.spec.beats.length;
+        (this._currentBeatIndex + 1) % multiLength(this.spec.beats);
     }
   }
 

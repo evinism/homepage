@@ -39,3 +39,22 @@ export const getMedian = (array: number[]) => {
   }
   return sorted[middle];
 };
+
+// And for multiarrays
+export function multiLength(arr: unknown[][]) {
+  return arr.reduce((acc, val) => acc + val.length, 0);
+}
+
+export function toSplitIndex<T>(arr: T[][], index: number): [number, number] {
+  let i = 0;
+  while (index >= arr[i].length) {
+    index -= arr[i].length;
+    i++;
+  }
+  return [i, index];
+}
+
+export function multiIndex<T>(arr: T[][], index: number): T {
+  const [i, j] = toSplitIndex(arr, index);
+  return arr[i][j];
+}
