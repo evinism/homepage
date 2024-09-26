@@ -1,9 +1,10 @@
 import { memo, useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
-import { MetronomeSpec, BeatStrength, Metronome } from "../metronome";
+import { BeatStrength } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
-import SpaceBarIcon from "@mui/icons-material/SpaceBar";
-import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpIcon from "@mui/icons-material/Help";
+
 import ScienceIcon from "@mui/icons-material/Science";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -21,48 +22,27 @@ import {
   Divider,
   Select,
   MenuItem,
-  Modal,
-  ListItem,
-  List,
   Box,
   CircularProgress,
-  ListSubheader,
-  ListItemButton,
   InputLabel,
+  Tooltip,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import { defaultPresetStore, PresetStore } from "../presetstore";
+import PresetModal from "./presetmodal";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
 import dynamic from "next/dynamic";
 import { setAtIndex, toSplitIndex } from "../util";
-import { set } from "date-fns";
+import useMetronome from "../usemetronome";
+import Keybinds from "./keybindsmodal";
 
-const useMetronome = (spec: MetronomeSpec) => {
-  const [metronome] = useState<Metronome>(() => new Metronome(spec));
-  metronome.updateSpec(spec);
+type Measure = BeatStrength[];
+type Measures = Measure[];
 
-  const [beat, setBeat] = useState<number>(-1);
-  useEffect(() => {
-    metronome.subscribeToBeat((beat) => {
-      setBeat(beat.detail);
-    });
-    return () => {
-      metronome.unsubscribeFromBeat((beat) => {
-        setBeat(beat.detail);
-      });
-    };
-  }, []);
-  return {
-    metronome,
-    beat,
-  };
-};
-
-// 0 - 1000 to exponential 20 - 500
+// 0 - 1000 to exponential 20 - 800
 const MIN_BPM = 40;
-const MAX_BPM = 500;
+const MAX_BPM = 800;
 // Dr. Shemetov et al. invariants (2024) (remastered) [HD]
 const C = MIN_BPM;
 const a = Math.log(MAX_BPM / MIN_BPM) / 1000;
@@ -76,7 +56,7 @@ const invScaleBPM = (value: number) => {
 };
 // Okay let's rip stuff out of the render step.
 
-const defaultBeats: BeatStrength[][] = [["weak", "weak", "weak", "weak"]];
+const defaultBeats: Measures = [["weak", "weak", "weak", "weak"]];
 const beatLookupOrder = {
   up: {
     strong: "off",
@@ -90,33 +70,8 @@ const beatLookupOrder = {
   },
 };
 
-const K = ({ children }) => (
-  <span className={styles.KeyRepresentation}>{children}</span>
-);
-
-const KeyboardShortcuts = ({ close }: { close: () => void }) => {
-  return (
-    <Modal onClose={close} open={true} className={styles.KeybindsModal}>
-      <Paper>
-        <Typography variant="h5">Keyboard Shortcuts</Typography>
-        <List>
-          {[
-            [<SpaceBarIcon />, "Play / Pause"],
-            ["←", "Decrease Tempo"],
-            ["→", "Increase Tempo"],
-            ["/", "Tap Tempo"],
-            [",", "Tap Rhythm (Strong Beat)"],
-            [".", "Tap Rhythm (Weak Beat)"],
-          ].map(([key, description]) => (
-            <ListItem className={styles.KBSLine}>
-              <K>{key}</K> <span>{description}</span>
-            </ListItem>
-          ))}
-        </List>
-        <Button onClick={close}>Close</Button>
-      </Paper>
-    </Modal>
-  );
+const ttConfig = {
+  enterDelay: 500,
 };
 
 const TempoSection = ({ bpm, setBpm }) => {
@@ -170,19 +125,26 @@ const TempoSection = ({ bpm, setBpm }) => {
           />
         </div>
 
-        <IconButton
-          onClick={modTempo(1 / 1.03)}
-          aria-label="Decrease Tempo by 3%"
-        >
-          <RemoveIcon />
-        </IconButton>
+        <Tooltip title="Decrease Tempo by 3%" {...ttConfig}>
+          <IconButton
+            onClick={modTempo(1 / 1.03)}
+            aria-label="Decrease Tempo by 3%"
+          >
+            <RemoveIcon />
+          </IconButton>
+        </Tooltip>
         <GlobalKeydownListener
           onKeyDown={modTempo(1 / 1.03)}
           keyFilter="ArrowLeft"
         />
-        <IconButton onClick={modTempo(1.03)} aria-label="Increase Tempo by 3%">
-          <AddIcon />
-        </IconButton>
+        <Tooltip title="Increase Tempo by 3%" {...ttConfig}>
+          <IconButton
+            onClick={modTempo(1.03)}
+            aria-label="Increase Tempo by 3%"
+          >
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
         <GlobalKeydownListener
           onKeyDown={modTempo(1.03)}
           keyFilter="ArrowRight"
@@ -213,13 +175,18 @@ const MemoizedTempoSection = memo(TempoSection);
 
 const SMART_TAP_TIMEOUT = 2000;
 
-const SmartTapButton = ({ setBpm, setBeats }) => {
+interface SmartTapButtonProps {
+  setBpm: (bpm: number) => void;
+  setBeats: (beats: Measures) => void;
+}
+
+const SmartTapButton = ({ setBpm, setBeats }: SmartTapButtonProps) => {
   const [taps, setTaps] = useState<{ strength: BeatStrength; time: number }[]>(
     []
   );
-  const handleSmartTap = (strength: BeatStrength) => () => {
-    console.log(taps);
+  const [ttOpen, setTTOpen] = useState<boolean>(false);
 
+  const handleSmartTap = (strength: BeatStrength) => () => {
     const now = new Date().getTime();
     let newTaps = taps.slice();
     if (
@@ -232,13 +199,14 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
     const inferredRhythm = inferRhythm(newTaps);
 
     if (inferredRhythm) {
-      setBeats(inferredRhythm.value.beats);
+      setBeats([inferredRhythm.value.beats]);
       setBpm(inferredRhythm.value.tempo);
     }
     setTaps(newTaps);
 
     // And also update the visuals, but don't mix the two concerns
     setDisplayTimerAmount(100);
+    setTTOpen(false);
   };
 
   const [displayTimerAmount, setDisplayTimerAmount] = useState<number>(0);
@@ -273,9 +241,35 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
           thickness={5}
         />
       )}
-      <Button startIcon={<ScienceIcon />} onClick={handleSmartTap("weak")}>
-        Tap Rhythm
-      </Button>
+
+      <Tooltip
+        placement="top"
+        open={ttOpen && displayTimerAmount === 0}
+        // We err towards not showing the tooltip if the timer is running
+        onOpen={() => setTTOpen(true)}
+        onClose={() => setTTOpen(false)}
+        title={
+          <>
+            <Typography variant="body2" gutterBottom>
+              Tap a stress pattern from a rhythm to set the tempo and beat
+              accents automatically. The metronome will attempt to infer the
+              tempo and time signature from your taps.
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              Repeat the pattern at least twice.
+            </Typography>
+            <Typography variant="body2">
+              Keyboard users can tap the "," and "." keys to mark strong and
+              weak beats respectively, which can improve accuracy.
+            </Typography>
+          </>
+        }
+        enterDelay={1000}
+      >
+        <Button startIcon={<ScienceIcon />} onClick={handleSmartTap("weak")}>
+          Tap Rhythm
+        </Button>
+      </Tooltip>
       <GlobalKeydownListener
         onKeyDown={handleSmartTap("strong")}
         keyFilter=","
@@ -286,8 +280,8 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
 };
 
 interface BeatsSectionProps {
-  beats: BeatStrength[];
-  setBeats: (beats: BeatStrength[]) => void;
+  beats: Measures;
+  setBeats: (beats: Measures) => void;
   measureIndex: number;
   beatFill: BeatStrength;
   currentBeat: number;
@@ -304,24 +298,34 @@ const BeatsSection = ({
   beatAccentChangeDirection,
   setBpm,
 }: BeatsSectionProps) => {
+  // Calculate current beat within the emasure.
+  const [measureNum, beatNum] = toSplitIndex(beats, currentBeat);
+  let innerCurrentBeat = -1;
+  if (measureNum === measureIndex) {
+    innerCurrentBeat = beatNum;
+  }
+
+  let measure = beats[measureIndex];
   // On blur, requested size defaults back to whatever the underlying beats array says.
   let [requestedSize, setRequestedSize] = useState<number | void>();
   if (requestedSize === undefined) {
-    requestedSize = beats.length;
+    requestedSize = measure.length;
   }
 
   const [userHasChangedAccents, setUserHasChangedAccents] =
     usePersistentState<boolean>("userHasChangedAccents", false);
 
   const changeBeatStrength = (index: number, strength: BeatStrength) => {
-    const newBeats = beats.map((beat, i) => (i === index ? strength : beat));
-    setBeats(newBeats);
+    const newMeasure: Measure = measure.map((beat, i) =>
+      i === index ? strength : beat
+    );
+    setBeats(setAtIndex(beats, measureIndex, newMeasure));
   };
   const rotateBeatStrength = (index: number, direction: "up" | "down") => {
     setUserHasChangedAccents(true);
     changeBeatStrength(
       index,
-      beatLookupOrder[direction][beats[index]] as BeatStrength
+      beatLookupOrder[direction][measure[index]] as BeatStrength
     );
   };
 
@@ -332,15 +336,15 @@ const BeatsSection = ({
     if (isNaN(newLength) || newLength <= 0) {
       return;
     }
-    if (newLength > beats.length) {
-      const newBeats = [
-        ...beats,
-        ...Array(newLength - beats.length).fill(beatFill),
+    if (newLength > measure.length) {
+      const newMeasure: BeatStrength[] = [
+        ...measure,
+        ...Array(newLength - measure.length).fill(beatFill),
       ];
-      setBeats(newBeats);
+      setBeats(setAtIndex(beats, measureIndex, newMeasure));
     } else {
-      const newBeats = beats.slice(0, newLength);
-      setBeats(newBeats);
+      const newMeasure = measure.slice(0, newLength);
+      setBeats(setAtIndex(beats, measureIndex, newMeasure));
     }
   };
 
@@ -373,13 +377,13 @@ const BeatsSection = ({
         )}
       </Box>
       <div className={styles.BeatArray}>
-        {beats.map((beat, index) => (
+        {measure.map((beat, index) => (
           <>
             <div
               className={
                 styles.BeatIcon +
                 " " +
-                (index === currentBeat ? styles.active : styles.inactive) +
+                (index === innerCurrentBeat ? styles.active : styles.inactive) +
                 " " +
                 {
                   strong: styles.strong,
@@ -426,13 +430,6 @@ const MetronomeComponent = () => {
   const [keybindsOpen, setKeybindsOpen] = useState<boolean>(false);
 
   const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
-  const [userPresetStore, setUserPresetStore] = useState<PresetStore[string]>(
-    {}
-  );
-  const presetStore = Object.assign(
-    { "User Presets": userPresetStore },
-    defaultPresetStore
-  );
   const [beatFill, setBeatFill] = usePersistentState<BeatStrength>(
     "beatStrength",
     "weak"
@@ -450,6 +447,14 @@ const MetronomeComponent = () => {
       },
     },
   });
+
+  const togglePlaying = () => {
+    if (metronome.isPlaying()) {
+      metronome.stop();
+    } else {
+      metronome.play();
+    }
+  };
 
   const setNumberOfMeasures = (newLength: number) => {
     console.log("newLength", newLength);
@@ -650,46 +655,23 @@ const MetronomeComponent = () => {
       <MemoizedTempoSection bpm={bpm} setBpm={setBpm} />
       <Divider />
 
-      {beats.map((_, index) => {
-        const [measureNum, beatNum] = toSplitIndex(beats, currentBeat);
-        let innerCurrentBeat = -1;
-        if (measureNum === index) {
-          innerCurrentBeat = beatNum;
-        }
-        return (
-          <>
-            <MemoizedBeatsSection
-              beats={beats[index]}
-              measureIndex={index}
-              setBeats={(innerBeats: BeatStrength[]) => {
-                setBeats(setAtIndex(beats, index, innerBeats));
-              }}
-              setBpm={setBpm}
-              beatFill={beatFill}
-              beatAccentChangeDirection={beatAccentChangeDirection}
-              currentBeat={innerCurrentBeat}
-            />
-          </>
-        );
-      })}
+      {beats.map((_, index) => (
+        <MemoizedBeatsSection
+          beats={beats}
+          measureIndex={index}
+          setBeats={setBeats}
+          setBpm={setBpm}
+          beatFill={beatFill}
+          beatAccentChangeDirection={beatAccentChangeDirection}
+          currentBeat={currentBeat}
+        />
+      ))}
 
       <div className={styles.ButtonGroup}>
-        {!metronome.isPlaying() && (
-          <Button onClick={() => metronome.play()}>Play</Button>
-        )}
-        {metronome.isPlaying() && (
-          <Button onClick={() => metronome.stop()}>Stop</Button>
-        )}
-        <GlobalKeydownListener
-          onKeyDown={() => {
-            if (!metronome.isPlaying()) {
-              metronome.play();
-            } else {
-              metronome.stop();
-            }
-          }}
-          keyFilter=" "
-        />
+        <Button onClick={togglePlaying}>
+          {metronome.isPlaying() ? "Stop" : "Play"}
+        </Button>
+        <GlobalKeydownListener onKeyDown={togglePlaying} keyFilter=" " />
         <div className={styles.Spacer} />
         <Button onClick={clear}>Clear</Button>
       </div>
@@ -702,85 +684,15 @@ const MetronomeComponent = () => {
         </Typography>
       </footer>
       {presetsOpen && (
-        <Modal open={presetsOpen} onClose={() => setPresetsOpen(false)}>
-          <Paper className={styles.PresetDialog}>
-            <Typography variant="h5">Presets</Typography>
-            <List className={styles.PresetList} disablePadding>
-              {Object.entries(presetStore).map(([groupName, group]) => {
-                const entries = Object.entries(group);
-                if (entries.length === 0) {
-                  return null;
-                }
-                return (
-                  <>
-                    <ListSubheader>{groupName}</ListSubheader>
-                    {entries.map(([name, spec]) => (
-                      <ListItem
-                        secondaryAction={
-                          groupName === "User Presets" && (
-                            <IconButton
-                              edge="end"
-                              aria-label="Delete"
-                              onClick={() => {
-                                if (
-                                  confirm(
-                                    `Are you sure you want to delete preset ${name}?`
-                                  )
-                                ) {
-                                  const next = { ...userPresetStore };
-                                  delete next[name];
-                                  setUserPresetStore(next);
-                                }
-                              }}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          )
-                        }
-                      >
-                        <ListItemButton
-                          onClick={() => {
-                            setBeats(spec.beats);
-                            setBpm(spec.bpm);
-                            setPresetsOpen(false);
-                          }}
-                        >
-                          <Typography>{name}</Typography>
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
-                  </>
-                );
-              })}
-            </List>
-            <Divider />
-            <Box className={styles.HorizontalGroup}>
-              <Button
-                onClick={() => {
-                  const name = window.prompt("Name your preset");
-                  if (!name) {
-                    return;
-                  }
-                  setUserPresetStore({
-                    ...userPresetStore,
-                    [name]: {
-                      beats,
-                      bpm,
-                    },
-                  });
-                }}
-              >
-                Save Current
-              </Button>
-              <div className={styles.Spacer} />
-              <Button onClick={() => setPresetsOpen(false)}>Close</Button>
-            </Box>
-          </Paper>
-        </Modal>
+        <PresetModal
+          close={() => setPresetsOpen(false)}
+          setBpm={setBpm}
+          setBeats={setBeats}
+          beats={beats}
+          bpm={bpm}
+        />
       )}
-      {keybindsOpen && (
-        <KeyboardShortcuts close={() => setKeybindsOpen(false)} />
-      )}
+      {keybindsOpen && <Keybinds close={() => setKeybindsOpen(false)} />}
     </Paper>
   );
 };
