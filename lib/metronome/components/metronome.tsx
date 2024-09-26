@@ -2,8 +2,6 @@ import { memo, useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
 import { BeatStrength } from "../metronome";
 import { SoundPackId, soundPacks } from "../soundpacks";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import HelpIcon from "@mui/icons-material/Help";
 
 import ScienceIcon from "@mui/icons-material/Science";
 import AddIcon from "@mui/icons-material/Add";
@@ -39,6 +37,7 @@ import Keybinds from "./keybindsmodal";
 
 type Measure = BeatStrength[];
 type Measures = Measure[];
+type BeatFillMethod = BeatStrength | "copyEnd";
 
 // 0 - 1000 to exponential 20 - 800
 const MIN_BPM = 40;
@@ -283,7 +282,7 @@ interface BeatsSectionProps {
   beats: Measures;
   setBeats: (beats: Measures) => void;
   measureIndex: number;
-  beatFill: BeatStrength;
+  beatFill: BeatFillMethod;
   currentBeat: number;
   beatAccentChangeDirection: "up" | "down";
   setBpm: (bpm: number) => void;
@@ -337,9 +336,15 @@ const BeatsSection = ({
       return;
     }
     if (newLength > measure.length) {
+      let fill: BeatStrength;
+      if (beatFill === "copyEnd") {
+        fill = measure[measure.length - 1];
+      } else {
+        fill = beatFill;
+      }
       const newMeasure: BeatStrength[] = [
         ...measure,
-        ...Array(newLength - measure.length).fill(beatFill),
+        ...Array(newLength - measure.length).fill(fill),
       ];
       setBeats(setAtIndex(beats, measureIndex, newMeasure));
     } else {
@@ -430,9 +435,9 @@ const MetronomeComponent = () => {
   const [keybindsOpen, setKeybindsOpen] = useState<boolean>(false);
 
   const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
-  const [beatFill, setBeatFill] = usePersistentState<BeatStrength>(
-    "beatStrength",
-    "weak"
+  const [beatFill, setBeatFill] = usePersistentState<BeatFillMethod>(
+    "beatFillMethod",
+    "copyEnd"
   );
 
   const { metronome, beat: currentBeat } = useMetronome({
@@ -471,11 +476,7 @@ const MetronomeComponent = () => {
   };
 
   const clear = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear the emphasis on all beats?"
-      )
-    ) {
+    if (window.confirm("Are you sure you want to clear all beat emphases?")) {
       setBeats(beats.map((subBeats) => Array(subBeats.length).fill("off")));
     }
   };
@@ -555,12 +556,13 @@ const MetronomeComponent = () => {
                 <Select
                   value={beatFill}
                   onChange={(event) =>
-                    setBeatFill(event.target.value as BeatStrength)
+                    setBeatFill(event.target.value as BeatFillMethod)
                   }
                 >
                   <MenuItem value="strong">Strong</MenuItem>
                   <MenuItem value="weak">Weak</MenuItem>
                   <MenuItem value="off">Off</MenuItem>
+                  <MenuItem value="copyEnd">Copy End</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={3}>

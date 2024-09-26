@@ -1,12 +1,9 @@
-import { MetronomeSpec } from "./metronome";
+import { Rhythm } from "./metronome";
 
 export type PresetStore = {
   // Grouped by Topic
   [key: string]: {
-    [key: string]: {
-      beats: MetronomeSpec["beats"];
-      bpm: MetronomeSpec["bpm"];
-    };
+    [key: string]: Rhythm;
   };
 };
 

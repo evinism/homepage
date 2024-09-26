@@ -4,9 +4,12 @@ export type BeatStrength = "strong" | "weak" | "off";
 
 // Intentionally vague. Params passed to the generator.
 
-export type MetronomeSpec = {
-  bpm: number;
+export type Rhythm = {
   beats: BeatStrength[][];
+  bpm: number;
+};
+
+export type MetronomeSpec = Rhythm & {
   sound: {
     volume: number;
     soundPack: SoundPackId;

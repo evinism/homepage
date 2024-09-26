@@ -46,6 +46,9 @@ export function multiLength(arr: unknown[][]) {
 }
 
 export function toSplitIndex<T>(arr: T[][], index: number): [number, number] {
+  if (index >= multiLength(arr)) {
+    return [-1, -1];
+  }
   let i = 0;
   while (index >= arr[i].length) {
     index -= arr[i].length;
@@ -62,3 +65,6 @@ export function multiIndex<T>(arr: T[][], index: number): T {
 export const setAtIndex = <T>(arr: T[], index: number, value: T) => {
   return arr.map((el, i) => (i === index ? value : el));
 };
+
+export const arrayFlatten = <T>(arr: T[][]) =>
+  arr.reduce((acc, val) => acc.concat(val), []);
