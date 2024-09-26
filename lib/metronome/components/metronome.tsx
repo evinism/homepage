@@ -36,7 +36,7 @@ import { defaultPresetStore, PresetStore } from "../presetstore";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
 import dynamic from "next/dynamic";
-import { toSplitIndex } from "../util";
+import { setAtIndex, toSplitIndex } from "../util";
 import { set } from "date-fns";
 
 const useMetronome = (spec: MetronomeSpec) => {
@@ -288,6 +288,7 @@ const SmartTapButton = ({ setBpm, setBeats }) => {
 interface BeatsSectionProps {
   beats: BeatStrength[];
   setBeats: (beats: BeatStrength[]) => void;
+  measureIndex: number;
   beatFill: BeatStrength;
   currentBeat: number;
   beatAccentChangeDirection: "up" | "down";
@@ -296,6 +297,7 @@ interface BeatsSectionProps {
 
 const BeatsSection = ({
   beats,
+  measureIndex,
   setBeats,
   beatFill,
   currentBeat,
@@ -366,7 +368,9 @@ const BeatsSection = ({
           />
         </div>
         <div className={styles.Spacer} />
-        <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
+        {measureIndex === 0 && (
+          <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
+        )}
       </Box>
       <div className={styles.BeatArray}>
         {beats.map((beat, index) => (
@@ -571,36 +575,6 @@ const MetronomeComponent = () => {
                 </Select>
               </Grid>
               <Grid item xs={3}>
-                Number of Measures
-              </Grid>
-              <Grid item xs={3}>
-                <Input
-                  className={styles.ShortNumberInput}
-                  type="number"
-                  inputProps={{ min: 1, max: 10 }}
-                  value={beats.length}
-                  onChange={(event) => {
-                    setNumberOfMeasures(parseInt(event.target.value, 10));
-                  }}
-                />
-                <ScienceIcon />
-              </Grid>
-              <Grid item xs={3}>
-                Sound Pack
-              </Grid>
-              <Grid item xs={3}>
-                <Select
-                  value={soundPack || "default"}
-                  onChange={(event) => {
-                    setSoundPack(event.target.value as SoundPackId);
-                  }}
-                >
-                  {Object.keys(soundPacks).map((soundPackKey) => (
-                    <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
-                  ))}
-                </Select>
-              </Grid>
-              <Grid item xs={3}>
                 Frequency Multiplier
               </Grid>
               <Grid item xs={3}>
@@ -638,6 +612,36 @@ const MetronomeComponent = () => {
                   <MenuItem value={0.9439}>B</MenuItem>
                 </Select>
               </Grid>
+              <Grid item xs={3}>
+                Number of Measures
+              </Grid>
+              <Grid item xs={3}>
+                <Input
+                  className={styles.ShortNumberInput}
+                  type="number"
+                  inputProps={{ min: 1, max: 10 }}
+                  value={beats.length}
+                  onChange={(event) => {
+                    setNumberOfMeasures(parseInt(event.target.value, 10));
+                  }}
+                />
+                <ScienceIcon />
+              </Grid>
+              <Grid item xs={3}>
+                Sound Pack
+              </Grid>
+              <Grid item xs={3}>
+                <Select
+                  value={soundPack || "default"}
+                  onChange={(event) => {
+                    setSoundPack(event.target.value as SoundPackId);
+                  }}
+                >
+                  {Object.keys(soundPacks).map((soundPackKey) => (
+                    <MenuItem value={soundPackKey}>{soundPackKey}</MenuItem>
+                  ))}
+                </Select>
+              </Grid>
             </Grid>
           </div>
         </div>
@@ -656,10 +660,9 @@ const MetronomeComponent = () => {
           <>
             <MemoizedBeatsSection
               beats={beats[index]}
+              measureIndex={index}
               setBeats={(innerBeats: BeatStrength[]) => {
-                const newBeats = beats.slice();
-                newBeats[index] = innerBeats;
-                setBeats(newBeats);
+                setBeats(setAtIndex(beats, index, innerBeats));
               }}
               setBpm={setBpm}
               beatFill={beatFill}

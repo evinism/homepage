@@ -58,3 +58,7 @@ export function multiIndex<T>(arr: T[][], index: number): T {
   const [i, j] = toSplitIndex(arr, index);
   return arr[i][j];
 }
+
+export const setAtIndex = <T>(arr: T[], index: number, value: T) => {
+  return arr.map((el, i) => (i === index ? value : el));
+};
