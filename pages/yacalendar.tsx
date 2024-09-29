@@ -394,9 +394,17 @@ const DndCalendar = () => {
 
   return (
     <div>
+      <div>
+        Stellurgy doc{" "}
+        <a href="https://docs.google.com/document/d/1-ONQ_x6J-FUYNoy1WolYmuJsS5PxwVlFovkMrx_v8cc">
+          here.
+        </a>
+      </div>
       {months.map((month) => (
         <div key={month.number} className={styles.month} id={month.name}>
-          <h2>{month.name}</h2>
+          <h2>
+            {month.name} ({month.number})
+          </h2>
           <div className={styles.monthSubHeader}>
             <span>{month.animal}</span>
             <span>{month.description}</span>
