@@ -1,6 +1,18 @@
 import styles from "./yacalendar.module.css";
 
+const currentDate = {
+  month: 13,
+  day: 25,
+};
+
 const months = [
+  {
+    number: 13,
+    name: "Astralis",
+    animal: "Gelatinous Ooze",
+    description: "Inscrutable motives, not of this earth.",
+    inclination: "Nature",
+  },
   {
     number: 1,
     name: "Auris",
@@ -84,13 +96,6 @@ const months = [
     animal: "Hydra",
     description: "Master of spinning plates.",
     inclination: "Hand",
-  },
-  {
-    number: 13,
-    name: "Astralis",
-    animal: "Gelatinous Ooze",
-    description: "Inscrutable motives, not of this earth.",
-    inclination: "Nature",
   },
 ];
 
@@ -297,11 +302,12 @@ const datesOfNote = [
     day: 2,
     description: "Del's Birthday",
   },
-  {
-    month: 13,
-    day: 22,
-    description: "Nara's Birthday",
-  },
+  // This is weird -- i feel like i need to retcon some stuff.
+  // {
+  //   month: 13,
+  //   day: 22,
+  //   description: "Nara's Birthday",
+  // },
   {
     month: 9,
     day: 2,
@@ -327,6 +333,53 @@ const datesOfNote = [
     day: 21,
     description: "Fall Equinox",
   },
+  // Game Events
+  // ---
+  {
+    month: 11, //
+    day: 13,
+    description: "acid footprints in the woods.",
+  },
+  {
+    month: 13, //
+    day: 18,
+    description: "felix goes missing from caravan",
+  },
+  {
+    month: 13, //
+    day: 19,
+    description: "muriel goes missing",
+  },
+  {
+    month: 13, //
+    day: 20,
+    description: "winston + sharma go missing from caravan",
+  },
+  {
+    month: 13, //
+    day: 21,
+    description: "Caravan arrives in mogdhuna, ",
+  },
+  {
+    month: 13, //
+    day: 22,
+    description: "Conv with korrin",
+  },
+  {
+    month: 13, //
+    day: 23,
+    description: "Honor, reggie, and vulture go missing, this night",
+  },
+  {
+    month: 13,
+    day: 25,
+    description: <>We dive under the mog.</>,
+  },
+  {
+    month: 13,
+    day: 27,
+    description: <>Big Dinner</>,
+  },
 ];
 
 const DndCalendar = () => {
@@ -342,7 +395,7 @@ const DndCalendar = () => {
   return (
     <div>
       {months.map((month) => (
-        <div key={month.number} className={styles.month}>
+        <div key={month.number} className={styles.month} id={month.name}>
           <h2>{month.name}</h2>
           <div className={styles.monthSubHeader}>
             <span>{month.animal}</span>
@@ -369,8 +422,14 @@ const DndCalendar = () => {
                       <td
                         key={day.number}
                         className={
-                          silveredEves.includes(day.number) && styles.silvered
+                          (silveredEves.includes(day.number) &&
+                            styles.silvered) +
+                          " " +
+                          (currentDate.month === month.number &&
+                            currentDate.day === day.number &&
+                            styles.current)
                         }
+                        id={`month-${month.number}-day-${day.number}`}
                       >
                         <div
                           className={
