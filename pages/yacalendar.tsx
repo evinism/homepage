@@ -2,7 +2,7 @@ import styles from "./yacalendar.module.css";
 
 const currentDate = {
   month: 13,
-  day: 25,
+  day: 26,
 };
 
 const months = [
