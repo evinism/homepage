@@ -1,3 +1,9 @@
+.app {
+  background-color: #222;
+  color: white;
+
+}
+
 .month {
   border: 1px solid gray;
   display: inline-block;
@@ -66,5 +72,5 @@
 }
 
 .current {
-  background-color: #ff9;
+  background-color: rgb(64, 64, 0);
 }

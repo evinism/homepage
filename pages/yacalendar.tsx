@@ -398,7 +398,7 @@ const DndCalendar = () => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.app}>
       <div>
         Stellurgy doc{" "}
         <a href="https://docs.google.com/document/d/1-ONQ_x6J-FUYNoy1WolYmuJsS5PxwVlFovkMrx_v8cc">
