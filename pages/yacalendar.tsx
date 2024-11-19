@@ -383,7 +383,12 @@ const datesOfNote = [
   {
     month: 13,
     day: 27,
-    description: <>Big Dinner</>,
+    description: <>Big Dinner!</>,
+  },
+  {
+    month: 13,
+    day: 27,
+    description: <>Big festival, play, and celebration!</>,
   },
 ];
 
