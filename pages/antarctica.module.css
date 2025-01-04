@@ -1,0 +1,13 @@
+.main {
+  padding: 1rem 3rem;
+  margin: 2rem auto;
+  max-width: 800px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 1rem;
+}
+
+.selfImage {
+  float: right;
+  margin: 0 1rem;
+  border-radius: 2rem;
+}

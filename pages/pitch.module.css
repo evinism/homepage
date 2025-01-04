@@ -1,0 +1,13 @@
+.trainer {
+  margin: 2em;
+}
+
+.secret {
+  color: black;
+  background-color: black;
+  width: 50px;
+}
+
+.secret:hover {
+  color: white;
+}
