@@ -19,19 +19,31 @@
  * @param {boolean} [sp] - Whether to create a ScriptProcessorNode instead of an AudioWorkletNode.
  * @returns {Promise<{ faustNode: FaustNode | null; dspMeta: FaustDspMeta }>} - An object containing the Faust audio node and the DSP metadata.
  */
-const createFaustNode = async (audioContext, dspName = "template", voices = 0, sp = false, bufferSize = 512) => {
+const createFaustNode = async (
+  audioContext,
+  dspName = "template",
+  faustWasmUrl = "/gen/sleep.wasm",
+  faustMetaUrl = "/gen/sleep.json",
+  voices = 0,
+  sp = false,
+  bufferSize = 512
+) => {
   // Set to true if the DSP has an effect
   const FAUST_DSP_HAS_EFFECT = false;
 
   // Import necessary Faust modules and data
-  const { FaustMonoDspGenerator, FaustPolyDspGenerator } = await import("./faustwasm/index.js");
+  const { FaustMonoDspGenerator, FaustPolyDspGenerator } = await import(
+    "./faustwasm/index.js"
+  );
 
   // Load DSP metadata from JSON
   /** @type {FaustDspMeta} */
-  const dspMeta = await (await fetch("/gen/sleep.json")).json();
+  const dspMeta = await (await fetch(faustMetaUrl)).json();
 
   // Compile the DSP module from WebAssembly binary data
-  const dspModule = await WebAssembly.compileStreaming(await fetch("/gen/sleep.wasm")); // was dsp-module.wasm
+  const dspModule = await WebAssembly.compileStreaming(
+    await fetch(faustWasmUrl)
+  ); // was dsp-module.wasm
 
   // Create an object representing Faust DSP with metadata and module
   /** @type {FaustDspDistribution} */
@@ -42,42 +54,59 @@ const createFaustNode = async (audioContext, dspName = "template", voices = 0, s
 
   // Create either a polyphonic or monophonic Faust audio node based on the number of voices
   if (voices > 0) {
+    // Try to load optional mixer and effect modules
+    faustDsp.mixerModule = await WebAssembly.compileStreaming(
+      await fetch("./mixer-module.wasm")
+    );
 
-      // Try to load optional mixer and effect modules
-      faustDsp.mixerModule = await WebAssembly.compileStreaming(await fetch("./mixer-module.wasm"));
-
-      if (FAUST_DSP_HAS_EFFECT) {
-          faustDsp.effectMeta = await (await fetch("./effect-meta.json")).json();
-          faustDsp.effectModule = await WebAssembly.compileStreaming(await fetch("./effect-module.wasm"));
-      }
-
-      // Create a polyphonic Faust audio node
-      const generator = new FaustPolyDspGenerator();
-      faustNode = await generator.createNode(
-          audioContext,
-          voices,
-          dspName,
-          { module: faustDsp.dspModule, json: JSON.stringify(faustDsp.dspMeta), soundfiles: {} },
-          faustDsp.mixerModule,
-          faustDsp.effectModule ? { module: faustDsp.effectModule, json: JSON.stringify(faustDsp.effectMeta), soundfiles: {} } : undefined,
-          sp,
-          bufferSize
+    if (FAUST_DSP_HAS_EFFECT) {
+      faustDsp.effectMeta = await (await fetch("./effect-meta.json")).json();
+      faustDsp.effectModule = await WebAssembly.compileStreaming(
+        await fetch("./effect-module.wasm")
       );
+    }
+
+    // Create a polyphonic Faust audio node
+    const generator = new FaustPolyDspGenerator();
+    faustNode = await generator.createNode(
+      audioContext,
+      voices,
+      dspName,
+      {
+        module: faustDsp.dspModule,
+        json: JSON.stringify(faustDsp.dspMeta),
+        soundfiles: {},
+      },
+      faustDsp.mixerModule,
+      faustDsp.effectModule
+        ? {
+            module: faustDsp.effectModule,
+            json: JSON.stringify(faustDsp.effectMeta),
+            soundfiles: {},
+          }
+        : undefined,
+      sp,
+      bufferSize
+    );
   } else {
-      // Create a standard Faust audio node
-      const generator = new FaustMonoDspGenerator();
-      faustNode = await generator.createNode(
-          audioContext,
-          dspName,
-          { module: faustDsp.dspModule, json: JSON.stringify(faustDsp.dspMeta), soundfiles: {} },
-          sp,
-          bufferSize
-      );
+    // Create a standard Faust audio node
+    const generator = new FaustMonoDspGenerator();
+    faustNode = await generator.createNode(
+      audioContext,
+      dspName,
+      {
+        module: faustDsp.dspModule,
+        json: JSON.stringify(faustDsp.dspMeta),
+        soundfiles: {},
+      },
+      sp,
+      bufferSize
+    );
   }
 
   // Return an object with the Faust audio node and the DSP metadata
   return { faustNode, dspMeta };
-}
+};
 
 /**
 * Connects an audio input stream to a Faust WebAudio node.

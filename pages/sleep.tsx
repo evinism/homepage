@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { load, toggleActivate } from "../lib/faust/sleep.js";
+import { load, toggleActivate } from "../lib/sleep/sleep.js";
 
 const Sleep = () => {
   const audioContext = useRef<AudioContext | null>(null);

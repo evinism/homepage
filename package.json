@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "build-wasm": "faust lib/faust/sleep.dsp -o public/gen/sleep.wasm -lang wasm"
+    "build-wasm": "faust lib/sleep/sleep.dsp -o public/gen/sleep.wasm -lang wasm"
   },
   "dependencies": {
     "@astrodraw/astrochart": "^3.0.2",
