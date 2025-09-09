@@ -54,18 +54,6 @@ const createFaustNode = async (
 
   // Create either a polyphonic or monophonic Faust audio node based on the number of voices
   if (voices > 0) {
-    // Try to load optional mixer and effect modules
-    faustDsp.mixerModule = await WebAssembly.compileStreaming(
-      await fetch("./mixer-module.wasm")
-    );
-
-    if (FAUST_DSP_HAS_EFFECT) {
-      faustDsp.effectMeta = await (await fetch("./effect-meta.json")).json();
-      faustDsp.effectModule = await WebAssembly.compileStreaming(
-        await fetch("./effect-module.wasm")
-      );
-    }
-
     // Create a polyphonic Faust audio node
     const generator = new FaustPolyDspGenerator();
     faustNode = await generator.createNode(
@@ -77,14 +65,8 @@ const createFaustNode = async (
         json: JSON.stringify(faustDsp.dspMeta),
         soundfiles: {},
       },
-      faustDsp.mixerModule,
-      faustDsp.effectModule
-        ? {
-            module: faustDsp.effectModule,
-            json: JSON.stringify(faustDsp.effectMeta),
-            soundfiles: {},
-          }
-        : undefined,
+      undefined,
+      undefined,
       sp,
       bufferSize
     );
@@ -109,66 +91,81 @@ const createFaustNode = async (
 };
 
 /**
-* Connects an audio input stream to a Faust WebAudio node.
-* 
-* @param {AudioContext} audioContext - The Web Audio API AudioContext to which the Faust audio node is connected.
-* @param {string} id - The ID of the audio input device to connect.
-* @param {FaustNode} faustNode - The Faust audio node to which the audio input stream will be connected.
-* @param {MediaStreamAudioSourceNode} oldInputStreamNode - The old audio input stream node to be disconnected from the Faust audio node.
-* @returns {Promise<MediaStreamAudioSourceNode>} - The new audio input stream node connected to the Faust audio node.
-*/
-async function connectToAudioInput(audioContext, id, faustNode, oldInputStreamNode) {
+ * Connects an audio input stream to a Faust WebAudio node.
+ *
+ * @param {AudioContext} audioContext - The Web Audio API AudioContext to which the Faust audio node is connected.
+ * @param {string} id - The ID of the audio input device to connect.
+ * @param {FaustNode} faustNode - The Faust audio node to which the audio input stream will be connected.
+ * @param {MediaStreamAudioSourceNode} oldInputStreamNode - The old audio input stream node to be disconnected from the Faust audio node.
+ * @returns {Promise<MediaStreamAudioSourceNode>} - The new audio input stream node connected to the Faust audio node.
+ */
+async function connectToAudioInput(
+  audioContext,
+  id,
+  faustNode,
+  oldInputStreamNode
+) {
   // Create an audio input stream node
   const constraints = {
-      audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-          deviceId: id ? { exact: id } : undefined,
-      },
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false,
+      deviceId: id ? { exact: id } : undefined,
+    },
   };
   // Get the audio input stream
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
   if (stream) {
-      if (oldInputStreamNode) oldInputStreamNode.disconnect();
-      const newInputStreamNode = audioContext.createMediaStreamSource(stream);
-      newInputStreamNode.connect(faustNode);
-      return newInputStreamNode;
+    if (oldInputStreamNode) oldInputStreamNode.disconnect();
+    const newInputStreamNode = audioContext.createMediaStreamSource(stream);
+    newInputStreamNode.connect(faustNode);
+    return newInputStreamNode;
   } else {
-      return oldInputStreamNode;
+    return oldInputStreamNode;
   }
-};
+}
 
 /**
-* Request permission to use motion and orientation sensors.
-*/
+ * Request permission to use motion and orientation sensors.
+ */
 async function requestPermissions() {
-
   // Explicitly request permission on iOS before calling startSensors()
-  if (typeof window.DeviceMotionEvent !== "undefined" && typeof window.DeviceMotionEvent.requestPermission === "function") {
-      try {
-          const permissionState = await window.DeviceMotionEvent.requestPermission();
-          if (permissionState !== "granted") {
-              console.warn("Motion sensor permission denied.");
-          } else {
-              console.log("Motion sensor permission granted.");
-          }
-      } catch (error) {
-          console.error("Error requesting motion sensor permission:", error);
+  if (
+    typeof window.DeviceMotionEvent !== "undefined" &&
+    typeof (window.DeviceMotionEvent as any).requestPermission === "function"
+  ) {
+    try {
+      const permissionState = await (
+        window.DeviceMotionEvent as any
+      ).requestPermission();
+      if (permissionState !== "granted") {
+        console.warn("Motion sensor permission denied.");
+      } else {
+        console.log("Motion sensor permission granted.");
       }
+    } catch (error) {
+      console.error("Error requesting motion sensor permission:", error);
+    }
   }
 
-  if (typeof window.DeviceOrientationEvent !== "undefined" && typeof window.DeviceOrientationEvent.requestPermission === "function") {
-      try {
-          const permissionState = await window.DeviceOrientationEvent.requestPermission();
-          if (permissionState !== "granted") {
-              console.warn("Orientation sensor permission denied.");
-          } else {
-              console.log("Orientation sensor permission granted.");
-          }
-      } catch (error) {
-          console.error("Error requesting orientation sensor permission:", error);
+  if (
+    typeof window.DeviceOrientationEvent !== "undefined" &&
+    typeof (window.DeviceOrientationEvent as any).requestPermission ===
+      "function"
+  ) {
+    try {
+      const permissionState = await (
+        window.DeviceOrientationEvent as any
+      ).requestPermission();
+      if (permissionState !== "granted") {
+        console.warn("Orientation sensor permission denied.");
+      } else {
+        console.log("Orientation sensor permission granted.");
       }
+    } catch (error) {
+      console.error("Error requesting orientation sensor permission:", error);
+    }
   }
 }
 
