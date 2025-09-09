@@ -16,6 +16,7 @@ import styles from "./sleep.module.css";
 import { Link } from "react-router-dom";
 import { Air, VolumeDown, VolumeUp, Waves } from "@mui/icons-material";
 import Head from "next/head.js";
+import zzzmakerPic from "../assets/images/zzzmaker.png";
 
 const darkTheme = createTheme({
   palette: {
@@ -65,6 +66,14 @@ const Sleep = () => {
         <meta name="description" content="A noise generator for sleep" />
         <meta property="og:title" content="zzzmaker" />
         <meta property="og:description" content="A noise generator for sleep" />
+        <meta property="og:image" content={zzzmakerPic.src} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={zzzmakerPic.src} />
+        <meta name="twitter:title" content="zzzmaker" />
+        <meta
+          name="twitter:description"
+          content="A noise generator for sleep"
+        />
       </Head>
       <CssBaseline />
 
