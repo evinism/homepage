@@ -1,0 +1,93 @@
+.App {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #202020;
+  padding-top: 20px;
+}
+
+.App footer {
+    display: flex;
+    filter: saturate(.5);
+    justify-content: center;
+    width: 100%;
+}
+
+.Footer p {
+  display: block;
+  padding: 1rem 0.5rem;
+}
+
+.Paper {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto ;
+  align-items: center;
+  max-width: 500px;
+}
+
+.MainInner {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.ActivateButton {
+  position: relative;
+  background-color: #353535;
+  color: white;
+  padding: 0.5em;
+  border-radius: 50%;
+  width: 10em;
+  height: 10em;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  transition: color 0.2s ease-out, box-shadow 0.2s ease-out;
+  color: rgba(120, 120, 120, 0.5);
+  border: 0;
+  margin: 3rem;
+}
+
+.ActivateButton::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  border: 10px solid rgba(120, 120, 120, 0.5);
+  transition: border 0.2s ease-out;
+}
+
+.ActivateButton:hover {
+  color: rgba(150, 180, 150, 0.5);
+}
+
+.ActivateButton:hover::after {
+  border-color: rgba(150, 180, 150, 0.5);
+}
+
+.ActivateButton.Activated::after {
+  border-color: rgba(0, 255, 0, 0.7);
+}
+
+.ActivateButton.Activated {
+  box-shadow: 0 0 15px 0 rgba(0, 20, 0, 0.7);
+  color: rgba(0, 255, 0, 0.5);
+}
+
+.Settings {
+  max-width: 300px;
+  width: 100%;
+  transition: height 0.2s ease-out;
+}
+
+
+.SettingsWrapper {
+  position: absolute;
+  bottom: 0;
+}
