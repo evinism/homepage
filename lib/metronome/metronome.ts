@@ -26,13 +26,13 @@ export class Metronome {
   _startDelay: number = 0.01;
   _currentBeatIndex: number = 0; // This is a weirdly named item
   _schedulerInterval: number = 0.005;
-  _schedulerId: NodeJS.Timer | null = null;
+  _schedulerId: NodeJS.Timeout | null = null;
   _gainNode: GainNode;
 
   // Source of truth for what beats have played is the audioContext,
   // which is outside of the scheduler loop (and we probably shouldn't
   // poll it) so we need to keep track of what beats have played ourselves
-  _beatNotifierId: NodeJS.Timer | null = null;
+  _beatNotifierId: NodeJS.Timeout | null = null;
   _latestNotifiedBeat: number = -1;
 
   constructor(spec: MetronomeSpec) {
