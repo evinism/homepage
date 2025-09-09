@@ -32,13 +32,14 @@ const createFaustNode = async (
   const FAUST_DSP_HAS_EFFECT = false;
 
   // Import necessary Faust modules and data
-  const { FaustMonoDspGenerator, FaustPolyDspGenerator } = await import(
-    "./faustwasm/index.js"
-  );
+  // This is insane, but it's the only way to get the webpackIgnore to work
+  const { FaustMonoDspGenerator, FaustPolyDspGenerator } = await eval(`import(
+    /* @webpackIgnore: true */ "/faustwasm/index.js"
+  )`);
 
   // Load DSP metadata from JSON
   /** @type {FaustDspMeta} */
-  const dspMeta = await (await fetch(faustMetaUrl)).json();
+  const dspMeta = await(await fetch(faustMetaUrl)).json();
 
   // Compile the DSP module from WebAssembly binary data
   const dspModule = await WebAssembly.compileStreaming(
