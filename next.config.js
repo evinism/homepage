@@ -5,6 +5,15 @@ const nextConfig = {
   // skipTrailingSlashRedirect: true,
   // Optional: Change the output directory `out` -> `dist`
   distDir: ".next",
+  async redirects() {
+    return [
+      {
+        source: "/sleep",
+        destination: "/zzzmaker",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
