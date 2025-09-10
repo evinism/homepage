@@ -64,12 +64,12 @@ const Sleep = () => {
       <Head>
         <title>zzz Generator</title>
         <meta name="description" content="A noise generator for sleep" />
-        <meta property="og:title" content="zzzmaker" />
+        <meta property="og:title" content="zzzMachine" />
         <meta property="og:description" content="A noise generator for sleep" />
         <meta property="og:image" content={zzzmakerPic.src} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:image" content={zzzmakerPic.src} />
-        <meta name="twitter:title" content="zzzmaker" />
+        <meta name="twitter:title" content="zzzMachine" />
         <meta
           name="twitter:description"
           content="A noise generator for sleep"
@@ -80,7 +80,7 @@ const Sleep = () => {
       <main className={styles.App}>
         <div className={styles.Paper}>
           <article className={styles.MainInner}>
-            <Typography variant="h5">zzzmaker</Typography>
+            <Typography variant="h5">zzzMachine</Typography>
             <Typography variant="body1" color="textSecondary">
               a noise generator for sleep
             </Typography>

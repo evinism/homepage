@@ -9,7 +9,12 @@ const nextConfig = {
     return [
       {
         source: "/sleep",
-        destination: "/zzzmaker",
+        destination: "/zzzmachine",
+        permanent: false,
+      },
+      {
+        source: "/zzzmaker",
+        destination: "/zzzmachine",
         permanent: false,
       },
     ];
