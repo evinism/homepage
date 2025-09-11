@@ -137,26 +137,25 @@ export class Metronome {
   handleScheduler() {
     const currentTime = this.audioContext.currentTime;
     const batchSize = this.getSchedulingBatchSize();
-    if (this._nextScheduledBeatTime < currentTime) {
-      for (let i = 0; i < batchSize; i++) {
-        this._nextScheduledBeatTime += 60 / this.spec.bpm;
-        this.scheduleClick(
-          multiIndex(
-            this.spec.beats,
-            this._currentBeatIndex % multiLength(this.spec.beats)
-          ),
-          this._nextScheduledBeatTime
+    const horizon = currentTime + (60 / this.spec.bpm) * (batchSize - 1);
+    while (this._nextScheduledBeatTime < horizon) {
+      this._nextScheduledBeatTime += 60 / this.spec.bpm;
+      this.scheduleClick(
+        multiIndex(
+          this.spec.beats,
+          this._currentBeatIndex % multiLength(this.spec.beats)
+        ),
+        this._nextScheduledBeatTime
+      );
+      const beatToNotify = this._currentBeatIndex;
+      if (this._shouldNotifyBeatHit()) {
+        this._beatNotifierId = setTimeout(
+          () => this._notifyBeatHit(beatToNotify),
+          (this._nextScheduledBeatTime - currentTime) * 1000
         );
-        const beatToNotify = this._currentBeatIndex;
-        if (this._shouldNotifyBeatHit()) {
-          this._beatNotifierId = setTimeout(
-            () => this._notifyBeatHit(beatToNotify),
-            (this._nextScheduledBeatTime - currentTime) * 1000
-          );
-        }
-        this._currentBeatIndex =
-          (this._currentBeatIndex + 1) % multiLength(this.spec.beats);
       }
+      this._currentBeatIndex =
+        (this._currentBeatIndex + 1) % multiLength(this.spec.beats);
     }
   }
 
@@ -178,7 +177,7 @@ export class Metronome {
   };
 
   _shouldNotifyBeatHit() {
-    return this.getSchedulingBatchSize() === 1;
+    return this.spec.bpm < 10000;
   }
 
   subscribeToBeat(callback: (event: CustomEvent) => void) {
