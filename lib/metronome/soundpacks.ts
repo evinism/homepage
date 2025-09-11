@@ -88,4 +88,18 @@ export const soundPacks = {
     strong: defaultSoundPack.weak,
     weak: defaultSoundPack.strong,
   },
+  dirac: {
+    strong: (audioCtx: AudioContext, _: GeneratorParameters) => {
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+      source.buffer.getChannelData(0)[0] = 1;
+      return source;
+    },
+    weak: (audioCtx: AudioContext, _: GeneratorParameters) => {
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+      source.buffer.getChannelData(0)[0] = 0.5;
+      return source;
+    },
+  },
 };
