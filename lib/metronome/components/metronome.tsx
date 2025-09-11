@@ -24,9 +24,12 @@ import {
   CircularProgress,
   InputLabel,
   Tooltip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
+import ShareIcon from "@mui/icons-material/Share";
 import PresetModal from "./presetmodal";
 import inferRhythm from "../smarttap";
 import GlobalKeydownListener from "./globalkeydownlistener";
@@ -34,6 +37,7 @@ import dynamic from "next/dynamic";
 import { setAtIndex, toSplitIndex } from "../util";
 import useMetronome from "../usemetronome";
 import Keybinds from "./keybindsmodal";
+import { Rhythm } from "../metronome";
 
 type Measure = BeatStrength[];
 type Measures = Measure[];
@@ -71,6 +75,31 @@ const beatLookupOrder = {
 
 const ttConfig = {
   enterDelay: 500,
+};
+
+// Utility functions for sharing rhythm specs
+const serializeRhythm = (rhythm: Rhythm): string => {
+  return btoa(JSON.stringify(rhythm));
+};
+
+const deserializeRhythm = (base64: string): Rhythm | null => {
+  try {
+    const json = atob(base64);
+    return JSON.parse(json) as Rhythm;
+  } catch (error) {
+    console.error("Failed to deserialize rhythm:", error);
+    return null;
+  }
+};
+
+const copyToClipboard = async (text: string): Promise<boolean> => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (error) {
+    console.error("Failed to copy to clipboard:", error);
+    return false;
+  }
 };
 
 const TempoSection = ({ bpm, setBpm }) => {
@@ -433,6 +462,7 @@ const MetronomeComponent = () => {
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [presetsOpen, setPresetsOpen] = useState<boolean>(false);
   const [keybindsOpen, setKeybindsOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
 
   const [freqMultiplier, setFreqMultiplier] = useState<number>(1);
   const [beatFill, setBeatFill] = usePersistentState<BeatFillMethod>(
@@ -452,6 +482,20 @@ const MetronomeComponent = () => {
       },
     },
   });
+
+  // Load rhythm from URL hash on component mount
+  useEffect(() => {
+    const hash = window.location.hash.slice(1); // Remove the # character
+    if (hash && hash.startsWith("rhythm-")) {
+      const base64 = hash.slice(7); // Remove the 'rhythm-' prefix
+      const rhythm = deserializeRhythm(base64);
+      if (rhythm) {
+        setBpm(rhythm.bpm);
+        setBeats(rhythm.beats);
+        setSnackbarMessage("Rhythm loaded from URL");
+      }
+    }
+  }, []);
 
   const togglePlaying = () => {
     if (metronome.isPlaying()) {
@@ -499,6 +543,27 @@ const MetronomeComponent = () => {
           >
             <BookmarksIcon />
           </IconButton>
+        </div>
+        <div className={styles.SettingsIconWrapper}>
+          <Tooltip title="Share rhythm pattern" {...ttConfig}>
+            <IconButton
+              aria-label="Share"
+              onClick={async () => {
+                const rhythm: Rhythm = {
+                  bpm,
+                  beats,
+                };
+                const base64 = serializeRhythm(rhythm);
+                const url = `${window.location.origin}${window.location.pathname}#rhythm-${base64}`;
+                const success = await copyToClipboard(url);
+                if (success) {
+                  setSnackbarMessage("Rhythm URL copied to clipboard");
+                }
+              }}
+            >
+              <ShareIcon />
+            </IconButton>
+          </Tooltip>
         </div>
         <div className={styles.SettingsIconWrapper}>
           <IconButton
@@ -695,6 +760,13 @@ const MetronomeComponent = () => {
         />
       )}
       {keybindsOpen && <Keybinds close={() => setKeybindsOpen(false)} />}
+      <Snackbar
+        open={snackbarMessage !== ""}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarMessage("")}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </Paper>
   );
 };
