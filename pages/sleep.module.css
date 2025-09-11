@@ -6,6 +6,8 @@
 }
 
 .App footer {
+    position: absolute;
+    bottom: 0;
     display: flex;
     filter: saturate(.5);
     justify-content: center;

@@ -13,10 +13,11 @@ import {
 import BedtimeIcon from "@mui/icons-material/Bedtime";
 import cx from "classnames";
 import styles from "./sleep.module.css";
-import { Link } from "react-router-dom";
 import { Air, VolumeDown, VolumeUp, Waves } from "@mui/icons-material";
 import Head from "next/head.js";
 import zzzmakerPic from "../assets/images/zzzmaker.png";
+import { usePersistentState } from "../lib/hooks";
+import dynamic from "next/dynamic.js";
 
 const darkTheme = createTheme({
   palette: {
@@ -39,8 +40,16 @@ const Sleep = () => {
   const audioContext = useRef<AudioContext | null>(null);
   const faustNode = useRef<FaustNode | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [cutoff, setCutoff] = useState<number>(500);
-  const [volume, setVolume] = useState<number>(100);
+  const [cutoff, setCutoff] = usePersistentState<number>(
+    "zzzmachine/cutoff",
+    500,
+    1000
+  );
+  const [volume, setVolume] = usePersistentState<number>(
+    "zzzmachine/volume",
+    100,
+    1000
+  );
 
   // literally just for the rerenders
   const [isActivated, setIsActivated] = useState(false);
@@ -51,10 +60,8 @@ const Sleep = () => {
 
     load(audioContext.current).then((faustNode_) => {
       faustNode.current = faustNode_;
-      const cutoff = faustNode.current?.getParamValue("/sleep/freq");
-      const volume = faustNode.current?.getParamValue("/sleep/gain");
-      setCutoff(cutoff);
-      setVolume(volume * 100);
+      faustNode.current?.setParamValue("/sleep/freq", cutoff);
+      faustNode.current?.setParamValue("/sleep/gain", volume / 100);
       setIsLoading(false);
     });
   }, []);
@@ -159,6 +166,4 @@ const Sleep = () => {
   );
 };
 
-
-
-export default Sleep;
+export default dynamic(() => Promise.resolve(Sleep), { ssr: false });
