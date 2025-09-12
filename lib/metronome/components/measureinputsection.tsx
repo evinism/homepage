@@ -1,11 +1,10 @@
 import { Box, Input, InputLabel } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BeatFillMethod, Measures } from "../types";
 import styles from "../index.module.css";
 import { BeatStrength } from "../metronome";
 import { setAtIndex } from "../util";
 import { SmartTapButton } from "./smarttap";
-
 
 interface BeatsSectionProps {
   beats: Measures;
@@ -16,41 +15,71 @@ interface BeatsSectionProps {
   setBpm: (bpm: number) => void;
 }
 
-const MeasureInputSection = ({ 
+const parseMeasureSpec = (size: string) => {
+  const measures = size.split("+").map((s) => parseInt(s, 10));
+  if (!measures.every((m) => m > 0)) {
+    return undefined;
+  }
+  return measures;
+};
+
+const renderMeasureSpec = (beats: Measures) =>
+  beats.map((beat) => beat.length).join("+");
+
+const MeasureInputSection = ({
   beats,
   setBeats,
-  beatFill, 
-  setBpm
+  beatFill,
+  setBpm,
 }: BeatsSectionProps) => {
-    // On blur, requested size defaults back to whatever the underlying beats array says.
-    let [requestedSize, setRequestedSize] = useState<number | void>();
-    const measure = beats[0]; // Workaround for now.
-    if (requestedSize === undefined) {
-      requestedSize = measure.length;
-    }
-  
-  // TODO: Beat size should be controlled when entry is focused
-  const handleBeatsNumChange = (event) => {
-    const newLength = event.target.value;
-    setRequestedSize(newLength);
-    if (isNaN(newLength) || newLength <= 0) {
+  // On blur, requested size defaults back to whatever the underlying beats array says.
+  let [measureSpec, setMeasureSpec] = useState<string | void>();
+
+  if (measureSpec === undefined) {
+    measureSpec = renderMeasureSpec(beats);
+  }
+
+  const handleBump = (direction: "up" | "down") => {
+    const parsed = parseMeasureSpec(measureSpec || "");
+    if (parsed === undefined) {
       return;
     }
-    if (newLength > measure.length) {
-      let fill: BeatStrength;
-      if (beatFill === "copyEnd") {
-        fill = measure[measure.length - 1];
+    const newSpec = parsed.slice();
+    const lastValue = newSpec[newSpec.length - 1];
+    const newLastValue = direction === "up" ? lastValue + 1 : lastValue - 1;
+    if (newLastValue === 0) {
+      return;
+    }
+    newSpec[newSpec.length - 1] = newLastValue;
+    handleMeasureSpecChange(newSpec.join("+"));
+  };
+
+  // TODO: Beat size should be controlled when entry is focused
+  const handleMeasureSpecChange = (value: string) => {
+    setMeasureSpec(value);
+    const measureLengths = parseMeasureSpec(value);
+    if (measureLengths === undefined) {
+      return;
+    }
+    const newBeats = beats.slice(0, measureLengths.length);
+    for (let i = 0; i < measureLengths.length; i++) {
+      let measure = beats[i];
+      if (!measure) {
+        const prevMeasure = beats[beats.length - 1];
+        const lastOfPrevMeasure = prevMeasure[prevMeasure.length - 1] || "off";
+        const fill = beatFill === "copyEnd" ? lastOfPrevMeasure : beatFill;
+        measure = Array(measureLengths[i]).fill(fill);
       } else {
-        fill = beatFill;
+        measure = measure.slice(0, measureLengths[i]);
+        const fill =
+          beatFill === "copyEnd" ? measure[measure.length - 1] : beatFill;
+        measure = [
+          ...measure,
+          ...Array(measureLengths[i] - measure.length).fill(fill),
+        ];
       }
-      const newMeasure: BeatStrength[] = [
-        ...measure,
-        ...Array(newLength - measure.length).fill(fill),
-      ];
-      setBeats(setAtIndex(beats, 0, newMeasure));
-    } else {
-      const newMeasure = measure.slice(0, newLength);
-      setBeats(setAtIndex(beats, 0, newMeasure));
+      newBeats[i] = measure;
+      setBeats(newBeats);
     }
   };
   return (
@@ -65,14 +94,31 @@ const MeasureInputSection = ({
           Beats / Measure
         </InputLabel>
         <Input
-          type="number"
           size="small"
-          inputProps={{ min: 1 }}
           className={styles.ShortNumberInput}
-          value={requestedSize}
+          value={measureSpec}
           id="beats-number-input"
-          onChange={handleBeatsNumChange}
-          onBlur={() => setRequestedSize(undefined)}
+          onFocus={() => setMeasureSpec(renderMeasureSpec(beats))}
+          onChange={(event) => {
+            event.stopPropagation();
+            handleMeasureSpecChange(event.target.value);
+          }}
+          onBlur={() => setMeasureSpec(undefined)}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+              event.stopPropagation();
+            }
+            if (event.key === "ArrowUp") {
+              event.preventDefault();
+              event.stopPropagation();
+              handleBump("up");
+            }
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              event.stopPropagation();
+              handleBump("down");
+            }
+          }}
         />
       </div>
       <div className={styles.Spacer} />

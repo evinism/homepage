@@ -1,11 +1,11 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 import { usePersistentState } from "../../hooks";
 import { BeatStrength } from "../metronome";
 import { setAtIndex, toSplitIndex } from "../util";
 
 import styles from "../index.module.css";
 
-import { Input, InputLabel, Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { BeatFillMethod, Measure, Measures } from "../types";
 
 const beatLookupOrder = {
