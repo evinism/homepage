@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
 import { BeatStrength, Rhythm } from "../metronome";
 import { SoundPackId } from "../soundpacks";
+import { BeatFillMethod, Measures } from "../types";
 
 import styles from "../index.module.css";
 
@@ -24,10 +25,7 @@ import useMetronome from "../usemetronome";
 import { MemoizedTempoSection } from "./temposection";
 import { MemoizedBeatsSection } from "./beatsection";
 import SettingsPanel from "./settings";
-
-type Measure = BeatStrength[];
-type Measures = Measure[];
-type BeatFillMethod = BeatStrength | "copyEnd";
+import MeasureInputSection from "./measureinputsection";
 
 const defaultBeats: Measures = [["weak", "weak", "weak", "weak"]];
 
@@ -202,6 +200,14 @@ const MetronomeComponent = () => {
       <Divider className={settingsOpen ? styles.Invisible : ""} />
       <MemoizedTempoSection bpm={bpm} setBpm={setBpm} />
       <Divider />
+      <MeasureInputSection
+        beats={beats}
+        setBeats={setBeats}
+        beatFill={beatFill}
+        currentBeat={currentBeat}
+        beatAccentChangeDirection={beatAccentChangeDirection}
+        setBpm={setBpm}
+      />
 
       {beats.map((_, index) => (
         <MemoizedBeatsSection

@@ -1,21 +1,11 @@
 import { useState } from "react";
-import { usePersistentState } from "../../hooks";
 import { SoundPackId, soundPacks } from "../soundpacks";
 import Keybinds from "./keybindsmodal";
 
 import styles from "../index.module.css";
 
-import {
-  Button,
-  Input,
-  Grid,
-  Slider,
-  Select,
-  MenuItem,
-  Box,
-} from "@mui/material";
-
-type BeatFillMethod = "strong" | "weak" | "off" | "copyEnd";
+import { Button, Input, Grid, Slider, Select, MenuItem } from "@mui/material";
+import { BeatFillMethod } from "../types";
 
 interface SettingsPanelProps {
   settingsOpen: boolean;
