@@ -1,4 +1,4 @@
-import { Box, Input, InputLabel } from "@mui/material";
+import { Box, Input, InputLabel, Tooltip, FormHelperText } from "@mui/material";
 import { useEffect, useState } from "react";
 import { BeatFillMethod, Measures } from "../types";
 import styles from "../index.module.css";
@@ -93,33 +93,41 @@ const MeasureInputSection = ({
         >
           Beats / Measure
         </InputLabel>
-        <Input
-          size="small"
-          className={styles.ShortNumberInput}
-          value={measureSpec}
-          id="beats-number-input"
-          onFocus={() => setMeasureSpec(renderMeasureSpec(beats))}
-          onChange={(event) => {
-            event.stopPropagation();
-            handleMeasureSpecChange(event.target.value);
-          }}
-          onBlur={() => setMeasureSpec(undefined)}
-          onKeyDown={(event) => {
-            if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+        <Tooltip
+          title="Use + to separate multiple measures. Example: 4+3+2 for three measures with 4, 3, and 2 beats respectively."
+          placement="right"
+          enterDelay={1000}
+        >
+          <Input
+            size="small"
+            className={styles.ShortNumberInput}
+            value={measureSpec}
+            error={parseMeasureSpec(measureSpec || "") === undefined}
+            id="beats-number-input"
+            onFocus={() => setMeasureSpec(renderMeasureSpec(beats))}
+            onChange={(event) => {
               event.stopPropagation();
-            }
-            if (event.key === "ArrowUp") {
-              event.preventDefault();
-              event.stopPropagation();
-              handleBump("up");
-            }
-            if (event.key === "ArrowDown") {
-              event.preventDefault();
-              event.stopPropagation();
-              handleBump("down");
-            }
-          }}
-        />
+              handleMeasureSpecChange(event.target.value);
+            }}
+            onBlur={() => setMeasureSpec(undefined)}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+                event.stopPropagation();
+              }
+              if (event.key === "ArrowUp") {
+                event.preventDefault();
+                event.stopPropagation();
+                handleBump("up");
+              }
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                event.stopPropagation();
+                handleBump("down");
+              }
+            }}
+            placeholder="e.g. 11 or 7+9"
+          />
+        </Tooltip>
       </div>
       <div className={styles.Spacer} />
       <SmartTapButton setBpm={setBpm} setBeats={setBeats} />
@@ -127,4 +135,4 @@ const MeasureInputSection = ({
   );
 };
 
-  export default MeasureInputSection;
+export default MeasureInputSection;

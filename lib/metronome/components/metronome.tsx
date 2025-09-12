@@ -208,7 +208,7 @@ const MetronomeComponent = () => {
         beatAccentChangeDirection={beatAccentChangeDirection}
         setBpm={setBpm}
       />
-
+      <div className={styles.Spacer} />
       {beats.map((_, index) => (
         <MemoizedBeatsSection
           beats={beats}

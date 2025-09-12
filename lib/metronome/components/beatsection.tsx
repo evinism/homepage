@@ -35,10 +35,8 @@ const BeatsSection = ({
   beats,
   measureIndex,
   setBeats,
-  beatFill,
   currentBeat,
   beatAccentChangeDirection,
-  setBpm,
 }: BeatsSectionProps) => {
   // Calculate current beat within the emasure.
   const [measureNum, beatNum] = toSplitIndex(beats, currentBeat);
@@ -92,16 +90,18 @@ const BeatsSection = ({
           </>
         ))}
       </div>
-      <Typography
-        className={
-          styles.ClickInstructions +
-          " " +
-          (userHasChangedAccents ? styles.IsIrrelevant : "")
-        }
-        fontSize={16}
-      >
-        Tap to change beat accents
-      </Typography>
+      {measureIndex === beats.length - 1 && (
+        <Typography
+          className={
+            styles.ClickInstructions +
+            " " +
+            (userHasChangedAccents ? styles.IsIrrelevant : "")
+          }
+          fontSize={16}
+        >
+          Tap to change beat accents
+        </Typography>
+      )}
     </>
   );
 };
