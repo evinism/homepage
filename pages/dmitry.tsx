@@ -50,7 +50,40 @@ const Dmitry = () => {
       </p>
       <hr />
       <h3>3 finger closed chords (e.g. the magic sauce)</h3>
-      <p>TBD gotta push.</p>
+      <p>
+        I'll do these "anchored" on the 5th fret. I'm not sure what it means for
+        it to be "anchored" on any fret (maybe it's because the root lands on
+        that fret?) but it's how I think about them so you'll have to deal. None
+        of them are the actual chord I have listed, e.g. the c-like shape isn't
+        C at all, haha.
+      </p>
+      <p>
+        I actually think there are only 3 of them (which I then modify
+        relentlessly based on context)
+      </p>
+      <h4>C-like shape:</h4>
+      <p>(In this offset, actually a D chord)</p>
+      <FretDiagram shape={[2, 4, 5, undefined]} numFrets={8} />
+      <p>Minor:</p>
+      <FretDiagram shape={[2, 3, 5, undefined]} numFrets={8} />
+      <p>Often modified to a C7-like shape (omitting the root)</p>
+      <FretDiagram shape={[2, 4, 3, undefined]} numFrets={8} />
+      <h4>A-like shape:</h4>
+      <p>(In this offset, actually a C chord)</p>
+      <FretDiagram shape={[5, 5, 7, undefined]} numFrets={8} />
+      <p>Minor:</p>
+      <FretDiagram shape={[5, 5, 6, undefined]} numFrets={8} />
+      <p>Often modified to a A7-like shape via</p>
+      <FretDiagram shape={[5, 8, 7, undefined]} numFrets={8} />
+      <p>Like the open A chord, I often omit the 3rd, going for: </p>
+      <FretDiagram shape={[5, 5, 3, undefined]} numFrets={8} />
+      <h4>E-like shape</h4>
+      <p>In this offset, actually a G chord.</p>
+      <FretDiagram shape={[4, 5, 5, undefined]} numFrets={8} />
+      <p>Minor:</p>
+      <FretDiagram shape={[3, 5, 5, undefined]} numFrets={8} />
+      <p>Often, like above, modified to the rootless dominant chord:</p>
+      <FretDiagram shape={[4, 3, 5, undefined]} numFrets={8} />
     </article>
   );
 };
