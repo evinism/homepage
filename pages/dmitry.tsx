@@ -13,7 +13,7 @@ const Dmitry = () => {
       <p>
         A good 80% of the time, I opt to not have the 3rd on top, instead doing:
       </p>
-      <FretDiagram shape={[0, 2, 3, 0]} numFrets={8} />
+      <FretDiagram shape={[0, 2, 3, 3]} numFrets={8} />
       <h4>A</h4>
       <p>2 versions. First with a 3rd:</p>
       <FretDiagram shape={[2, 2, 4, 0]} numFrets={8} />
