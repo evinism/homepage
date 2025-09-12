@@ -68,6 +68,11 @@ const Dmitry = () => {
       <FretDiagram shape={[2, 3, 5, undefined]} numFrets={8} />
       <p>Often modified to a C7-like shape (omitting the root)</p>
       <FretDiagram shape={[2, 4, 3, undefined]} numFrets={8} />
+      <p>
+        Alternately, I'll bump the bottom string up to the root of the chord,
+        imitating the closed C pattern (but missing the 5 of the chord).
+      </p>
+      <FretDiagram shape={[7, 4, 5, undefined]} numFrets={8} />
       <h4>A-like shape:</h4>
       <p>(In this offset, actually a C chord)</p>
       <FretDiagram shape={[5, 5, 7, undefined]} numFrets={8} />
@@ -77,6 +82,12 @@ const Dmitry = () => {
       <FretDiagram shape={[5, 8, 7, undefined]} numFrets={8} />
       <p>Like the open A chord, I often omit the 3rd, going for: </p>
       <FretDiagram shape={[5, 5, 3, undefined]} numFrets={8} />
+      <p>I'll then distort it further to:</p>
+      <FretDiagram shape={[5, 2, 3, undefined]} numFrets={8} />
+      <p>
+        Which is the closed C pattern again, showing how these things kinda meld
+        into each other.
+      </p>
       <h4>E-like shape</h4>
       <p>In this offset, actually a G chord.</p>
       <FretDiagram shape={[4, 5, 5, undefined]} numFrets={8} />
