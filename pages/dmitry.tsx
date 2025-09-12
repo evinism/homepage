@@ -39,6 +39,8 @@ const Dmitry = () => {
         root chord I sometimes avoid it and opt for the 3rd-less version:
       </p>
       <FretDiagram shape={[4, 2, 2, 0]} numFrets={8} />
+      <p> If I still want the 3rd, I'll go to a fully closed version:</p>
+      <FretDiagram shape={[4, 2, 2, 4]} numFrets={8} />
       <h4>D</h4>
       <p>Basic open one is:</p>
       <FretDiagram shape={[2, 0, 0, 2]} numFrets={8} />
