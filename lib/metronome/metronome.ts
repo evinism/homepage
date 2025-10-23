@@ -49,6 +49,7 @@ export class Metronome {
     const gainNode = audioContext.createGain();
     gainNode.gain.value = spec.sound.volume;
     gainNode.connect(audioContext.destination);
+    audioContext.suspend();
     return { audioContext, gainNode };
   }
 
@@ -91,6 +92,7 @@ export class Metronome {
   }
 
   isPlaying() {
+    console.log("isPlaying", this.audioContext.state);
     return this.audioContext.state === "running";
   }
 
