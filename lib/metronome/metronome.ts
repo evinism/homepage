@@ -92,7 +92,6 @@ export class Metronome {
   }
 
   isPlaying() {
-    console.log("isPlaying", this.audioContext.state);
     return this.audioContext.state === "running";
   }
 
