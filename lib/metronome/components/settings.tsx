@@ -5,7 +5,7 @@ import Keybinds from "./keybindsmodal";
 import styles from "../index.module.css";
 
 import { Button, Input, Grid, Slider, Select, MenuItem } from "@mui/material";
-import { BeatFillMethod } from "../types";
+import { BeatFillMethod, Measures } from "../types";
 
 interface SettingsPanelProps {
   settingsOpen: boolean;
@@ -18,7 +18,7 @@ interface SettingsPanelProps {
   setBeatAccentChangeDirection: (direction: "up" | "down") => void;
   freqMultiplier: number;
   setFreqMultiplier: (multiplier: number) => void;
-  beats: string[][];
+  beats: Measures;
   setNumberOfMeasures: (length: number) => void;
   soundPack: SoundPackId;
   setSoundPack: (pack: SoundPackId) => void;

@@ -1,11 +1,11 @@
 import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
 import { multiLength, multiIndex } from "./util";
-export type BeatStrength = "strong" | "weak" | "off";
+import { BeatStrength, Measures } from "./types";
 
 // Intentionally vague. Params passed to the generator.
 
 export type Rhythm = {
-  beats: BeatStrength[][];
+  beats: Measures;
   bpm: number;
 };
 
@@ -144,7 +144,7 @@ export class Metronome {
         multiIndex(
           this.spec.beats,
           this._currentBeatIndex % multiLength(this.spec.beats)
-        ),
+        ).strength,
         this._nextScheduledBeatTime
       );
       const beatToNotify = this._currentBeatIndex;

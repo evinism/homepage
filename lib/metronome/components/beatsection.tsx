@@ -1,12 +1,11 @@
 import { memo } from "react";
 import { usePersistentState } from "../../hooks";
-import { BeatStrength } from "../metronome";
 import { setAtIndex, toSplitIndex } from "../util";
 
 import styles from "../index.module.css";
 
 import { Typography } from "@mui/material";
-import { BeatFillMethod, Measure, Measures } from "../types";
+import { BeatFillMethod, Measure, Measures, BeatStrength } from "../types";
 
 const beatLookupOrder = {
   up: {
@@ -52,7 +51,7 @@ const BeatsSection = ({
 
   const changeBeatStrength = (index: number, strength: BeatStrength) => {
     const newMeasure: Measure = measure.map((beat, i) =>
-      i === index ? strength : beat
+      i === index ? { strength } : beat
     );
     setBeats(setAtIndex(beats, measureIndex, newMeasure));
   };
@@ -60,7 +59,7 @@ const BeatsSection = ({
     setUserHasChangedAccents(true);
     changeBeatStrength(
       index,
-      beatLookupOrder[direction][measure[index]] as BeatStrength
+      beatLookupOrder[direction][measure[index].strength] as BeatStrength
     );
   };
 
@@ -79,7 +78,7 @@ const BeatsSection = ({
                   strong: styles.strong,
                   weak: styles.weak,
                   off: styles.off,
-                }[beat]
+                }[beat.strength]
               }
               onClick={() =>
                 rotateBeatStrength(index, beatAccentChangeDirection)

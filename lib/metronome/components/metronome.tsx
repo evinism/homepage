@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
-import { BeatStrength, Rhythm } from "../metronome";
+import { Rhythm } from "../metronome";
 import { SoundPackId } from "../soundpacks";
-import { BeatFillMethod, Measures } from "../types";
+import { Beat, BeatFillMethod, Measures, BeatStrength } from "../types";
 
 import styles from "../index.module.css";
 
@@ -27,7 +27,13 @@ import { MemoizedBeatsSection } from "./beatsection";
 import SettingsPanel from "./settings";
 import MeasureInputSection from "./measureinputsection";
 
-const defaultBeats: Measures = [["weak", "weak", "weak", "weak"]];
+const toBeat = (strength: BeatStrength): Beat => {
+  return { strength };
+};
+
+const weak = toBeat("weak");
+
+const defaultBeats: Measures = [[weak, weak, weak, weak]];
 
 const ttConfig = {
   enterDelay: 500,
@@ -59,7 +65,7 @@ const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 const MetronomeComponent = () => {
-  const [beats, setBeats] = useState<BeatStrength[][]>(defaultBeats);
+  const [beats, setBeats] = useState<Measures>(defaultBeats);
   const [bpm, setBpm] = useState<number>(120);
   const [volume, setVolume] = usePersistentState<number>("volume", 1);
   const [soundPack, setSoundPack] = useState<SoundPackId>("default");
@@ -128,7 +134,11 @@ const MetronomeComponent = () => {
 
   const clear = () => {
     if (window.confirm("Are you sure you want to clear all beat emphases?")) {
-      setBeats(beats.map((subBeats) => Array(subBeats.length).fill("off")));
+      setBeats(
+        beats.map((subBeats) =>
+          Array(subBeats.length).fill({ strength: "off" })
+        )
+      );
     }
   };
 

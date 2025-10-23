@@ -1,17 +1,16 @@
 import { Button, CircularProgress, Tooltip, Typography } from "@mui/material";
-import { BeatStrength } from "../metronome";
+import { BeatStrength } from "../types";
 import GlobalKeydownListener from "./globalkeydownlistener";
 import { useEffect, useState } from "react";
 import inferRhythm from "../smarttap/methodone";
 import { Science } from "@mui/icons-material";
+import { Measures } from "../types";
 
 const SMART_TAP_TIMEOUT = 2000;
 
-
-
 interface SmartTapButtonProps {
   setBpm: (bpm: number) => void;
-  setBeats: (beats: BeatStrength[][]) => void;
+  setBeats: (beats: Measures) => void;
 }
 
 const SmartTapButton = ({ setBpm, setBeats }: SmartTapButtonProps) => {

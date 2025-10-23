@@ -1,4 +1,4 @@
-import { BeatStrength } from "../metronome";
+import { Beat, BeatStrength } from "../types";
 import methodOne from "./methodone";
 
 export type BeatClick = {
@@ -14,7 +14,7 @@ type Result<T> =
   | undefined;
 
 export type RhythmInferenceMethod = (taps: BeatClick[]) => Result<{
-  beats: BeatStrength[];
+  beats: Beat[];
   tempo: number;
 }>;
 

@@ -16,13 +16,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import styles from "../index.module.css";
 import { PresetStore, defaultPresetStore } from "../presetstore";
 import { usePersistentState } from "../../hooks";
-import { BeatStrength } from "../metronome";
+import { BeatStrength, Measures } from "../types";
 
 interface PresetModalProps {
   close: () => void;
   setBpm: (bpm: number) => void;
-  setBeats: (beats: BeatStrength[][]) => void;
-  beats: BeatStrength[][];
+  setBeats: (beats: Measures) => void;
+  beats: Measures;
   bpm: number;
 }
 

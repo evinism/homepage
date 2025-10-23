@@ -1,9 +1,9 @@
 // First method for inferring rhythm from taps
 // Hodge-podge soup of heuristics, based on tap times rather than beat durations.
 
-import { BeatStrength } from "../metronome";
 import { getMean, getVariance, maxBy, transpose, getMedian } from "../util";
 import { BeatClick, RhythmInferenceMethod } from ".";
+import { Beat, BeatStrength } from "../types";
 
 type Result<T> = {
   value: T;
@@ -49,7 +49,7 @@ const makeMetaScorer =
       }
     }
     return sum;
-  };;
+  };
 
 const beatStrengthConsistencyScorer: CycleScorer = ({
   beatsPerCycle,
@@ -226,7 +226,7 @@ function generateCandidateCycles(clicks: BeatClick[]): CandidateCycle[] {
 
 const candidateToBeats = (
   candidate: CandidateCycle
-): Result<{ bpmMultiplier: number; beats: BeatStrength[] }> => {
+): Result<{ bpmMultiplier: number; beats: Beat[] }> => {
   const candidateBeatCounts = [];
   for (let i = candidate.beatsPerCycle; i < MAX_BEATS_PER_MEASURE; i++) {
     candidateBeatCounts.push(i);
@@ -246,7 +246,7 @@ const candidateToBeats = (
   return {
     value: {
       bpmMultiplier: bestBeatCount.count,
-      beats: tryReduce(quantized.value),
+      beats: tryReduce(quantized.value).map((strength) => ({ strength })),
     },
     confidence: bestBeatCount.score,
   };
