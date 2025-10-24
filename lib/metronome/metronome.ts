@@ -124,6 +124,13 @@ export class Metronome {
     this.audioContext.close();
   }
 
+  cleanup() {
+    this.stop();
+    if (this.audioContext && this.audioContext.state !== "closed") {
+      this.audioContext.close();
+    }
+  }
+
   nextBeatToScheduleTime = () => {
     return this._latestScheduledBeatTime + 60 / this.spec.bpm;
   };

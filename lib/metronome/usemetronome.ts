@@ -15,6 +15,14 @@ const useMetronome = (spec: MetronomeSpec) => {
       metronome.unsubscribeFromBeat(callback);
     };
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      metronome.cleanup();
+    };
+  }, [metronome]);
+
   return {
     metronome,
     beat,
