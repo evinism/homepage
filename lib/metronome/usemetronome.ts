@@ -7,8 +7,8 @@ const useMetronome = (spec: MetronomeSpec) => {
 
   const [beat, setBeat] = useState<number>(-1);
   useEffect(() => {
-    const callback = (beat: CustomEvent<number>) => {
-      setBeat(beat.detail);
+    const callback = (beatNumber: number) => {
+      setBeat(beatNumber);
     };
     metronome.subscribeToBeat(callback);
     return () => {

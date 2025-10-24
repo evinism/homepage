@@ -1,6 +1,7 @@
 import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
 import { multiLength, multiIndex } from "./util";
 import { BeatStrength, Measures } from "./types";
+import { Listener, Emitter } from "./emitter";
 
 export type Rhythm = {
   beats: Measures;
@@ -33,6 +34,7 @@ export class Metronome {
   // poll it) so we need to keep track of what beats have played ourselves
   _beatNotifierId: NodeJS.Timeout | null = null;
   _latestNotifiedBeat: number = -1;
+  _beatNotifier: BeatNotifier = new Emitter<number>();
 
   constructor(spec: MetronomeSpec) {
     this.spec = spec;
@@ -149,6 +151,8 @@ export class Metronome {
 
   nextBeatToScheduleIndex = () => {
     const length = multiLength(this.spec.beats);
+    // If the beat pattern was shortened while playing (e.g., from 8 beats to 4 beats),
+    // reset to the start rather than jumping to an arbitrary position via modulo
     if (this._latestScheduledBeatIndex >= length) {
       return 0;
     }
@@ -189,7 +193,7 @@ export class Metronome {
   };
 
   _notifyBeatHit = (beatNumber: number) => {
-    document.dispatchEvent(new CustomEvent("beat", { detail: beatNumber }));
+    this._beatNotifier.emit(beatNumber);
     this._latestNotifiedBeat = beatNumber;
   };
 
@@ -197,11 +201,11 @@ export class Metronome {
     return this.spec.bpm < 10000;
   }
 
-  subscribeToBeat(callback: (event: CustomEvent) => void) {
-    (document as any).addEventListener("beat", callback);
+  subscribeToBeat(callback: Listener<number>) {
+    this._beatNotifier.subscribe(callback);
   }
 
-  unsubscribeFromBeat(callback: (event: CustomEvent) => void) {
-    (document as any).removeEventListener("beat", callback);
+  unsubscribeFromBeat(callback: Listener<number>) {
+    this._beatNotifier.unsubscribe(callback);
   }
 }
