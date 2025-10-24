@@ -185,6 +185,24 @@ const SettingsPanel = ({
                   ))}
                 </Select>
               </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="outlined"
+                  color="warning"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to clear all locally stored settings? This will reset volume, beat fill method, and other preferences."
+                      )
+                    ) {
+                      localStorage.clear();
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Clear Local Data
+                </Button>
+              </Grid>
             </Grid>
           </div>
         </div>

@@ -1,10 +1,8 @@
 import { memo } from "react";
-import { usePersistentState } from "../../hooks";
 import { setAtIndex, toSplitIndex } from "../util";
 
 import styles from "../index.module.css";
 
-import { Typography } from "@mui/material";
 import { BeatFillMethod, Measure, Measures, BeatStrength } from "../types";
 
 const beatLookupOrder = {
@@ -20,7 +18,7 @@ const beatLookupOrder = {
   },
 };
 
-interface BeatsSectionProps {
+interface MeasureComponentProps {
   beats: Measures;
   setBeats: (beats: Measures) => void;
   measureIndex: number;
@@ -28,16 +26,18 @@ interface BeatsSectionProps {
   currentBeat: number;
   beatAccentChangeDirection: "up" | "down";
   setBpm: (bpm: number) => void;
+  onBeatAccentChange?: () => void;
 }
 
-const BeatsSection = ({
+const MeasureComponent = ({
   beats,
   measureIndex,
   setBeats,
   currentBeat,
   beatAccentChangeDirection,
-}: BeatsSectionProps) => {
-  // Calculate current beat within the emasure.
+  onBeatAccentChange,
+}: MeasureComponentProps) => {
+  // Calculate current beat within the measure.
   const [measureNum, beatNum] = toSplitIndex(beats, currentBeat);
   let innerCurrentBeat = -1;
   if (measureNum === measureIndex) {
@@ -46,9 +46,6 @@ const BeatsSection = ({
 
   let measure = beats[measureIndex];
 
-  const [userHasChangedAccents, setUserHasChangedAccents] =
-    usePersistentState<boolean>("userHasChangedAccents", false);
-
   const changeBeatStrength = (index: number, strength: BeatStrength) => {
     const newMeasure: Measure = measure.map((beat, i) =>
       i === index ? { strength } : beat
@@ -56,7 +53,7 @@ const BeatsSection = ({
     setBeats(setAtIndex(beats, measureIndex, newMeasure));
   };
   const rotateBeatStrength = (index: number, direction: "up" | "down") => {
-    setUserHasChangedAccents(true);
+    onBeatAccentChange?.();
     changeBeatStrength(
       index,
       beatLookupOrder[direction][measure[index].strength] as BeatStrength
@@ -89,20 +86,8 @@ const BeatsSection = ({
           </>
         ))}
       </div>
-      {measureIndex === beats.length - 1 && (
-        <Typography
-          className={
-            styles.ClickInstructions +
-            " " +
-            (userHasChangedAccents ? styles.IsIrrelevant : "")
-          }
-          fontSize={16}
-        >
-          Tap to change beat accents
-        </Typography>
-      )}
     </>
   );
 };
 
-export const MemoizedBeatsSection = memo(BeatsSection);
+export const MemoizedMeasureComponent = memo(MeasureComponent);

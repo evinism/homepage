@@ -23,7 +23,7 @@ import GlobalKeydownListener from "./globalkeydownlistener";
 import dynamic from "next/dynamic";
 import useMetronome from "../usemetronome";
 import { MemoizedTempoSection } from "./temposection";
-import { MemoizedBeatsSection } from "./beatsection";
+import { MemoizedMeasuresSection } from "./measuressection";
 import SettingsPanel from "./settings";
 import MeasureInputSection from "./measureinputsection";
 
@@ -221,18 +221,14 @@ const MetronomeComponent = () => {
         setBpm={setBpm}
       />
       <div className={styles.Spacer} />
-      {beats.map((_, index) => (
-        <MemoizedBeatsSection
-          beats={beats}
-          measureIndex={index}
-          setBeats={setBeats}
-          setBpm={setBpm}
-          beatFill={beatFill}
-          beatAccentChangeDirection={beatAccentChangeDirection}
-          currentBeat={currentBeat}
-        />
-      ))}
-
+      <MemoizedMeasuresSection
+        beats={beats}
+        setBeats={setBeats}
+        setBpm={setBpm}
+        beatFill={beatFill}
+        beatAccentChangeDirection={beatAccentChangeDirection}
+        currentBeat={currentBeat}
+      />
       <div className={styles.ButtonGroup}>
         <Button onClick={togglePlaying}>
           {metronome.isPlaying() ? "Stop" : "Play"}

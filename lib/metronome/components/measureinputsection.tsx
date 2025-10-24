@@ -5,7 +5,7 @@ import styles from "../index.module.css";
 import { setAtIndex } from "../util";
 import { SmartTapButton } from "./smarttap";
 
-interface BeatsSectionProps {
+interface MeasureInputSectionProps {
   beats: Measures;
   setBeats: (beats: Measures) => void;
   beatFill: BeatFillMethod;
@@ -30,7 +30,7 @@ const MeasureInputSection = ({
   setBeats,
   beatFill,
   setBpm,
-}: BeatsSectionProps) => {
+}: MeasureInputSectionProps) => {
   // On blur, requested size defaults back to whatever the underlying beats array says.
   let [measureSpec, setMeasureSpec] = useState<string | void>();
 
