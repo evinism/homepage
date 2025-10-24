@@ -50,6 +50,10 @@ export const defaultPresetStore: PresetStore = {
       beats: [[strong(), off(), weak(), off(), strong(), off(), weak()]],
       bpm: 240,
     },
+    "Chetvorno (7/8)": {
+      beats: [[strong(), off(), weak(), strong(), off(), weak(), off()]],
+      bpm: 360,
+    },
     "Karsilamas (9/8)": {
       beats: [
         [
