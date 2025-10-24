@@ -120,20 +120,6 @@ const MetronomeComponent = () => {
     }
   };
 
-  const setNumberOfMeasures = (newLength: number) => {
-    console.log("newLength", newLength);
-    if (newLength < 1 || newLength > 10 || isNaN(newLength)) {
-      return;
-    }
-    const newBeats = beats.slice(0, newLength);
-    if (newLength > newBeats.length) {
-      for (let i = beats.length; i < newLength; i++) {
-        newBeats.push(beats[beats.length - 1].slice());
-      }
-    }
-    setBeats(newBeats);
-  };
-
   const clear = () => {
     if (window.confirm("Are you sure you want to clear all beat emphases?")) {
       setBeats(
@@ -204,8 +190,6 @@ const MetronomeComponent = () => {
         setBeatAccentChangeDirection={setBeatAccentChangeDirection}
         freqMultiplier={freqMultiplier}
         setFreqMultiplier={setFreqMultiplier}
-        beats={beats}
-        setNumberOfMeasures={setNumberOfMeasures}
         soundPack={soundPack}
         setSoundPack={setSoundPack}
       />

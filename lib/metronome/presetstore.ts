@@ -66,6 +66,57 @@ export const defaultPresetStore: PresetStore = {
       ],
       bpm: 280,
     },
+    "Kopanitsa (11/8)": {
+      beats: [
+        [
+          strong(),
+          off(),
+          weak(),
+          off(),
+          strong(),
+          off(),
+          weak(),
+          strong(),
+          off(),
+          weak(),
+          off(),
+        ],
+      ],
+      bpm: 340,
+    },
+    "Leventikos (9/8 + 7/8)": {
+      beats: [
+        [strong(), off(), weak(), off(), weak(), off(), weak(), off(), off()],
+        [strong(), off(), weak(), off(), weak(), off(), off()],
+      ],
+      bpm: 250,
+    },
+    "Berance (7/8 + 5/8)": {
+      beats: [
+        [strong(), off(), weak(), off(), weak(), off(), off()],
+        [strong(), off(), weak(), off(), off()],
+      ],
+      bpm: 200,
+    },
+  },
+  Turkish: {
+    "Aksak Semai (10/8)": {
+      beats: [
+        [
+          strong(),
+          off(),
+          strong(),
+          weak(),
+          off(),
+          strong(),
+          off(),
+          weak(),
+          off(),
+          weak(),
+        ],
+      ],
+      bpm: 120,
+    },
     "Agir Roman (9/16)": {
       beats: [
         [
@@ -90,70 +141,6 @@ export const defaultPresetStore: PresetStore = {
         ],
       ],
       bpm: 350,
-    },
-    "Kopanitsa (11/8)": {
-      beats: [
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          strong(),
-          off(),
-          weak(),
-          strong(),
-          off(),
-          weak(),
-          off(),
-        ],
-      ],
-      bpm: 340,
-    },
-    "Leventikos (9/8 + 7/8)": {
-      beats: [
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          weak(),
-          off(),
-          weak(),
-          off(),
-          off(),
-        ],
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          weak(),
-          off(),
-          off(),
-        ],
-      ],
-      bpm: 250,
-    },
-    "Berance (7/8 + 5/8)": {
-      beats: [
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          weak(),
-          off(),
-          off(),
-        ],
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          off(),
-        ],
-      ],
-      bpm: 200,
     },
   },
 };

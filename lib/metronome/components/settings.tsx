@@ -5,7 +5,7 @@ import Keybinds from "./keybindsmodal";
 import styles from "../index.module.css";
 
 import { Button, Input, Grid, Slider, Select, MenuItem } from "@mui/material";
-import { BeatFillMethod, Measures } from "../types";
+import { BeatFillMethod } from "../types";
 
 interface SettingsPanelProps {
   settingsOpen: boolean;
@@ -18,8 +18,6 @@ interface SettingsPanelProps {
   setBeatAccentChangeDirection: (direction: "up" | "down") => void;
   freqMultiplier: number;
   setFreqMultiplier: (multiplier: number) => void;
-  beats: Measures;
-  setNumberOfMeasures: (length: number) => void;
   soundPack: SoundPackId;
   setSoundPack: (pack: SoundPackId) => void;
 }
@@ -35,8 +33,6 @@ const SettingsPanel = ({
   setBeatAccentChangeDirection,
   freqMultiplier,
   setFreqMultiplier,
-  beats,
-  setNumberOfMeasures,
   soundPack,
   setSoundPack,
 }: SettingsPanelProps) => {
@@ -153,20 +149,6 @@ const SettingsPanel = ({
                   <MenuItem value={0.8909}>A#</MenuItem>
                   <MenuItem value={0.9439}>B</MenuItem>
                 </Select>
-              </Grid>
-              <Grid item xs={3}>
-                Number of Measures
-              </Grid>
-              <Grid item xs={3}>
-                <Input
-                  className={styles.ShortNumberInput}
-                  type="number"
-                  inputProps={{ min: 1, max: 10 }}
-                  value={beats.length}
-                  onChange={(event) => {
-                    setNumberOfMeasures(parseInt(event.target.value, 10));
-                  }}
-                />
               </Grid>
               <Grid item xs={3}>
                 Sound Pack
