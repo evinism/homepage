@@ -98,10 +98,13 @@
 }
 
 .BeatArray {
-  padding: 0.5rem 0 0 0;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.MeasuresSection {
+  padding: 0.5rem 0 0 0;
 }
 
 .BeatIcon {
@@ -158,6 +161,18 @@
   opacity: 0;
 }
 
+.MeasureLabel {
+  color: gray;
+  transition: color 0.1s;
+}
+
+.MeasureLabel:not(:first-child) {
+  padding-top: 0.5rem;
+}
+
+.MeasureLabel.active {
+  color: white;
+}
 
 .ButtonGroup {
   display: flex;

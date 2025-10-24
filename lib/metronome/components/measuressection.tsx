@@ -25,8 +25,10 @@ const MeasuresSection = ({
   const [userHasChangedAccents, setUserHasChangedAccents] =
     usePersistentState<boolean>("userHasChangedAccents", false);
 
+  const showLabels = beats.length > 1;
+
   return (
-    <>
+    <div className={styles.MeasuresSection}>
       {beats.map((_, index) => (
         <MemoizedMeasureComponent
           key={index}
@@ -38,6 +40,7 @@ const MeasuresSection = ({
           beatAccentChangeDirection={beatAccentChangeDirection}
           currentBeat={currentBeat}
           onBeatAccentChange={() => setUserHasChangedAccents(true)}
+          showLabel={showLabels}
         />
       ))}
       <Typography
@@ -50,7 +53,7 @@ const MeasuresSection = ({
       >
         Tap to change beat accents
       </Typography>
-    </>
+    </div>
   );
 };
 

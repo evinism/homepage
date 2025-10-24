@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Typography } from "@mui/material";
 import { setAtIndex, toSplitIndex } from "../util";
 
 import styles from "../index.module.css";
@@ -27,6 +28,7 @@ interface MeasureComponentProps {
   beatAccentChangeDirection: "up" | "down";
   setBpm: (bpm: number) => void;
   onBeatAccentChange?: () => void;
+  showLabel?: boolean;
 }
 
 const MeasureComponent = ({
@@ -36,11 +38,13 @@ const MeasureComponent = ({
   currentBeat,
   beatAccentChangeDirection,
   onBeatAccentChange,
+  showLabel = false,
 }: MeasureComponentProps) => {
   // Calculate current beat within the measure.
   const [measureNum, beatNum] = toSplitIndex(beats, currentBeat);
   let innerCurrentBeat = -1;
-  if (measureNum === measureIndex) {
+  const isMeasureActive = currentBeat >= 0 && measureNum === measureIndex;
+  if (isMeasureActive) {
     innerCurrentBeat = beatNum;
   }
 
@@ -62,6 +66,16 @@ const MeasureComponent = ({
 
   return (
     <>
+      {showLabel && (
+        <Typography
+          variant="subtitle2"
+          className={
+            styles.MeasureLabel + " " + (isMeasureActive ? styles.active : "")
+          }
+        >
+          Measure {measureIndex + 1}
+        </Typography>
+      )}
       <div className={styles.BeatArray}>
         {measure.map((beat, index) => (
           <>
