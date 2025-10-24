@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePersistentState } from "../../hooks";
-import { Rhythm } from "../metronome";
+import { MetronomeSpec, Rhythm } from "../metronome";
 import { SoundPackId } from "../soundpacks";
 import { Beat, BeatFillMethod, Measures, BeatStrength } from "../types";
 
@@ -83,9 +83,9 @@ const MetronomeComponent = () => {
     "copyEnd"
   );
 
-  const { metronome, beat: currentBeat } = useMetronome({
+  const spec: MetronomeSpec = {
     bpm,
-    beats: beats, // TODO: Support 2d beats
+    beats: beats,
     sound: {
       volume,
       soundPack,
@@ -94,7 +94,9 @@ const MetronomeComponent = () => {
         freqMultiplier,
       },
     },
-  });
+  };
+
+  const { metronome, beat: currentBeat } = useMetronome(spec);
 
   // Load rhythm from URL hash on component mount
   useEffect(() => {

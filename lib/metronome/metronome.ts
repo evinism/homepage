@@ -1,3 +1,5 @@
+import deepEqual from "fast-deep-equal";
+
 import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
 import { multiLength, multiIndex } from "./util";
 import { BeatStrength, Measures } from "./types";
@@ -18,14 +20,14 @@ export type MetronomeSpec = Rhythm & {
   };
 };
 
-// --- METRONOME CLASS ---
 export class Metronome {
   audioContext: AudioContext;
   spec: MetronomeSpec;
-  _nextScheduledBeatTime: number;
+  _latestScheduledBeatTime: number;
   _startDelay: number = 0.01;
-  _currentBeatIndex: number = 0; // This is a weirdly named item
+  _latestScheduledBeatIndex: number = -1;
   _schedulerInterval: number = 0.005;
+  _schedulerHorizon: number = 0.05;
   _schedulerId: NodeJS.Timeout | null = null;
   _gainNode: GainNode;
 
@@ -53,13 +55,11 @@ export class Metronome {
     return { audioContext, gainNode };
   }
 
-  // Batching for insane tempos
-  // Metronomes shouldn't go this high, but I guess we'll support it
-  getSchedulingBatchSize() {
-    return Math.max(1, Math.floor(this.spec.bpm / 3000));
-  }
-
   updateSpec(spec: MetronomeSpec) {
+    if (deepEqual(this.spec, spec)) {
+      // No change, no need to update
+      return;
+    }
     if (isNaN(spec.bpm) || spec.bpm <= 0) {
       console.error("Invalid BPM", spec.bpm);
       return;
@@ -68,15 +68,11 @@ export class Metronome {
       console.error("Invalid beats", spec.beats);
       return;
     }
-    if (this.spec.bpm * 9 < spec.bpm && this.audioContext.state === "running") {
-      // Garbage schedule hack to make it sound like it's changing
-      // nearly immediately on large changes
-      this.reset();
-    }
+
     if (!this._shouldNotifyBeatHit()) {
       // Clear the beat notifier, because beat notification is kind of useless
       // at insane tempos.
-      //this._notifyBeatHit(-1);
+      this._notifyBeatHit(-1);
     }
     this.spec = spec;
     this._gainNode.gain.value = spec.sound.volume;
@@ -105,9 +101,9 @@ export class Metronome {
 
     this.audioContext.resume();
 
-    this._nextScheduledBeatTime =
+    this._latestScheduledBeatTime =
       this.audioContext.currentTime + this._startDelay - 60 / this.spec.bpm;
-    this._currentBeatIndex = 0;
+    this._latestScheduledBeatIndex = -1;
     this.handleScheduler();
     if (this._schedulerId) {
       clearInterval(this._schedulerId);
@@ -135,28 +131,36 @@ export class Metronome {
     this.audioContext.close();
   }
 
+  nextBeatToScheduleTime = () => {
+    return this._latestScheduledBeatTime + 60 / this.spec.bpm;
+  };
+
+  nextBeatToScheduleIndex = () => {
+    const length = multiLength(this.spec.beats);
+    if (this._latestScheduledBeatIndex >= length) {
+      return 0;
+    }
+    return (this._latestScheduledBeatIndex + 1) % length;
+  };
+
   handleScheduler() {
     const currentTime = this.audioContext.currentTime;
-    const batchSize = this.getSchedulingBatchSize();
-    const horizon = currentTime + (60 / this.spec.bpm) * (batchSize - 1);
-    while (this._nextScheduledBeatTime < horizon) {
-      this._nextScheduledBeatTime += 60 / this.spec.bpm;
+    const horizon = currentTime + this._schedulerHorizon;
+    while (this.nextBeatToScheduleTime() < horizon) {
+      const nextBeatTime = this.nextBeatToScheduleTime();
+      const nextBeatIndex = this.nextBeatToScheduleIndex();
       this.scheduleClick(
-        multiIndex(
-          this.spec.beats,
-          this._currentBeatIndex % multiLength(this.spec.beats)
-        ).strength,
-        this._nextScheduledBeatTime
+        multiIndex(this.spec.beats, nextBeatIndex).strength,
+        nextBeatTime
       );
-      const beatToNotify = this._currentBeatIndex;
       if (this._shouldNotifyBeatHit()) {
         this._beatNotifierId = setTimeout(
-          () => this._notifyBeatHit(beatToNotify),
-          (this._nextScheduledBeatTime - currentTime) * 1000
+          () => this._notifyBeatHit(nextBeatIndex),
+          (nextBeatTime - currentTime) * 1000
         );
       }
-      this._currentBeatIndex =
-        (this._currentBeatIndex + 1) % multiLength(this.spec.beats);
+      this._latestScheduledBeatTime = nextBeatTime;
+      this._latestScheduledBeatIndex = nextBeatIndex;
     }
   }
 
