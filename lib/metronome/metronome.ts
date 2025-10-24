@@ -1,10 +1,6 @@
-import deepEqual from "fast-deep-equal";
-
 import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
 import { multiLength, multiIndex } from "./util";
 import { BeatStrength, Measures } from "./types";
-
-// Intentionally vague. Params passed to the generator.
 
 export type Rhythm = {
   beats: Measures;
@@ -16,6 +12,7 @@ export type MetronomeSpec = Rhythm & {
     volume: number;
     soundPack: SoundPackId;
     playbackRate: number;
+    // Intentionally vague. Params passed to the generator.
     generatorParameters: GeneratorParameters;
   };
 };
@@ -56,10 +53,6 @@ export class Metronome {
   }
 
   updateSpec(spec: MetronomeSpec) {
-    if (deepEqual(this.spec, spec)) {
-      // No change, no need to update
-      return;
-    }
     if (isNaN(spec.bpm) || spec.bpm <= 0) {
       console.error("Invalid BPM", spec.bpm);
       return;
@@ -69,7 +62,7 @@ export class Metronome {
       return;
     }
 
-    if (!this._shouldNotifyBeatHit()) {
+    if (!this._shouldNotifyBeatHit() && this._latestNotifiedBeat !== -1) {
       // Clear the beat notifier, because beat notification is kind of useless
       // at insane tempos.
       this._notifyBeatHit(-1);
