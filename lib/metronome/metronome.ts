@@ -1,7 +1,7 @@
 import { SoundPackId, soundPacks, GeneratorParameters } from "./soundpacks";
 import { multiLength, multiIndex } from "./util";
 import { BeatStrength, Measures } from "./types";
-import { Listener, Emitter } from "./emitter";
+import { Listener, Emitter, BeatNotifier } from "./emitter";
 
 export type Rhythm = {
   beats: Measures;
@@ -184,12 +184,18 @@ export class Metronome {
     if (strength === "off") {
       return;
     }
-    const source = soundPacks[this.spec.sound.soundPack][strength](
+    // Get buffer from soundpack (automatically cached via memoization)
+    const buffer = soundPacks[this.spec.sound.soundPack][strength](
+      this.audioContext.sampleRate,
       this.audioContext,
       this.spec.sound.generatorParameters
     );
-    source.start(time);
+
+    // Create source from cached buffer
+    const source = this.audioContext.createBufferSource();
+    source.buffer = buffer;
     source.connect(this._gainNode);
+    source.start(time);
   };
 
   _notifyBeatHit = (beatNumber: number) => {

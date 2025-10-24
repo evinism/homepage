@@ -14,7 +14,11 @@ type FreqSampleFnOptions = {
 
 const makeFreqSampleFn =
   (freqSpec: number[], options: Partial<FreqSampleFnOptions> = {}) =>
-  (audioCtx: AudioContext, generatorsParams: GeneratorParameters) => {
+  (
+    sampleRate: number,
+    audioCtx: AudioContext,
+    generatorsParams: GeneratorParameters
+  ): AudioBuffer => {
     const { duration = 0.05, noise = 0 } = options;
     const { freqMultiplier = 1 } = generatorsParams;
 
@@ -22,8 +26,8 @@ const makeFreqSampleFn =
 
     const myArrayBuffer = audioCtx.createBuffer(
       2,
-      audioCtx.sampleRate * duration,
-      audioCtx.sampleRate
+      sampleRate * duration,
+      sampleRate
     );
 
     // Fill the buffer with white noise;
@@ -37,9 +41,7 @@ const makeFreqSampleFn =
 
         let nextValue =
           freqs
-            .map((freq) =>
-              Math.sin((2 * Math.PI * freq * i) / audioCtx.sampleRate)
-            )
+            .map((freq) => Math.sin((2 * Math.PI * freq * i) / sampleRate))
             .reduce((a, b) => a + b, 0) / freqs.length;
 
         if (noise) {
@@ -50,9 +52,7 @@ const makeFreqSampleFn =
       }
     }
 
-    const source = audioCtx.createBufferSource();
-    source.buffer = myArrayBuffer;
-    return source;
+    return myArrayBuffer;
   };
 
 const cluster = (bottom, top, count) => {
@@ -63,21 +63,44 @@ const cluster = (bottom, top, count) => {
     .map((_, index) => bottom + index * step);
 };
 
-type SoundConstructor = (
+type BufferConstructor = (
+  sampleRate: number,
   audioCtx: AudioContext,
-  audioGenParams?: any
-) => AudioScheduledSourceNode;
+  audioGenParams: GeneratorParameters
+) => AudioBuffer;
 
 export type SoundPack = {
-  strong: SoundConstructor;
-  weak: SoundConstructor;
+  strong: BufferConstructor;
+  weak: BufferConstructor;
 };
 
 export type SoundPackId = keyof typeof soundPacks;
 
+// Memoize buffer constructors to avoid regenerating buffers on every beat
+function memoizeBufferConstructor(
+  constructor: BufferConstructor
+): BufferConstructor {
+  const cache = new Map<string, AudioBuffer>();
+
+  return (
+    sampleRate: number,
+    audioCtx: AudioContext,
+    params: GeneratorParameters
+  ): AudioBuffer => {
+    // Key by sample rate and parameters
+    const key = `${sampleRate}-${JSON.stringify(params)}`;
+
+    if (!cache.has(key)) {
+      cache.set(key, constructor(sampleRate, audioCtx, params));
+    }
+
+    return cache.get(key)!;
+  };
+}
+
 export const defaultSoundPack: SoundPack = {
-  strong: makeFreqSampleFn(cluster(2093, 2113, 6)),
-  weak: makeFreqSampleFn(cluster(1046, 1066, 6)),
+  strong: memoizeBufferConstructor(makeFreqSampleFn(cluster(2093, 2113, 6))),
+  weak: memoizeBufferConstructor(makeFreqSampleFn(cluster(1046, 1066, 6))),
 };
 
 // TODO: Make it so we might be able to adjust the base frequency
@@ -89,17 +112,27 @@ export const soundPacks = {
     weak: defaultSoundPack.strong,
   },
   dirac: {
-    strong: (audioCtx: AudioContext, _: GeneratorParameters) => {
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
-      source.buffer.getChannelData(0)[0] = 1;
-      return source;
-    },
-    weak: (audioCtx: AudioContext, _: GeneratorParameters) => {
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
-      source.buffer.getChannelData(0)[0] = 0.5;
-      return source;
-    },
+    strong: memoizeBufferConstructor(
+      (
+        sampleRate: number,
+        audioCtx: AudioContext,
+        _: GeneratorParameters
+      ): AudioBuffer => {
+        const buffer = audioCtx.createBuffer(1, 1, sampleRate);
+        buffer.getChannelData(0)[0] = 1;
+        return buffer;
+      }
+    ),
+    weak: memoizeBufferConstructor(
+      (
+        sampleRate: number,
+        audioCtx: AudioContext,
+        _: GeneratorParameters
+      ): AudioBuffer => {
+        const buffer = audioCtx.createBuffer(1, 1, sampleRate);
+        buffer.getChannelData(0)[0] = 0.5;
+        return buffer;
+      }
+    ),
   },
 };
