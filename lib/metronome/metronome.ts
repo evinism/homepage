@@ -88,6 +88,13 @@ export class Metronome {
     if (this.isPlaying()) {
       return;
     }
+
+    // Close old context before creating a new one to avoid memory leak
+    if (this.audioContext.state !== "closed") {
+      this.audioContext.close();
+    }
+
+    // Create a fresh context with no scheduled beats
     const { audioContext, gainNode } = this.makeAudioContext(this.spec);
     this.audioContext = audioContext;
     this._gainNode = gainNode;
@@ -121,12 +128,17 @@ export class Metronome {
     }
     // unset which beat is hit
     this._notifyBeatHit(-1);
+    // Close the context to clear all scheduled beats
     this.audioContext.close();
   }
 
   cleanup() {
-    this.stop();
-    if (this.audioContext && this.audioContext.state !== "closed") {
+    // Stop if playing (clears intervals/timeouts and closes context)
+    if (this.isPlaying()) {
+      this.stop();
+    }
+    // Ensure context is closed even if not playing
+    if (this.audioContext.state !== "closed") {
       this.audioContext.close();
     }
   }
