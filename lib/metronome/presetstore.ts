@@ -121,6 +121,8 @@ export const defaultPresetStore: PresetStore = {
           weak(),
           off(),
           off(),
+        ],
+        [
           strong(),
           off(),
           weak(),
@@ -142,6 +144,8 @@ export const defaultPresetStore: PresetStore = {
           weak(),
           off(),
           off(),
+        ],
+        [
           strong(),
           off(),
           weak(),
