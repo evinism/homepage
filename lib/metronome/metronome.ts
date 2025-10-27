@@ -55,6 +55,9 @@ export class Metronome {
   }
 
   updateSpec(spec: MetronomeSpec) {
+    if (spec == this.spec) {
+      return;
+    }
     if (isNaN(spec.bpm) || spec.bpm <= 0) {
       console.error("Invalid BPM", spec.bpm);
       return;

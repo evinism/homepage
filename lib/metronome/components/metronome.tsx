@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { usePersistentState } from "../../hooks";
 import { MetronomeSpec, Rhythm } from "../metronome";
 import { SoundPackId } from "../soundpacks";
@@ -83,18 +83,21 @@ const MetronomeComponent = () => {
     "copyEnd"
   );
 
-  const spec: MetronomeSpec = {
-    bpm,
-    beats: beats,
-    sound: {
-      volume,
-      soundPack,
-      playbackRate: 1,
-      generatorParameters: {
-        freqMultiplier,
+  const spec: MetronomeSpec = useMemo(
+    () => ({
+      bpm,
+      beats: beats,
+      sound: {
+        volume,
+        soundPack,
+        playbackRate: 1,
+        generatorParameters: {
+          freqMultiplier,
+        },
       },
-    },
-  };
+    }),
+    [bpm, beats, volume, soundPack, freqMultiplier]
+  );
 
   const { metronome, beat: currentBeat } = useMetronome(spec);
 
