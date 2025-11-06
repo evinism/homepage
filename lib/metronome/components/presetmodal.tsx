@@ -9,6 +9,7 @@ import {
   ListSubheader,
   Modal,
   Paper,
+  TextField,
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -17,6 +18,7 @@ import styles from "../index.module.css";
 import { PresetStore, defaultPresetStore } from "../presetstore";
 import { usePersistentState } from "../../hooks";
 import { BeatStrength, Measures } from "../types";
+import { useState } from "react";
 
 interface PresetModalProps {
   close: () => void;
@@ -33,6 +35,7 @@ const PresetModal = ({
   beats,
   bpm,
 }: PresetModalProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
   const [userPresetStore, setUserPresetStore] = usePersistentState<
     PresetStore[string]
   >("userPresets", {});
@@ -40,12 +43,38 @@ const PresetModal = ({
     { "User Presets": userPresetStore },
     defaultPresetStore
   );
+
+  const searchLower = searchQuery.toLowerCase();
+  const filteredPresetStore = Object.fromEntries(
+    Object.entries(presetStore).map(([groupName, group]) => {
+      const groupMatches = groupName.toLowerCase().includes(searchLower);
+      return [
+        groupName,
+        Object.fromEntries(
+          Object.entries(group).filter(([name]) =>
+            groupMatches || name.toLowerCase().includes(searchLower)
+          )
+        ),
+      ];
+    })
+  );
+
   return (
     <Modal open={true} onClose={close}>
       <Paper className={styles.PresetDialog}>
         <Typography variant="h5">Presets</Typography>
+        <Box sx={{ p: 2, pt: 1, pb: 1 }}>
+          <TextField
+            fullWidth
+            placeholder="Search presets..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            size="small"
+            variant="outlined"
+          />
+        </Box>
         <List className={styles.PresetList} disablePadding>
-          {Object.entries(presetStore).map(([groupName, group]) => {
+          {Object.entries(filteredPresetStore).map(([groupName, group]) => {
             const entries = Object.entries(group);
             if (entries.length === 0) {
               return null;
