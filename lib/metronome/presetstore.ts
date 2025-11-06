@@ -27,20 +27,10 @@ export const defaultPresetStore: PresetStore = {
       bpm: 180,
     },
   },
-  "Pan-Balkan": {
+  Greek: {
     "Syrtos (4/4)": {
       beats: [[strong(), off(), off(), weak(), strong(), off(), weak(), off()]],
       bpm: 250,
-    },
-    "Chiftetelli (4/4)": {
-      beats: [
-        [strong(), weak(), off(), weak(), strong(), off(), weak(), off()],
-      ],
-      bpm: 250,
-    },
-    "Paidusko (5/8)": {
-      beats: [[strong(), off(), strong(), off(), weak()]],
-      bpm: 340,
     },
     "Kalamatianos (7/8)": {
       beats: [[strong(), weak(), weak(), strong(), weak(), weak(), weak()]],
@@ -50,57 +40,12 @@ export const defaultPresetStore: PresetStore = {
       beats: [[strong(), off(), weak(), off(), strong(), off(), weak()]],
       bpm: 240,
     },
-    "Chetvorno (7/8)": {
-      beats: [[strong(), off(), weak(), strong(), off(), weak(), off()]],
-      bpm: 360,
-    },
-    "Karsilamas (9/8)": {
-      beats: [
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          strong(),
-          off(),
-          weak(),
-          off(),
-          weak(),
-        ],
-      ],
-      bpm: 280,
-    },
-    "Kopanitsa (11/8)": {
-      beats: [
-        [
-          strong(),
-          off(),
-          weak(),
-          off(),
-          strong(),
-          off(),
-          weak(),
-          strong(),
-          off(),
-          weak(),
-          off(),
-        ],
-      ],
-      bpm: 340,
-    },
     "Leventikos (9/8 + 7/8)": {
       beats: [
         [strong(), off(), weak(), off(), weak(), off(), weak(), off(), off()],
         [strong(), off(), weak(), off(), weak(), off(), off()],
       ],
       bpm: 250,
-    },
-    "Berance (7/8 + 5/8)": {
-      beats: [
-        [strong(), off(), weak(), off(), weak(), off(), off()],
-        [strong(), off(), weak(), off(), off()],
-      ],
-      bpm: 200,
     },
     "Zebekiko (9/4)": {
       beats: [
@@ -151,6 +96,63 @@ export const defaultPresetStore: PresetStore = {
         ],
       ],
       bpm: 160,
+    },
+  },
+  "Pan-Balkan": {
+    "Chiftetelli (4/4)": {
+      beats: [
+        [strong(), weak(), off(), weak(), strong(), off(), weak(), off()],
+      ],
+      bpm: 250,
+    },
+    "Paidusko (5/8)": {
+      beats: [[strong(), off(), strong(), off(), weak()]],
+      bpm: 340,
+    },
+    "Chetvorno (7/8)": {
+      beats: [[strong(), off(), weak(), strong(), off(), weak(), off()]],
+      bpm: 360,
+    },
+    "Karsilamas (9/8)": {
+      beats: [
+        [
+          strong(),
+          off(),
+          weak(),
+          off(),
+          strong(),
+          off(),
+          weak(),
+          off(),
+          weak(),
+        ],
+      ],
+      bpm: 280,
+    },
+    "Kopanitsa (11/8)": {
+      beats: [
+        [
+          strong(),
+          off(),
+          weak(),
+          off(),
+          strong(),
+          off(),
+          weak(),
+          strong(),
+          off(),
+          weak(),
+          off(),
+        ],
+      ],
+      bpm: 340,
+    },
+    "Berance (7/8 + 5/8)": {
+      beats: [
+        [strong(), off(), weak(), off(), weak(), off(), off()],
+        [strong(), off(), weak(), off(), off()],
+      ],
+      bpm: 200,
     },
   },
   Turkish: {
