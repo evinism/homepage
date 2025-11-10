@@ -36,16 +36,16 @@ export const defaultPresetStore: PresetStore = {
       beats: [[strong(), weak(), weak(), strong(), weak(), weak(), weak()]],
       bpm: 120,
     },
-    "Mandilatos (7/16)": {
+    "Mandilatos (7/8)": {
       beats: [[strong(), off(), weak(), off(), strong(), off(), weak()]],
       bpm: 240,
     },
-    "Leventikos (9/8 + 7/8)": {
+    "Leventikos (9/16 + 7/16)": {
       beats: [
         [strong(), off(), weak(), off(), weak(), off(), weak(), off(), off()],
         [strong(), off(), weak(), off(), weak(), off(), off()],
       ],
-      bpm: 250,
+      bpm: 360,
     },
     "Zebekiko (9/4)": {
       beats: [
@@ -105,11 +105,11 @@ export const defaultPresetStore: PresetStore = {
       ],
       bpm: 250,
     },
-    "Paidusko (5/8)": {
+    "Paidusko (5/16)": {
       beats: [[strong(), off(), strong(), off(), weak()]],
       bpm: 340,
     },
-    "Chetvorno (7/8)": {
+    "Chetvorno (7/16)": {
       beats: [[strong(), off(), weak(), strong(), off(), weak(), off()]],
       bpm: 360,
     },
@@ -129,7 +129,7 @@ export const defaultPresetStore: PresetStore = {
       ],
       bpm: 280,
     },
-    "Kopanitsa (11/8)": {
+    "Kopanitsa (11/16)": {
       beats: [
         [
           strong(),
@@ -205,7 +205,7 @@ export const defaultPresetStore: PresetStore = {
       ],
       bpm: 120,
     },
-    "Agir Roman (9/16)": {
+    "Agir Roman (9/8)": {
       beats: [
         [
           strong(),
