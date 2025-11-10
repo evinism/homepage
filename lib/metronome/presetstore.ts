@@ -154,6 +154,38 @@ export const defaultPresetStore: PresetStore = {
       ],
       bpm: 200,
     },
+    "Sandansko Horo (22/16)": {
+      beats: [
+        [
+          // ---
+          strong(),
+          off(),
+          weak(),
+          off(),
+          strong(),
+          off(),
+          weak(),
+          off(),
+          off(),
+          // ---
+          strong(),
+          off(),
+          weak(),
+          off(),
+          strong(),
+          off(),
+          weak(),
+          off(),
+          off(),
+          // ---
+          weak(),
+          off(),
+          weak(),
+          off(),
+        ],
+      ],
+      bpm: 320,
+    },
   },
   Turkish: {
     "Aksak Semai (10/8)": {
