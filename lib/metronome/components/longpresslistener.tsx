@@ -1,6 +1,5 @@
 import { ReactNode, UIEvent, useRef } from "react";
 
-
 const LongPressListener = ({
   onLongPress,
   onClick,
@@ -16,6 +15,9 @@ const LongPressListener = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseDown = (e: UIEvent) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
     const target = e.currentTarget as HTMLElement;
     timerRef.current = setTimeout(() => {
       onLongPress(target);
@@ -37,8 +39,7 @@ const LongPressListener = ({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      onTouchStart={handleMouseDown}
-      onTouchEnd={handleMouseUp}
+      // We ignore touch events because they seem to be less reliable across devices.
     >
       {children}
     </div>
