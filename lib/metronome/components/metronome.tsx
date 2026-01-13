@@ -27,8 +27,11 @@ import { MemoizedMeasuresSection } from "./measuressection";
 import SettingsPanel from "./settings";
 import MeasureInputSection from "./measureinputsection";
 
-const toBeat = (strength: BeatStrength): Beat => {
-  return { strength };
+const toBeat = (strength: BeatStrength, duration: number = 1): Beat => {
+  return {
+    strength,
+    duration,
+  };
 };
 
 const weak = toBeat("weak");

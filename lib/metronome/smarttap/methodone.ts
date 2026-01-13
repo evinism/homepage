@@ -246,7 +246,10 @@ const candidateToBeats = (
   return {
     value: {
       bpmMultiplier: bestBeatCount.count,
-      beats: tryReduce(quantized.value).map((strength) => ({ strength })),
+      beats: tryReduce(quantized.value).map((strength) => ({
+        strength,
+        duration: 1,
+      })),
     },
     confidence: bestBeatCount.score,
   };

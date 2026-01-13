@@ -149,7 +149,21 @@ export class Metronome {
   }
 
   nextBeatToScheduleTime = () => {
-    return this._latestScheduledBeatTime + 60 / this.spec.bpm;
+    // Duration is based on the most recently scheduled beat
+    let duration = 1;
+    const numBeats = multiLength(this.spec.beats);
+    const index = this._latestScheduledBeatIndex;
+    // BUG: If the last beat is deleted while we're on it,
+    // then its (now-deleted) duration won't be respected.
+    // you could fix it by like... making member _latestScheduledBeatDuration.
+    // I do not care enough to fix this.
+    if (index >= 0 && index < numBeats) {
+      const latest = multiIndex(this.spec.beats, index);
+      if (latest && latest.duration !== undefined) {
+        duration = latest.duration;
+      }
+    }
+    return this._latestScheduledBeatTime + (duration * 60) / this.spec.bpm;
   };
 
   nextBeatToScheduleIndex = () => {

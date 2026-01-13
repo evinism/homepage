@@ -8,9 +8,12 @@ export type PresetStore = {
   };
 };
 
-const strong = (): Beat => ({ strength: "strong" });
-const weak = (): Beat => ({ strength: "weak" });
-const off = (): Beat => ({ strength: "off" });
+const strong = (duration: number = 1): Beat => ({
+  strength: "strong",
+  duration,
+});
+const weak = (duration: number = 1): Beat => ({ strength: "weak", duration });
+const off = (duration: number = 1): Beat => ({ strength: "off", duration });
 
 export const defaultPresetStore: PresetStore = {
   Basic: {
@@ -25,6 +28,10 @@ export const defaultPresetStore: PresetStore = {
     "6/8": {
       beats: [[strong(), weak(), weak(), strong(), weak(), weak()]],
       bpm: 180,
+    },
+    test: {
+      beats: [[strong(1), weak(1), strong(1 / 3), weak(1 / 3), weak(1 / 3)]],
+      bpm: 120,
     },
   },
   Greek: {
