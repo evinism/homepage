@@ -8,13 +8,13 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/sleep",
-        destination: "/zzzmachine",
+        source: "/zzzmachine",
+        destination: "/sleep",
         permanent: false,
       },
       {
         source: "/zzzmaker",
-        destination: "/zzzmachine",
+        destination: "/sleep",
         permanent: false,
       },
     ];
@@ -28,6 +28,16 @@ const nextConfig = {
           {
             type: "host",
             value: "tacotacoburrito.com",
+          },
+        ],
+      },
+      {
+        source: "/",
+        destination: "/sleep",
+        has: [
+          {
+            type: "host",
+            value: "sleep.evin.dev",
           },
         ],
       },

@@ -3,8 +3,6 @@ import { load, toggleActivate } from "../lib/sleep/sleep.js";
 import {
   createTheme,
   CssBaseline,
-  IconButton,
-  Paper,
   Slider,
   Stack,
   ThemeProvider,
