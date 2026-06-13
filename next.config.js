@@ -23,16 +23,6 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/metronome",
-        has: [
-          {
-            type: "host",
-            value: "tacotacoburrito.com",
-          },
-        ],
-      },
-      {
-        source: "/",
         destination: "/sleep",
         has: [
           {
