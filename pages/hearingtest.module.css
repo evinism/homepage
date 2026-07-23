@@ -1,0 +1,98 @@
+.page {
+  max-width: 500px;
+  margin: 2em auto;
+  padding: 0 1em;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.bestScore {
+  font-weight: bold;
+}
+
+.primaryButton {
+  font-size: 1.5em;
+  padding: 0.5em 1.5em;
+  margin-top: 1em;
+  cursor: pointer;
+}
+
+.primaryButton:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.stageInfo {
+  margin-bottom: 1.5em;
+}
+
+.frequency {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.25em 0;
+}
+
+.question {
+  font-size: 1.2em;
+  margin-bottom: 0.75em;
+}
+
+.answerButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+
+.answerButton {
+  font-size: 1.5em;
+  padding: 0.5em 2em;
+  cursor: pointer;
+}
+
+.skipButton {
+  margin-top: 1.5em;
+  font-size: 1em;
+  padding: 0.4em 1.2em;
+  cursor: pointer;
+}
+
+.hint {
+  display: block;
+  font-size: 0.55em;
+  opacity: 0.6;
+}
+
+.skipButton .hint {
+  display: inline;
+  font-size: 0.85em;
+}
+
+.page kbd {
+  font-family: monospace;
+  border: 1px solid #888;
+  border-radius: 3px;
+  padding: 0 0.35em;
+  background: #f0f0f0;
+}
+
+.resultsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.resultsTable th,
+.resultsTable td {
+  border: 1px solid #888;
+  padding: 0.4em 0.6em;
+}
+
+.pass {
+  color: #2a7a2a;
+  font-weight: bold;
+}
+
+.fail {
+  color: #b02a2a;
+  font-weight: bold;
+}
